@@ -1,18 +1,35 @@
+#if defined(ARDUINO)
+#else
+
 #include "ofApp.h"
+
+#include "Engine.h"
+
+GraphicsPC gfx_t;
+Engine engine(&gfx_t);
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	ofSetWindowShape(SCREEN_WIDTH *8, SCREEN_HEIGHT*8);
+	ofSetWindowPosition(100, 100);
+	ofBackground(0, 0, 0);
 
+	ofSetRectMode(OF_RECTMODE_CORNER);
+
+	ofSetFrameRate(60);
+
+	engine.init();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	engine.updateModel();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+	ofBackground(ofColor::black);
+	engine.composeFrame();
 }
 
 //--------------------------------------------------------------
@@ -69,3 +86,6 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
+
+
+#endif

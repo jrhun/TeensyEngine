@@ -1,5 +1,8 @@
 #pragma once
 
+#if defined(ARDUINO)
+#else
+
 #include "ofMain.h"
 
 class ofApp : public ofBaseApp{
@@ -22,3 +25,5 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 };
+
+#endif

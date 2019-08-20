@@ -1,3 +1,7 @@
+#if defined(ARDUINO)
+#else
+
+
 #include "ofMain.h"
 #include "ofApp.h"
 
@@ -11,3 +15,6 @@ int main( ){
 	ofRunApp(new ofApp());
 
 }
+
+
+#endif
