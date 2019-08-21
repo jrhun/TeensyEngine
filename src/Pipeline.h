@@ -25,8 +25,44 @@ public:
 			// cull backfacing triangles with cross product (%) shenanigans
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
 			{
-				// process 3 vertices into a triangle
 				ProcessTriangle(v0, v1, v2, i);
+				//// process 3 vertices into a triangle
+				//unsigned char hue = ((i / 2) * 40)%255;
+				//Vec3 c;
+				//switch (i / 2) {
+				//case 0:
+				//	c = { 255,0,0 };
+				//	break;
+				//case 1:
+				//	c = { 255,255,0 };
+				//	break;
+				//case 2:
+				//	c = { 0,255,0 };
+				//	break;
+				//case 3:
+				//	c = { 0,255,255 };
+				//	break;
+				//case 4:
+				//	c = { 0,0,255 };
+				//	break;
+				//case 5:
+				//	c = { 255,0,255 };
+				//	break;
+				//};
+
+
+				//GSVertex gs0(v0);
+				////gs0.pos = v0;
+				//GSVertex gs1(v1);
+				//GSVertex gs2(v2);
+
+				//sst.TransformSphere(gs0.pos);
+				//sst.TransformSphere(gs1.pos);
+				//sst.TransformSphere(gs2.pos);
+
+
+				//gfx.drawTriangle(gs0.pos, gs1.pos, gs2.pos, c);
+				//PostProcessTriangleVertices(t);
 			}
 		}
 	}
@@ -39,11 +75,27 @@ public:
 		// cull + clip
 
 		// 
-		sst.Transform(v0);
-		sst.Transform(v1);
-		sst.Transform(v2);
+		sst.TransformSphere(v0);
+		sst.TransformSphere(v1);
+		sst.TransformSphere(v2);
 
-		unsigned char hue = (triangle_index / 2) * 40;
+		// take into account borders
+		// assumes that we won't be drawing triangles wider than 32 in x axis around borders
+		bool oneGreater = false;
+		const float lower = SCREEN_WIDTH / 4;
+		const float upper = 3 * SCREEN_WIDTH / 4;
+		if (v0.x > upper || v1.x > upper || v2.x > upper)
+			oneGreater = true;
+		if (oneGreater) {
+			if (v0.x < lower)
+				v0.x += SCREEN_WIDTH;
+			if (v1.x < lower)
+				v1.x += SCREEN_WIDTH;
+			if (v2.x < lower)
+				v2.x += SCREEN_WIDTH;
+		}
+
+		unsigned char hue = ((triangle_index / 2) * 40) %256;
 		Vec3 c;
 		switch (triangle_index / 2) {
 		case 0:
@@ -68,6 +120,68 @@ public:
 
 
 		gfx.drawTriangle(v0, v1, v2, c);
+
+	}
+
+	void ClipCullTriangle(Triangle<GSVertex>& t)
+	{
+		// cull tests
+		if (t.v0.pos.y > 1.0f &&
+			t.v1.pos.y > 1.0f &&
+			t.v2.pos.y > 1.0f)
+		{
+			return;
+		}
+		if (t.v0.pos.y < -1.0f &&
+			t.v1.pos.y < -1.0f &&
+			t.v2.pos.y < -1.0f)
+		{
+			return;
+		}
+
+		// clipping routines
+		const auto Clip1 = [this](GSVertex& v0, GSVertex& v1, GSVertex& v2)
+		{
+			// calculate alpha values for getting adjusted vertices
+			const float alphaA = (-v0.pos.z) / (v1.pos.z - v0.pos.z);
+			const float alphaB = (-v0.pos.z) / (v2.pos.z - v0.pos.z);
+			// interpolate to get v0a and v0b
+			const auto v0a = interpolate(v0, v1, alphaA);
+			const auto v0b = interpolate(v0, v2, alphaB);
+			// draw triangles
+			PostProcessTriangleVertices(Triangle<GSVertex>{ v0a, v1, v2 });
+			PostProcessTriangleVertices(Triangle<GSVertex>{ v0b, v0a, v2 });
+		};
+		const auto Clip2 = [this](GSVertex& v0, GSVertex& v1, GSVertex& v2)
+		{
+			// calculate alpha values for getting adjusted vertices
+			const float alpha0 = (-v0.pos.z) / (v2.pos.z - v0.pos.z);
+			const float alpha1 = (-v1.pos.z) / (v2.pos.z - v1.pos.z);
+			// interpolate to get v0a and v0b
+			v0 = interpolate(v0, v2, alpha0);
+			v1 = interpolate(v1, v2, alpha1);
+			// draw triangles
+			PostProcessTriangleVertices(Triangle<GSVertex>{ v0, v1, v2 });
+		};
+
+
+		// near clipping tests
+		PostProcessTriangleVertices(t);
+	}
+
+	void PostProcessTriangleVertices(Triangle<GSVertex> t) {
+		// GS returns triangle which has copies of vertexs
+		// cull + clip
+
+		// 
+		sst.TransformSphere(t.v0.pos);
+		sst.TransformSphere(t.v1.pos);
+		sst.TransformSphere(t.v2.pos);
+
+
+
+
+		gfx.drawTriangle(t.v0.pos, t.v1.pos, t.v2.pos, t.v0.col);
 
 	}
 

@@ -22,7 +22,29 @@ T interpolate(const T& src, const T& dst, float alpha)
 }
 
 #if defined(ARDUINO)
+#define FLT_EPSILON      1.192092896e-07F   
+float myMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 
+	if (fabs(inputMin - inputMax) < FLT_EPSILON) {
+		return outputMin;
+	}
+	else {
+		float outVal = ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin);
+
+		if (clamp) {
+			if (outputMax < outputMin) {
+				if (outVal < outputMax)outVal = outputMax;
+				else if (outVal > outputMin)outVal = outputMin;
+			}
+			else {
+				if (outVal > outputMax)outVal = outputMax;
+				else if (outVal < outputMin)outVal = outputMin;
+			}
+		}
+		return outVal;
+	}
+
+}
 #else
 #include "ofMath.h"
 //#include "math.h"

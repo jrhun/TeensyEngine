@@ -4,6 +4,7 @@
 #define SCREEN_HEIGHT	32
 
 #include "Vec3.h"
+#include "Geometry.h"
 #include <limits>
 
 class Graphics {
@@ -30,21 +31,23 @@ public:
 	virtual void putPixel(int x, int y, unsigned char h) {};
 
 	void drawPointDepth(Vec3 &v, unsigned char r, unsigned char g, unsigned char b) {
-		if (testAndSetZ(v.x, v.y, v.z)) {
+		if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
 			float z = v.z;
 			r = r * z / 255;
 			g = g * z / 255;
 			b = b * z / 255;
-			putPixel(v.x, v.y, r, g, b);
+			//putPixel( (int(v.x) + SCREEN_WIDTH) % SCREEN_WIDTH, v.y, r, g, b);
+			putPixel(int(v.x) % SCREEN_WIDTH, v.y, r, g, b);
 		}
 	}
 
 	void drawPointDepth(int16_t x, int16_t y, int16_t z, unsigned char r, unsigned char g, unsigned char b) {
-		if (testAndSetZ(x, y, z)) {
+		if (testAndSetZ(x % SCREEN_WIDTH, y, z)) {
 			r = r * z / 255;
 			g = g * z / 255;
 			b = b * z / 255;
-			putPixel(x, y, r, g, b);
+			//putPixel((x + SCREEN_WIDTH) % SCREEN_WIDTH, y, r, g, b);
+			putPixel((x) % SCREEN_WIDTH, y, r, g, b);
 		}
 	}
 
@@ -69,8 +72,8 @@ public:
 		z1 = dm / 2; /* error offset */
 
 		for (;;) { /* loop */
-			drawPointDepth(x0,y0,z0, r, g, b);
-
+			//drawPointDepth((x0+SCREEN_WIDTH) % SCREEN_WIDTH,y0,z0, r, g, b);
+			drawPointDepth((x0+ SCREEN_WIDTH) % SCREEN_WIDTH, y0, z0, r, g, b);
 			if (i-- == 0) break;
 			x1 -= dx;
 			if (x1 < 0) {
@@ -89,11 +92,13 @@ public:
 			}
 		}
 	}
-
+	//void drawTriangle()
 	void drawTriangle(const Vec3 &v0, const Vec3 &v1, const Vec3 &v2, Vec3 &c) {
 		const Vec3* pv0 = &v0;
 		const Vec3* pv1 = &v1;
 		const Vec3* pv2 = &v2;
+
+		// offset x by screen width to x 
 
 		// sorting vertices by y
 		if (pv1->y < pv0->y) std::swap(pv0, pv1);
@@ -203,73 +208,15 @@ public:
 		}
 	}
 
-
-
-	//void DrawLineDepth(const Vec3& v0, const Vec3& v1, unsigned char r, unsigned char g, unsigned char b)
-	//{
-	//	Vec3
-
-	//	float dx = v1.x - v0.x;
-	//	float dy = v1.y - v0.y;
-
-	//	if (dy == 0.0f && dx == 0.0f)
-	//	{
-	//	}
-	//	else if (abs(dy) > abs(dx))
-	//	{
-	//		if (dy < 0.0f)
-	//		{
-	//			std::swap(v0, v1);
-	//			dy = -dy;
-	//		}
-
-	//		const auto dv = (v1 - v0) / dy;
-	//		for (auto v = v0; v.y < v1.y; v += dv)
-	//		{
-	//			const auto x = int(v.x);
-	//			const auto y = int(v.y);
-	//			if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT)
-	//			{
-	//				continue;
-	//			}
-	//			//if (testAndSetZ(x, y, v.z))
-	//			//{
-	//				drawPointDepth(v, r, g, b);
-	//			//}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (dx < 0.0f)
-	//		{
-	//			std::swap(v0, v1);
-	//			dx = -dx;
-	//		}
-
-	//		const auto dv = (v1 - v0) / dx;
-	//		for (auto v = v0; v.x < v1.x; v += dv)
-	//		{
-	//			const auto x = int(v.x);
-	//			const auto y = int(v.y);
-	//			if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT)
-	//			{
-	//				continue;
-	//			}
-	//			//if (testAndSetZ(x, y, v.z))
-	//			//{
-	//				drawPointDepth(v, r, g, b);
-	//			//}
-	//		}
-	//	}
-	//}
-
 	void resetZ() {
 		for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
 			zBuffer[i] = 0;// std::numeric_limits<float>::infinity();
 		}
 	}
+	
 
 	bool testAndSetZ(int x, int y, float depth) {
+		x = (x + SCREEN_WIDTH) % SCREEN_WIDTH;
 		if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT) {
 			float &val = zBuffer[x + y * SCREEN_WIDTH];
 			if (depth > val) {
