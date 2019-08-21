@@ -6,7 +6,7 @@
 #include "Engine.h"
 
 GraphicsPC gfx_t;
-Engine engine(&gfx_t);
+Engine engine(gfx_t);
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -23,12 +23,13 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	engine.updateModel();
+	
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	ofBackground(ofColor::black);
+	engine.updateModel();
 	engine.composeFrame();
 }
 

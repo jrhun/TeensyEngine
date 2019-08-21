@@ -103,6 +103,8 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <LanguageStandard>
+      </LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -185,12 +187,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Color.h" />
+    <ClInclude Include="src\Cube.h" />
     <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\GraphicsPC.h" />
+    <ClInclude Include="src\Mat.h" />
     <ClInclude Include="src\mathHelpers.h" />
     <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\Pipeline.h" />
+    <ClInclude Include="src\ScreenTransform.h" />
+    <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\Vec3.h" />
+    <ClInclude Include="src\Vec4.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

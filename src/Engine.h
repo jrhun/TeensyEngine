@@ -12,20 +12,33 @@
 
 #include "ScreenTransform.h"
 #include "Cube.h"
+#include "Mat.h"
+#include "Vec3.h"
+#include "Pipeline.h"
+#include "Geometry.h"
+#include "mathHelpers.h"
 
 
 class Engine {
 public:
-	Engine(Graphics *gfx) : gfx(gfx) {
-		sst.width = SCREEN_WIDTH;
-		sst.height = SCREEN_HEIGHT;
-	}
+	//typedef Pipeline<Vertex> Pipeline;
+public:
+	Engine(Graphics &gfx) : 
+		gfx(gfx),
+		sst(SCREEN_WIDTH,SCREEN_HEIGHT),
+		pipeline(gfx, sst) {}
 
 
-
+	float cameraOffset = 2.0f;
+	float offsetDir = 1.0f;
 
 	void updateModel() {
 		incAngle();
+		if (cameraOffset > 4)
+			offsetDir = -1.0f;
+		if (cameraOffset < 2)
+			offsetDir = 1.0f;
+		cameraOffset += 0.01 * offsetDir;
 		// set each objects translation matrix to rotate seprately
 		// 
 	}
@@ -34,42 +47,94 @@ public:
 
 	void composeFrame() {
 		// pipeline!
+		
+		gfx.resetZ();
 		//for each object
 		//generate list of vertex
 		//send to pipeline
-		auto lines = cube.GetLines();
+		for (int i = 0; i < 16; i++) {
+			float r = 1;
+			float theta = myMap(i, 0, 16, 0, PI);
+			float x = r * cos(theta);
+			float z = r * sin(theta);
+			for (int j = 0; j < 8; j++) {
+				float y = (j * 2.0) / 16.0f - 0.5f;
+				Mat3 m = Mat3::RotationY(anglex);
+				Vec3 v(x,y,z);
+				v = v * m;
+				v.z += 1;
+				sst.Transform(v);
+				gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16, (i * 255 / 32) % 255);
+			}
+		}
+
+
+	}
+
+
+
+	void grid() {
+		for (int i = 0; i < 16; i++) {
+			float x = (i * 2.0) / 16.0f - 1.0f;
+			for (int j = 0; j < 8; j++) {
+				float y = (j * 2.0) / 16.0f - 0.5f;
+				Vec3 v(x*2, y * 2, cameraOffset);
+				sst.Transform(v);
+				gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16,( i * 255 / 32)%255);
+
+			}
+		}
+	}
+
+	void solidCube() {
+		auto it = cube.getTriangles<Vertex>(1.0f);
+		for (auto &v : it.vertices) {
+			Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
+			v.pos = v.pos * m;
+			v.pos.z += cameraOffset;
+		}
+		pipeline.Draw(it);
+	}
+
+	void wireFrame() {
+		auto lines = cube.getLines();
 		for (auto &v : lines.vertices) {
-			v.pos.z += 1.0f;
-			sst.Transform(v.pos);
+			Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
+			v = v * m;
+			v.z += cameraOffset;
+			sst.Transform(v);
+		}
+		for (auto i = 0; i < lines.indices.size() / 2; i++) {
+			gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], 0, 50, 255);
 		}
 	}
 
 	void drawTest() {
-		gfx->resetZ();
+		gfx.resetZ();
 		for (int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++) {
 				Vec3 a(i, i, 0);
 				Vec3 b(i + 30, i, 255);
-				gfx->DrawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
+				gfx.drawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
 				//gfx->putPixel(i, i+j, (i / 20.0) * (j / 20.0) * 255);
 			}
 		}
 	}
 
 	void init() {
-		gfx->init();
+		gfx.init();
 	}
 
 	void clear() {
-		gfx->clear();
+		gfx.clear();
 	}
 
 	void fade(unsigned char a) {
-		gfx->fade(a);
+		gfx.fade(a);
 	}
 
 	void show() {
-		gfx->show();
+		gfx.show();
 	}
 
 	float anglex = 0;
@@ -84,8 +149,9 @@ public:
 			angley -= TWO_PI;
 	}
 
-	Graphics * gfx;
+	Graphics &gfx;
 	ScreenTransform sst;
+	Pipeline<Vertex> pipeline;
 };
 
 
