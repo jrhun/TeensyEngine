@@ -23,6 +23,8 @@ T interpolate(const T& src, const T& dst, float alpha)
 
 #if defined(ARDUINO)
 #define FLT_EPSILON      1.192092896e-07F   
+
+
 float myMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 
 	if (fabs(inputMin - inputMax) < FLT_EPSILON) {

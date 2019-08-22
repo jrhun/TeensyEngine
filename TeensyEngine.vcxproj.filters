@@ -62,13 +62,19 @@
     <ClInclude Include="src\Particle.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Patterns\PatternList.h">
-      <Filter>src\Patterns</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Patterns\Patterns.h">
-      <Filter>src\Patterns</Filter>
-    </ClInclude>
     <ClInclude Include="src\Patterns\FastLED_PC.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\Pattern.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternBeachWaves.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternController.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternSpiral.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
   </ItemGroup>

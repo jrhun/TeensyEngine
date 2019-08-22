@@ -13,6 +13,7 @@ typedef uint32_t  accum1616;///< ANSI: signed         _Accum. 16 bits int, 16 bi
 typedef int32_t   saccum1516;///< ANSI: signed         _Accum. 15 bits int, 16 bits fraction
 typedef uint16_t  accum124; ///< no direct ANSI counterpart. 12 bits int, 4 bits fraction
 typedef int32_t   saccum114;///< no direct ANSI counterpart. 1 bit int, 14 bits fraction
+typedef uint8_t	  byte;
 
 /// typedef for IEEE754 "binary32" float type internals
 typedef union {

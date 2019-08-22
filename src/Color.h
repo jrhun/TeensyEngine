@@ -3,7 +3,11 @@
 
 #if defined(ARDUINO)
 #include "FastLED.h"
+
+
 #else
+
+
 #include "Patterns/FastLED_PC.h"
 
 struct CRGB;
@@ -301,6 +305,8 @@ struct CRGB {
 		return *this;
 	}
 
+	
+
 	/// scale down a RGB to N 256ths of it's current brightness, using
 	/// 'video' dimming rules, which means that unless the scale factor is ZERO
 	/// each channel is guaranteed NOT to dim down to zero.  If it's already
@@ -438,6 +444,7 @@ struct CRGB {
 		cleanup_R1();
 		return luma;
 	}
+
 
 	/// Get the average of the R, G, and B values
 	inline uint8_t getAverageLight()  const {
@@ -1154,6 +1161,762 @@ void hsv2rgb_spectrum(const struct CHSV* phsv, struct CRGB * prgb, int numLeds) 
 		hsv2rgb_spectrum(phsv[i], prgb[i]);
 	}
 }
+
+
+typedef enum { FORWARD_HUES, BACKWARD_HUES, SHORTEST_HUES, LONGEST_HUES } TGradientDirectionCode;
+#define saccum87 int16_t
+
+
+template <typename T>
+void fill_gradient(T* targetArray,
+	uint16_t startpos, CHSV startcolor,
+	uint16_t endpos, CHSV endcolor,
+	TGradientDirectionCode directionCode = SHORTEST_HUES)
+{
+	// if the points are in the wrong order, straighten them
+	if (endpos < startpos) {
+		uint16_t t = endpos;
+		CHSV tc = endcolor;
+		endcolor = startcolor;
+		endpos = startpos;
+		startpos = t;
+		startcolor = tc;
+	}
+
+	// If we're fading toward black (val=0) or white (sat=0),
+	// then set the endhue to the starthue.
+	// This lets us ramp smoothly to black or white, regardless
+	// of what 'hue' was set in the endcolor (since it doesn't matter)
+	if (endcolor.value == 0 || endcolor.saturation == 0) {
+		endcolor.hue = startcolor.hue;
+	}
+
+	// Similarly, if we're fading in from black (val=0) or white (sat=0)
+	// then set the starthue to the endhue.
+	// This lets us ramp smoothly up from black or white, regardless
+	// of what 'hue' was set in the startcolor (since it doesn't matter)
+	if (startcolor.value == 0 || startcolor.saturation == 0) {
+		startcolor.hue = endcolor.hue;
+	}
+
+	saccum87 huedistance87;
+	saccum87 satdistance87;
+	saccum87 valdistance87;
+
+	satdistance87 = (endcolor.sat - startcolor.sat) << 7;
+	valdistance87 = (endcolor.val - startcolor.val) << 7;
+
+	uint8_t huedelta8 = endcolor.hue - startcolor.hue;
+
+	if (directionCode == SHORTEST_HUES) {
+		directionCode = FORWARD_HUES;
+		if (huedelta8 > 127) {
+			directionCode = BACKWARD_HUES;
+		}
+	}
+
+	if (directionCode == LONGEST_HUES) {
+		directionCode = FORWARD_HUES;
+		if (huedelta8 < 128) {
+			directionCode = BACKWARD_HUES;
+		}
+	}
+
+	if (directionCode == FORWARD_HUES) {
+		huedistance87 = huedelta8 << 7;
+	}
+	else /* directionCode == BACKWARD_HUES */
+	{
+		huedistance87 = (uint8_t)(256 - huedelta8) << 7;
+		huedistance87 = -huedistance87;
+	}
+
+	uint16_t pixeldistance = endpos - startpos;
+	int16_t divisor = pixeldistance ? pixeldistance : 1;
+
+	saccum87 huedelta87 = huedistance87 / divisor;
+	saccum87 satdelta87 = satdistance87 / divisor;
+	saccum87 valdelta87 = valdistance87 / divisor;
+
+	huedelta87 *= 2;
+	satdelta87 *= 2;
+	valdelta87 *= 2;
+
+	accum88 hue88 = startcolor.hue << 8;
+	accum88 sat88 = startcolor.sat << 8;
+	accum88 val88 = startcolor.val << 8;
+	for (uint16_t i = startpos; i <= endpos; i++) {
+		targetArray[i] = CHSV(hue88 >> 8, sat88 >> 8, val88 >> 8);
+		hue88 += huedelta87;
+		sat88 += satdelta87;
+		val88 += valdelta87;
+	}
+}
+
+
+// Convenience functions to fill an array of colors with a
+// two-color, three-color, or four-color gradient
+template <typename T>
+void fill_gradient(T* targetArray, uint16_t numLeds, const CHSV& c1, const CHSV& c2,
+	TGradientDirectionCode directionCode = SHORTEST_HUES)
+{
+	uint16_t last = numLeds - 1;
+	fill_gradient(targetArray, 0, c1, last, c2, directionCode);
+}
+
+template <typename T>
+void fill_gradient(T* targetArray, uint16_t numLeds,
+	const CHSV& c1, const CHSV& c2, const CHSV& c3,
+	TGradientDirectionCode directionCode = SHORTEST_HUES)
+{
+	uint16_t half = (numLeds / 2);
+	uint16_t last = numLeds - 1;
+	fill_gradient(targetArray, 0, c1, half, c2, directionCode);
+	fill_gradient(targetArray, half, c2, last, c3, directionCode);
+}
+
+template <typename T>
+void fill_gradient(T* targetArray, uint16_t numLeds,
+	const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4,
+	TGradientDirectionCode directionCode = SHORTEST_HUES)
+{
+	uint16_t onethird = (numLeds / 3);
+	uint16_t twothirds = ((numLeds * 2) / 3);
+	uint16_t last = numLeds - 1;
+	fill_gradient(targetArray, 0, c1, onethird, c2, directionCode);
+	fill_gradient(targetArray, onethird, c2, twothirds, c3, directionCode);
+	fill_gradient(targetArray, twothirds, c3, last, c4, directionCode);
+}
+
+void fill_solid(struct CRGB * leds, int numToFill,
+	const struct CRGB& color)
+{
+	for (int i = 0; i < numToFill; i++) {
+		leds[i] = color;
+	}
+}
+
+void fill_solid(struct CHSV * targetArray, int numToFill,
+	const struct CHSV& hsvColor)
+{
+	for (int i = 0; i < numToFill; i++) {
+		targetArray[i] = hsvColor;
+	}
+}
+
+void fill_rainbow(struct CRGB * pFirstLED, int numToFill,
+	uint8_t initialhue,
+	uint8_t deltahue)
+{
+	CHSV hsv;
+	hsv.hue = initialhue;
+	hsv.val = 255;
+	hsv.sat = 240;
+	for (int i = 0; i < numToFill; i++) {
+		pFirstLED[i] = hsv;
+		hsv.hue += deltahue;
+	}
+}
+
+void fill_rainbow(struct CHSV * targetArray, int numToFill,
+	uint8_t initialhue,
+	uint8_t deltahue)
+{
+	CHSV hsv;
+	hsv.hue = initialhue;
+	hsv.val = 255;
+	hsv.sat = 240;
+	for (int i = 0; i < numToFill; i++) {
+		targetArray[i] = hsv;
+		hsv.hue += deltahue;
+	}
+}
+
+
+void fill_gradient_RGB(CRGB* leds,
+	uint16_t startpos, CRGB startcolor,
+	uint16_t endpos, CRGB endcolor)
+{
+	// if the points are in the wrong order, straighten them
+	if (endpos < startpos) {
+		uint16_t t = endpos;
+		CRGB tc = endcolor;
+		endcolor = startcolor;
+		endpos = startpos;
+		startpos = t;
+		startcolor = tc;
+	}
+
+	saccum87 rdistance87;
+	saccum87 gdistance87;
+	saccum87 bdistance87;
+
+	rdistance87 = (endcolor.r - startcolor.r) << 7;
+	gdistance87 = (endcolor.g - startcolor.g) << 7;
+	bdistance87 = (endcolor.b - startcolor.b) << 7;
+
+	uint16_t pixeldistance = endpos - startpos;
+	int16_t divisor = pixeldistance ? pixeldistance : 1;
+
+	saccum87 rdelta87 = rdistance87 / divisor;
+	saccum87 gdelta87 = gdistance87 / divisor;
+	saccum87 bdelta87 = bdistance87 / divisor;
+
+	rdelta87 *= 2;
+	gdelta87 *= 2;
+	bdelta87 *= 2;
+
+	accum88 r88 = startcolor.r << 8;
+	accum88 g88 = startcolor.g << 8;
+	accum88 b88 = startcolor.b << 8;
+	for (uint16_t i = startpos; i <= endpos; i++) {
+		leds[i] = CRGB(r88 >> 8, g88 >> 8, b88 >> 8);
+		r88 += rdelta87;
+		g88 += gdelta87;
+		b88 += bdelta87;
+	}
+}
+
+void fill_gradient_RGB(CRGB* leds, uint16_t numLeds, const CRGB& c1, const CRGB& c2)
+{
+	uint16_t last = numLeds - 1;
+	fill_gradient_RGB(leds, 0, c1, last, c2);
+}
+
+
+void fill_gradient_RGB(CRGB* leds, uint16_t numLeds, const CRGB& c1, const CRGB& c2, const CRGB& c3)
+{
+	uint16_t half = (numLeds / 2);
+	uint16_t last = numLeds - 1;
+	fill_gradient_RGB(leds, 0, c1, half, c2);
+	fill_gradient_RGB(leds, half, c2, last, c3);
+}
+
+void fill_gradient_RGB(CRGB* leds, uint16_t numLeds, const CRGB& c1, const CRGB& c2, const CRGB& c3, const CRGB& c4)
+{
+	uint16_t onethird = (numLeds / 3);
+	uint16_t twothirds = ((numLeds * 2) / 3);
+	uint16_t last = numLeds - 1;
+	fill_gradient_RGB(leds, 0, c1, onethird, c2);
+	fill_gradient_RGB(leds, onethird, c2, twothirds, c3);
+	fill_gradient_RGB(leds, twothirds, c3, last, c4);
+}
+
+
+void nscale8(CRGB* leds, uint16_t num_leds, uint8_t scale);
+
+void nscale8_video(CRGB* leds, uint16_t num_leds, uint8_t scale)
+{
+	for (uint16_t i = 0; i < num_leds; i++) {
+		leds[i].nscale8_video(scale);
+	}
+}
+
+void fade_video(CRGB* leds, uint16_t num_leds, uint8_t fadeBy)
+{
+	nscale8_video(leds, num_leds, 255 - fadeBy);
+}
+
+void fadeLightBy(CRGB* leds, uint16_t num_leds, uint8_t fadeBy)
+{
+	nscale8_video(leds, num_leds, 255 - fadeBy);
+}
+
+
+void fadeToBlackBy(CRGB* leds, uint16_t num_leds, uint8_t fadeBy)
+{
+	nscale8(leds, num_leds, 255 - fadeBy);
+}
+
+void fade_raw(CRGB* leds, uint16_t num_leds, uint8_t fadeBy)
+{
+	nscale8(leds, num_leds, 255 - fadeBy);
+}
+
+void nscale8_raw(CRGB* leds, uint16_t num_leds, uint8_t scale)
+{
+	nscale8(leds, num_leds, scale);
+}
+
+void nscale8(CRGB* leds, uint16_t num_leds, uint8_t scale)
+{
+	for (uint16_t i = 0; i < num_leds; i++) {
+		leds[i].nscale8(scale);
+	}
+}
+
+void fadeUsingColor(CRGB* leds, uint16_t numLeds, const CRGB& colormask)
+{
+	uint8_t fr, fg, fb;
+	fr = colormask.r;
+	fg = colormask.g;
+	fb = colormask.b;
+
+	for (uint16_t i = 0; i < numLeds; i++) {
+		leds[i].r = scale8_LEAVING_R1_DIRTY(leds[i].r, fr);
+		leds[i].g = scale8_LEAVING_R1_DIRTY(leds[i].g, fg);
+		leds[i].b = scale8(leds[i].b, fb);
+	}
+}
+
+
+CRGB& nblend(CRGB& existing, const CRGB& overlay, fract8 amountOfOverlay)
+{
+	if (amountOfOverlay == 0) {
+		return existing;
+	}
+
+	if (amountOfOverlay == 255) {
+		existing = overlay;
+		return existing;
+	}
+
+#if 0
+	// Old blend method which unfortunately had some rounding errors
+	fract8 amountOfKeep = 255 - amountOfOverlay;
+
+	existing.red = scale8_LEAVING_R1_DIRTY(existing.red, amountOfKeep)
+		+ scale8_LEAVING_R1_DIRTY(overlay.red, amountOfOverlay);
+	existing.green = scale8_LEAVING_R1_DIRTY(existing.green, amountOfKeep)
+		+ scale8_LEAVING_R1_DIRTY(overlay.green, amountOfOverlay);
+	existing.blue = scale8_LEAVING_R1_DIRTY(existing.blue, amountOfKeep)
+		+ scale8_LEAVING_R1_DIRTY(overlay.blue, amountOfOverlay);
+
+	cleanup_R1();
+#else
+	// Corrected blend method, with no loss-of-precision rounding errors
+	existing.red = blend8(existing.red, overlay.red, amountOfOverlay);
+	existing.green = blend8(existing.green, overlay.green, amountOfOverlay);
+	existing.blue = blend8(existing.blue, overlay.blue, amountOfOverlay);
+#endif
+
+	return existing;
+}
+
+
+
+void nblend(CRGB* existing, CRGB* overlay, uint16_t count, fract8 amountOfOverlay)
+{
+	for (uint16_t i = count; i; i--) {
+		nblend(*existing, *overlay, amountOfOverlay);
+		existing++;
+		overlay++;
+	}
+}
+
+CRGB blend(const CRGB& p1, const CRGB& p2, fract8 amountOfP2)
+{
+	CRGB nu(p1);
+	nblend(nu, p2, amountOfP2);
+	return nu;
+}
+
+CRGB* blend(const CRGB* src1, const CRGB* src2, CRGB* dest, uint16_t count, fract8 amountOfsrc2)
+{
+	for (uint16_t i = 0; i < count; i++) {
+		dest[i] = blend(src1[i], src2[i], amountOfsrc2);
+	}
+	return dest;
+}
+
+
+
+CHSV& nblend(CHSV& existing, const CHSV& overlay, fract8 amountOfOverlay, TGradientDirectionCode directionCode)
+{
+	if (amountOfOverlay == 0) {
+		return existing;
+	}
+
+	if (amountOfOverlay == 255) {
+		existing = overlay;
+		return existing;
+	}
+
+	fract8 amountOfKeep = 255 - amountOfOverlay;
+
+	uint8_t huedelta8 = overlay.hue - existing.hue;
+
+	if (directionCode == SHORTEST_HUES) {
+		directionCode = FORWARD_HUES;
+		if (huedelta8 > 127) {
+			directionCode = BACKWARD_HUES;
+		}
+	}
+
+	if (directionCode == LONGEST_HUES) {
+		directionCode = FORWARD_HUES;
+		if (huedelta8 < 128) {
+			directionCode = BACKWARD_HUES;
+		}
+	}
+
+	if (directionCode == FORWARD_HUES) {
+		existing.hue = existing.hue + scale8(huedelta8, amountOfOverlay);
+	}
+	else /* directionCode == BACKWARD_HUES */
+	{
+		huedelta8 = -huedelta8;
+		existing.hue = existing.hue - scale8(huedelta8, amountOfOverlay);
+	}
+
+	existing.sat = scale8_LEAVING_R1_DIRTY(existing.sat, amountOfKeep)
+		+ scale8_LEAVING_R1_DIRTY(overlay.sat, amountOfOverlay);
+	existing.val = scale8_LEAVING_R1_DIRTY(existing.val, amountOfKeep)
+		+ scale8_LEAVING_R1_DIRTY(overlay.val, amountOfOverlay);
+
+	cleanup_R1();
+
+	return existing;
+}
+
+
+
+void nblend(CHSV* existing, CHSV* overlay, uint16_t count, fract8 amountOfOverlay, TGradientDirectionCode directionCode)
+{
+	if (existing == overlay) return;
+	for (uint16_t i = count; i; i--) {
+		nblend(*existing, *overlay, amountOfOverlay, directionCode);
+		existing++;
+		overlay++;
+	}
+}
+
+CHSV blend(const CHSV& p1, const CHSV& p2, fract8 amountOfP2, TGradientDirectionCode directionCode)
+{
+	CHSV nu(p1);
+	nblend(nu, p2, amountOfP2, directionCode);
+	return nu;
+}
+
+CHSV* blend(const CHSV* src1, const CHSV* src2, CHSV* dest, uint16_t count, fract8 amountOfsrc2, TGradientDirectionCode directionCode)
+{
+	for (uint16_t i = 0; i < count; i++) {
+		dest[i] = blend(src1[i], src2[i], amountOfsrc2, directionCode);
+	}
+	return dest;
+}
+
+// CRGBSet
+
+#ifndef abs
+#include <stdlib.h>
+#endif
+
+/// Represents a set of CRGB led objects.  Provides the [] array operator, and works like a normal array in that case.
+/// This should be kept in sync with the set of functions provided by CRGB as well as functions in colorutils.  Note
+/// that a pixel set is a window into another set of led data, it is not its own set of led data.
+template<class PIXEL_TYPE>
+class CPixelView {
+public:
+	const int8_t  dir;
+	const int   len;
+	PIXEL_TYPE * const leds;
+	PIXEL_TYPE * const end_pos;
+
+public:
+
+	/// PixelSet copy constructor
+	inline CPixelView(const CPixelView & other) : dir(other.dir), len(other.len), leds(other.leds), end_pos(other.end_pos) {}
+
+	/// pixelset constructor for a pixel set starting at the given PIXEL_TYPE* and going for _len leds.  Note that the length
+	/// can be backwards, creating a PixelSet that walks backwards over the data
+	/// @param leds point to the raw led data
+	/// @param len how many leds in this set
+	inline CPixelView(PIXEL_TYPE *_leds, int _len) : dir(_len < 0 ? -1 : 1), len(_len), leds(_leds), end_pos(_leds + _len) {}
+
+	/// PixelSet constructor for the given set of leds, with start and end boundaries.  Note that start can be after
+	/// end, resulting in a set that will iterate backwards
+	/// @param leds point to the raw led data
+	/// @param start the start index of the leds for this array
+	/// @param end the end index of the leds for this array
+	inline CPixelView(PIXEL_TYPE *_leds, int _start, int _end) : dir(((_end - _start) < 0) ? -1 : 1), len((_end - _start) + dir), leds(_leds + _start), end_pos(_leds + _start + len) {}
+
+	/// Get the size of this set
+	/// @return the size of the set
+	int size() { return abs(len); }
+
+	/// Whether or not this set goes backwards
+	/// @return whether or not the set is backwards
+	bool reversed() { return len < 0; }
+
+	/// do these sets point to the same thing (note, this is different from the contents of the set being the same)
+	bool operator==(const CPixelView & rhs) const { return leds == rhs.leds && len == rhs.len && dir == rhs.dir; }
+
+	/// do these sets point to the different things (note, this is different from the contents of the set being the same)
+	bool operator!=(const CPixelView & rhs) const { return leds != rhs.leds || len != rhs.len || dir != rhs.dir; }
+
+	/// access a single element in this set, just like an array operator
+	inline PIXEL_TYPE & operator[](int x) const { if (dir & 0x80) { return leds[-x]; } else { return leds[x]; } }
+
+	/// Access an inclusive subset of the leds in this set.  Note that start can be greater than end, which will
+	/// result in a reverse ordering for many functions (useful for mirroring)
+	/// @param start the first element from this set for the new subset
+	/// @param end the last element for the new subset
+	inline CPixelView operator()(int start, int end) { return CPixelView(leds, start, end); }
+
+	/// Access an inclusive subset of the leds in this set, starting from the first.
+	/// @param end the last element for the new subset
+	/// Not sure i want this? inline CPixelView operator()(int end) { return CPixelView(leds, 0, end); }
+
+	/// Return the reverse ordering of this set
+	inline CPixelView operator-() { return CPixelView(leds + len - dir, len - dir, 0); }
+
+	/// Return a pointer to the first element in this set
+	inline operator PIXEL_TYPE* () const { return leds; }
+
+	/// Assign the passed in color to all elements in this set
+	/// @param color the new color for the elements in the set
+	inline CPixelView & operator=(const PIXEL_TYPE & color) {
+		for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) = color; }
+		return *this;
+	}
+
+
+	void dump() const {
+		/**
+			Serial.print("len: "); Serial.print(len); Serial.print(", dir:"); Serial.print((int)dir);
+			Serial.print(", range:"); Serial.print((uint32_t)leds); Serial.print("-"); Serial.print((uint32_t)end_pos);
+			Serial.print(", diff:"); Serial.print((int32_t)(end_pos - leds));
+			Serial.println("");
+		 **/
+	}
+
+	/// Copy the contents of the passed in set to our set.  Note if one set is smaller than the other, only the
+	/// smallest number of items will be copied over.
+	inline CPixelView & operator=(const CPixelView & rhs) {
+		for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) {
+			(*pixel) = (*rhspixel);
+		}
+		return *this;
+	}
+
+	/// @name modification/scaling operators
+	//@{
+	/// Add the passed in value to r,g, b for all the pixels in this set
+	inline CPixelView & addToRGB(uint8_t inc) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) += inc; } return *this; }
+	/// Add every pixel in the other set to this set
+	inline CPixelView & operator+=(CPixelView & rhs) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { (*pixel) += (*rhspixel); } return *this; }
+
+	/// Subtract the passed in value from r,g,b for all pixels in this set
+	inline CPixelView & subFromRGB(uint8_t inc) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) -= inc; } return *this; }
+	/// Subtract every pixel in the other set from this set
+	inline CPixelView & operator-=(CPixelView & rhs) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { (*pixel) -= (*rhspixel); } return *this; }
+
+	/// Increment every pixel value in this set
+	inline CPixelView & operator++() { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel)++; } return *this; }
+	/// Increment every pixel value in this set
+	inline CPixelView & operator++(int DUMMY_ARG) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel)++; } return *this; }
+
+	/// Decrement every pixel value in this set
+	inline CPixelView & operator--() { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel)--; } return *this; }
+	/// Decrement every pixel value in this set
+	inline CPixelView & operator--(int DUMMY_ARG) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel)--; } return *this; }
+
+	/// Divide every led by the given value
+	inline CPixelView & operator/=(uint8_t d) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) /= d; } return *this; }
+	/// Shift every led in this set right by the given number of bits
+	inline CPixelView & operator>>=(uint8_t d) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) >>= d; } return *this; }
+	/// Multiply every led in this set by the given value
+	inline CPixelView & operator*=(uint8_t d) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) *= d; } return *this; }
+
+	/// Scale every led by the given scale
+	inline CPixelView & nscale8_video(uint8_t scaledown) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel).nscale8_video(scaledown); } return *this; }
+	/// Scale down every led by the given scale
+	inline CPixelView & operator%=(uint8_t scaledown) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel).nscale8_video(scaledown); } return *this; }
+	/// Fade every led down by the given scale
+	inline CPixelView & fadeLightBy(uint8_t fadefactor) { return nscale8_video(255 - fadefactor); }
+
+	/// Scale every led by the given scale
+	inline CPixelView & nscale8(uint8_t scaledown) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel).nscale8(scaledown); } return *this; }
+	/// Scale every led by the given scale
+	inline CPixelView & nscale8(PIXEL_TYPE & scaledown) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel).nscale8(scaledown); } return *this; }
+	/// Scale every led in this set by every led in the other set
+	inline CPixelView & nscale8(CPixelView & rhs) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { (*pixel).nscale8((*rhspixel)); } return *this; }
+
+	/// Fade every led down by the given scale
+	inline CPixelView & fadeToBlackBy(uint8_t fade) { return nscale8(255 - fade); }
+
+	/// Apply the PIXEL_TYPE |= operator to every pixel in this set with the given PIXEL_TYPE value (bringing each channel to the higher of the two values)
+	inline CPixelView & operator|=(const PIXEL_TYPE & rhs) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) |= rhs; } return *this; }
+	/// Apply the PIXEL_TYPE |= operator to every pixel in this set with every pixel in the passed in set
+	inline CPixelView & operator|=(const CPixelView & rhs) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { (*pixel) |= (*rhspixel); } return *this; }
+	/// Apply the PIXEL_TYPE |= operator to every pixel in this set
+	inline CPixelView & operator|=(uint8_t d) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) |= d; } return *this; }
+
+	/// Apply the PIXEL_TYPE &= operator to every pixel in this set with the given PIXEL_TYPE value (bringing each channel down to the lower of the two values)
+	inline CPixelView & operator&=(const PIXEL_TYPE & rhs) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) &= rhs; } return *this; }
+	/// Apply the PIXEL_TYPE &= operator to every pixel in this set with every pixel in the passed in set
+	inline CPixelView & operator&=(const CPixelView & rhs) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { (*pixel) &= (*rhspixel); } return *this; }
+	/// APply the PIXEL_TYPE &= operator to every pixel in this set with the passed in value
+	inline CPixelView & operator&=(uint8_t d) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { (*pixel) &= d; } return *this; }
+	//@}
+
+	/// Returns whether or not any leds in this set are non-zero
+	inline operator bool() { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { if ((*pixel)) return true; } return false; }
+
+	// Color util functions
+	inline CPixelView & fill_solid(const PIXEL_TYPE & color) { *this = color; return *this; }
+	inline CPixelView & fill_solid(const CHSV & color) { if (dir > 0) { *this = color; return *this; } }
+
+	inline CPixelView & fill_rainbow(uint8_t initialhue, uint8_t deltahue = 5) {
+		if (dir >= 0) {
+			::fill_rainbow(leds, len, initialhue, deltahue);
+		}
+		else {
+			::fill_rainbow(leds + len + 1, -len, initialhue, deltahue);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient(const CHSV & startcolor, const CHSV & endcolor, TGradientDirectionCode directionCode = SHORTEST_HUES) {
+		if (dir >= 0) {
+			::fill_gradient(leds, len, startcolor, endcolor, directionCode);
+		}
+		else {
+			::fill_gradient(leds + len + 1, (-len), endcolor, startcolor, directionCode);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient(const CHSV & c1, const CHSV & c2, const CHSV &  c3, TGradientDirectionCode directionCode = SHORTEST_HUES) {
+		if (dir >= 0) {
+			::fill_gradient(leds, len, c1, c2, c3, directionCode);
+		}
+		else {
+			::fill_gradient(leds + len + 1, -len, c3, c2, c1, directionCode);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient(const CHSV & c1, const CHSV & c2, const CHSV & c3, const CHSV & c4, TGradientDirectionCode directionCode = SHORTEST_HUES) {
+		if (dir >= 0) {
+			::fill_gradient(leds, len, c1, c2, c3, c4, directionCode);
+		}
+		else {
+			::fill_gradient(leds + len + 1, -len, c4, c3, c2, c1, directionCode);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient_RGB(const PIXEL_TYPE & startcolor, const PIXEL_TYPE & endcolor, TGradientDirectionCode directionCode = SHORTEST_HUES) {
+		if (dir >= 0) {
+			::fill_gradient_RGB(leds, len, startcolor, endcolor);
+		}
+		else {
+			::fill_gradient_RGB(leds + len + 1, (-len), endcolor, startcolor);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient_RGB(const PIXEL_TYPE & c1, const PIXEL_TYPE & c2, const PIXEL_TYPE &  c3) {
+		if (dir >= 0) {
+			::fill_gradient_RGB(leds, len, c1, c2, c3);
+		}
+		else {
+			::fill_gradient_RGB(leds + len + 1, -len, c3, c2, c1);
+		}
+		return *this;
+	}
+
+	inline CPixelView & fill_gradient_RGB(const PIXEL_TYPE & c1, const PIXEL_TYPE & c2, const PIXEL_TYPE & c3, const PIXEL_TYPE & c4) {
+		if (dir >= 0) {
+			::fill_gradient_RGB(leds, len, c1, c2, c3, c4);
+		}
+		else {
+			::fill_gradient_RGB(leds + len + 1, -len, c4, c3, c2, c1);
+		}
+		return *this;
+	}
+
+	inline CPixelView & nblend(const PIXEL_TYPE & overlay, fract8 amountOfOverlay) { for (iterator pixel = begin(), _end = end(); pixel != _end; ++pixel) { ::nblend((*pixel), overlay, amountOfOverlay); } return *this; }
+	inline CPixelView & nblend(const CPixelView & rhs, fract8 amountOfOverlay) { for (iterator pixel = begin(), rhspixel = rhs.begin(), _end = end(), rhs_end = rhs.end(); (pixel != _end) && (rhspixel != rhs_end); ++pixel, ++rhspixel) { ::nblend((*pixel), (*rhspixel), amountOfOverlay); } return *this; }
+
+	// Note: only bringing in a 1d blur, not sure 2d blur makes sense when looking at sub arrays
+	inline CPixelView & blur1d(fract8 blur_amount) {
+		if (dir >= 0) {
+			::blur1d(leds, len, blur_amount);
+		}
+		else {
+			::blur1d(leds + len + 1, -len, blur_amount);
+		}
+		return *this;
+	}
+
+	inline CPixelView & napplyGamma_video(float gamma) {
+		if (dir >= 0) {
+			::napplyGamma_video(leds, len, gamma);
+		}
+		else {
+			::napplyGamma_video(leds + len + 1, -len, gamma);
+		}
+		return *this;
+	}
+
+	inline CPixelView & napplyGamma_video(float gammaR, float gammaG, float gammaB) {
+		if (dir >= 0) {
+			::napplyGamma_video(leds, len, gammaR, gammaG, gammaB);
+		}
+		else {
+			::napplyGamma_video(leds + len + 1, -len, gammaR, gammaG, gammaB);
+		}
+		return *this;
+	}
+
+	// TODO: Make this a fully specified/proper iterator
+	template <class T>
+	class pixelset_iterator_base {
+		T * leds;
+		const int8_t dir;
+	public:
+		inline pixelset_iterator_base(const pixelset_iterator_base & rhs) : leds(rhs.leds), dir(rhs.dir) {}
+		inline pixelset_iterator_base(T * _leds, const char _dir) : leds(_leds), dir(_dir) {}
+
+		inline pixelset_iterator_base& operator++() { leds += dir; return *this; }
+		inline pixelset_iterator_base operator++(int) { pixelset_iterator_base tmp(*this); leds += dir; return tmp; }
+
+		inline bool operator==(pixelset_iterator_base & other) const { return leds == other.leds; } // && set==other.set; }
+		inline bool operator!=(pixelset_iterator_base & other) const { return leds != other.leds; } // || set != other.set; }
+
+		inline PIXEL_TYPE& operator*() const { return *leds; }
+	};
+
+	typedef pixelset_iterator_base<PIXEL_TYPE> iterator;
+	typedef pixelset_iterator_base<const PIXEL_TYPE> const_iterator;
+
+	iterator begin() { return iterator(leds, dir); }
+	iterator end() { return iterator(end_pos, dir); }
+
+	iterator begin() const { return iterator(leds, dir); }
+	iterator end() const { return iterator(end_pos, dir); }
+
+	const_iterator cbegin() const { return const_iterator(leds, dir); }
+	const_iterator cend() const { return const_iterator(end_pos, dir); }
+};
+
+typedef CPixelView<CRGB> CRGBSet;
+
+inline CRGB *operator+(const CRGBSet & pixels, int offset) { return (CRGB*)pixels + offset; }
+
+template<int SIZE>
+class CRGBArray : public CPixelView<CRGB> {
+public:
+	CRGB rawleds[SIZE];
+	CRGBArray() : CPixelView<CRGB>(rawleds, SIZE) {}
+	using CPixelView::operator=;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
