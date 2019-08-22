@@ -7,6 +7,7 @@
 #include "Pattern.h"
 #include "PatternBeachWaves.h"
 #include "PatternSpiral.h"
+#include "PatternCube.h"
 
 
 
@@ -17,12 +18,14 @@ public:
 	//add patterns as members here
 	PatternBeachWaves	beachWaves;
 	PatternSpiral		spiral;
+	PatternCube			cube3d;
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 2;
+	static const uint8_t numPatterns = 3;
 	Pattern *patternList[numPatterns] = {
 		&spiral,
-		&beachWaves
+		&beachWaves,
+		&cube3d
 		
 	};
 
@@ -76,10 +79,11 @@ public:
 			//        memcpy(&leds[0], &scratchArray[0], NUM_LEDS * sizeof(leds[0]));
 #if defined(ARDUINO)
 			FastLED.setBrightness(Data::brightness);
-			FastLED.show();
+			//FastLED.show();
 #else 
-			gfx.show();
+			//gfx.show();
 #endif
+			gfx.show();
 		}
 		if (now - nextHueUpdate > 1000 / 60) {
 			nextHueUpdate = now;
@@ -88,3 +92,5 @@ public:
 
 	}
 };
+
+PatternController patterns;

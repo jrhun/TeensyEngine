@@ -7,7 +7,7 @@
 #include "Patterns/PatternController.h"
 
 
-PatternController patterns;
+
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -17,7 +17,7 @@ void ofApp::setup() {
 
 	ofSetRectMode(OF_RECTMODE_CORNER);
 
-	ofSetFrameRate(60);
+	//ofSetFrameRate(60);
 
 	//engine.init();
 	//Pattern::setGfx(&gfx_t);
