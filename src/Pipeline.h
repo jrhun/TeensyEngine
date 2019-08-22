@@ -6,6 +6,8 @@
 #include "Geometry.h"
 
 
+#include "Color.h"
+
 template<class Vertex>
 class Pipeline {
 public: 
@@ -26,43 +28,7 @@ public:
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
 			{
 				ProcessTriangle(v0, v1, v2, i);
-				//// process 3 vertices into a triangle
-				//unsigned char hue = ((i / 2) * 40)%255;
-				//Vec3 c;
-				//switch (i / 2) {
-				//case 0:
-				//	c = { 255,0,0 };
-				//	break;
-				//case 1:
-				//	c = { 255,255,0 };
-				//	break;
-				//case 2:
-				//	c = { 0,255,0 };
-				//	break;
-				//case 3:
-				//	c = { 0,255,255 };
-				//	break;
-				//case 4:
-				//	c = { 0,0,255 };
-				//	break;
-				//case 5:
-				//	c = { 255,0,255 };
-				//	break;
-				//};
 
-
-				//GSVertex gs0(v0);
-				////gs0.pos = v0;
-				//GSVertex gs1(v1);
-				//GSVertex gs2(v2);
-
-				//sst.TransformSphere(gs0.pos);
-				//sst.TransformSphere(gs1.pos);
-				//sst.TransformSphere(gs2.pos);
-
-
-				//gfx.drawTriangle(gs0.pos, gs1.pos, gs2.pos, c);
-				//PostProcessTriangleVertices(t);
 			}
 		}
 	}
@@ -118,6 +84,11 @@ public:
 			break;
 		};
 
+		CRGB colour;// = CHSV(hue, 255, 255);
+		colour.setHSV(hue, 255, 255);
+		c.x = colour.r;
+		c.y = colour.g;
+		c.z = colour.b;
 
 		gfx.drawTriangle(v0, v1, v2, c);
 

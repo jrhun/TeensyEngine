@@ -25,6 +25,10 @@ public:
 	void putPixel(int x, int y, unsigned char h) {
 		ledRef->drawPixel(x, y, h);
 	}
+  
+  // crgb getcolor(unsigned char offset = 0) {
+     
+  // }
 
 
 	Leds *ledRef;
