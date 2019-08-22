@@ -18,22 +18,14 @@ float rgb2luma(CRGB rgb) {
 class GraphicsPC : public Graphics {
 public:
 	void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {
-		//ofSetColor(r, g, b);
-		//ofDrawRectangle(x*scale, y*scale, scale, scale);
 		CRGB col(r, g, b);
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			leds[(x + y * SCREEN_WIDTH)] = col;
 		}
 	}
-	//void putPixel(int x, int y, mRGB c) {
-	//	putPixel(x, y, c.r, c.b, c.g);
-	//}
+
 
 	void putPixel(int x, int y, unsigned char h) {
-		//ofColor c;
-		//c.setHsb(h, 255, 255);
-		//ofSetColor(c);
-		//ofDrawRectangle(x*scale, y*scale, scale, scale);
 		CRGB col;
 		col.setHSV(h, 255, 255);
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
@@ -66,7 +58,6 @@ public:
 				leds[i + j * SCREEN_WIDTH] = CRGB::Black;
 			}
 		}
-		/*leds->fill_solid(CRGB::Black);*/
 	}
 	void fade(uint8_t a = 128) {
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
@@ -74,7 +65,6 @@ public:
 				leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
 			}
 		}
-		//leds->fadeToBlackBy(a);
 	}
 
 	CRGB getColor(uint8_t offset = 0) {
