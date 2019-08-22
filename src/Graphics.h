@@ -16,7 +16,7 @@ public:
 	virtual void show() {}
 	virtual void clear() {}
 	virtual void fade(uint8_t a = 128) {}
-	virtual CRGB getColor(uint8_t offset = 0) {
+	virtual CRGB getColour(uint8_t offset = 0) {
 		return CRGB::Black;
 	}
 

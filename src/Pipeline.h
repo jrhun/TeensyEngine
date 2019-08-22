@@ -50,16 +50,35 @@ public:
 		bool oneGreater = false;
 		const float lower = SCREEN_WIDTH / 4;
 		const float upper = 3 * SCREEN_WIDTH / 4;
-		if (v0.x > upper || v1.x > upper || v2.x > upper)
-			oneGreater = true;
-		if (oneGreater) {
-			if (v0.x < lower)
-				v0.x += SCREEN_WIDTH;
-			if (v1.x < lower)
-				v1.x += SCREEN_WIDTH;
-			if (v2.x < lower)
-				v2.x += SCREEN_WIDTH;
+
+
+
+		if (v0.x > upper || v1.x > upper || v2.x > upper) {
+			//oneGreater = true;
+			//if (oneGreater) {
+				if (v0.x < lower + 1)
+					v0.x += SCREEN_WIDTH;
+				if (v1.x < lower + 1)
+					v1.x += SCREEN_WIDTH;
+				if (v2.x < lower + 1)
+					v2.x += SCREEN_WIDTH;
+			//}
 		}
+
+		if (abs(v0.x - v1.x) > SCREEN_WIDTH / 2) {
+			// HOW DID WE GET HERE??
+			DebugBreak();
+		}
+		else if (abs(v2.x - v1.x) > SCREEN_WIDTH / 2) {
+			// HOW DID WE GET HERE??
+			DebugBreak();
+		}
+		else if (abs(v2.x - v0.x) > SCREEN_WIDTH / 2) {
+			// HOW DID WE GET HERE??
+			DebugBreak();
+		}
+
+
 
 		unsigned char hue = ((triangle_index / 2) * 40) %256;
 		Vec3 c;

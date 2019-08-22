@@ -11,7 +11,7 @@
 #include "FastLED.h"
 #include "../../ledControl.h"
 #include "../GraphicsFastLED.h"
-GraphicsFastLED gfx_t(&ledControl);
+GraphicsFastLED gfx(&ledControl);
 #else 
 #include "FastLED_PC.h"
 #include "../GraphicsPC.h"

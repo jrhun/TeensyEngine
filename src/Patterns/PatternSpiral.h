@@ -43,9 +43,7 @@ private:
 	}
 
 public:
-	PatternSpiral() {
-		name = (char *)"Spiral";
-	}
+	PatternSpiral() : Pattern("Spiral") {}
 
 	void start() {
 		// set all counting directions positive for the beginning

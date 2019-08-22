@@ -67,7 +67,7 @@ public:
 		}
 	}
 
-	CRGB getColor(uint8_t offset = 0) {
+	CRGB getColour(uint8_t offset = 0) {
 		uint8_t h = (Data::getHue() + offset) % 256;
 		return CHSV(h, 255, 255);
 	}
