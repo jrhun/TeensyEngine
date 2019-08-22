@@ -3,13 +3,15 @@
 //Main file for controlling UI, drawing, etc
 
 // Includes
-#if defined(ESP32) || defined(CORE_TEENSY)
-//  #if defined(__IMXRT1052__) || defined(__IMXRT1062__) TEENSY 4.X
-#include "GraphicsFastLED.h"
-#else // PC includes
-#include "GraphicsPC.h"
-#endif // endif includes
+//#if defined(ESP32) || defined(CORE_TEENSY)
+////  #if defined(__IMXRT1052__) || defined(__IMXRT1062__) TEENSY 4.X
+//#include "GraphicsFastLED.h"
+//#else // PC includes
+//#include "GraphicsPC.h"
+//#endif // endif includes
 
+
+#include "Graphics.h"
 #include "ScreenTransform.h"
 #include "Cube.h"
 #include "Mat.h"
@@ -17,6 +19,7 @@
 #include "Pipeline.h"
 #include "Geometry.h"
 #include "mathHelpers.h"
+#include "Color.h"
 
 
 class Engine {
@@ -47,34 +50,17 @@ public:
 
 	void composeFrame() {
 		// pipeline!
-
-		gfx.resetZ();
+		clear();
+		resetZ();
 		//for each object
 		//generate list of vertex
 		//send to pipeline
 
-
-		//for (int i = 0; i < 16; i++) {
-		//	float r = 2;
-		//	float theta = myMap(i, 0, 16, 0, PI);
-		//	float x = r * cos(theta);
-		//	float z = r * sin(theta);
-		//	for (int j = 0; j < 16; j++) {
-		//		float y = (j ) / 16.0f - 0.5f;
-		//		Mat3 m = Mat3::RotationY(angley);
-		//		Vec3 v(x,y,z);
-		//		v = v * m;
-		//		v.z += 1;
-		//		sst.TransformSphere(v);
-		//		gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16, (i * 255 / 32) % 255);
-		//	}
-		//}
-
-
 		solidCube();
+		
 		//wireFrame();
 		//grid();
-
+		show();
 	}
 
 
@@ -156,6 +142,10 @@ public:
 
 	void show() {
 		gfx.show();
+	}
+
+	void resetZ() {
+		gfx.resetZ();
 	}
 
 	float anglex = 0;

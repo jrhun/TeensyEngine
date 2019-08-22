@@ -25,6 +25,15 @@
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+#if defined(ARDUINO)
+//typedef String String
+
+#else
+#include <string>
+typedef std::string String;
+#define PROGMEM
+#endif
+
 namespace Data {
 //  public:
 // VARS

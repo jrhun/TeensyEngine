@@ -6,52 +6,71 @@
 #include "Vec3.h"
 #include "Geometry.h"
 #include <limits>
+#include "Color.h"
 
 class Graphics {
 public:
-	struct mRGB {
-		mRGB(int r, int g, int b) : r(r), g(g), b(b) {}
-		mRGB(int x) : r((x >> 16) & 0xFF), g((x >> 8) & 0xFF), b((x >> 0) & 0xFF) {}
-		union {
-			unsigned char raw[3];
-			struct {
-				char r, g, b;
-			};
-		};
+	Graphics()  {}
 
-	};
+	//struct mRGB {
+	//	mRGB(int r, int g, int b) : r(r), g(g), b(b) {}
+	//	mRGB(int x) : r((x >> 16) & 0xFF), g((x >> 8) & 0xFF), b((x >> 0) & 0xFF) {}
+	//	union {
+	//		unsigned char raw[3];
+	//		struct {
+	//			char r, g, b;
+	//		};
+	//	};
 
-	void init() {}
-	void show() {}
-	void clear() {}
-	void fade(unsigned char a) {}
+	//};
+
+	virtual void init() {}
+	virtual void show() {}
+	virtual void clear() {}
+	virtual void fade(uint8_t a = 128) {}
+	virtual CRGB getColor(uint8_t offset = 0) {
+		return CRGB::Black;
+	}
 
 	virtual void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {};
-	virtual void putPixel(int x, int y, mRGB c) {};
+	virtual void putPixel(int x, int y, CRGB c) {};
 	virtual void putPixel(int x, int y, unsigned char h) {};
 
-	void drawPointDepth(Vec3 &v, unsigned char r, unsigned char g, unsigned char b) {
-		if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
-			float z = v.z;
-			r = r * z / 255;
-			g = g * z / 255;
-			b = b * z / 255;
-			//putPixel( (int(v.x) + SCREEN_WIDTH) % SCREEN_WIDTH, v.y, r, g, b);
-			putPixel(int(v.x) % SCREEN_WIDTH, v.y, r, g, b);
-		}
-	}
 
 	void drawPointDepth(int16_t x, int16_t y, int16_t z, unsigned char r, unsigned char g, unsigned char b) {
+		drawPointDepth(x, y, z, CRGB(r, g, b));
+	}
+
+	void drawPointDepth(Vec3 &v, unsigned char r, unsigned char g, unsigned char b) {
+		drawPointDepth(v, CRGB(r, g, b));
+		//if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
+		//	float z = v.z;
+		//	r = r * z / 255;
+		//	g = g * z / 255;
+		//	b = b * z / 255;
+		//	putPixel(int(v.x) % SCREEN_WIDTH, v.y, r, g, b);
+		//}
+	}
+
+	void drawPointDepth(Vec3 &v, CRGB c) {
+		if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
+			c.nscale8_video(v.z);
+			putPixel(int(v.x) % SCREEN_WIDTH, v.y, c);
+		}
+	}
+	void drawPointDepth(int16_t x, int16_t y, int16_t z, CRGB c) {
 		if (testAndSetZ(x % SCREEN_WIDTH, y, z)) {
-			r = r * z / 255;
-			g = g * z / 255;
-			b = b * z / 255;
-			//putPixel((x + SCREEN_WIDTH) % SCREEN_WIDTH, y, r, g, b);
-			putPixel((x) % SCREEN_WIDTH, y, r, g, b);
+			c.nscale8_video(z);
+			putPixel(int(x) % SCREEN_WIDTH, y, c);
 		}
 	}
 
+
 	void drawLineDepth(Vec3 &v0, Vec3 &v1, unsigned char r, unsigned char g, unsigned char b) {
+		drawLineDepth(v0, v1, CRGB(r, g, b));
+	}
+
+	void drawLineDepth(Vec3 &v0, Vec3 &v1, CRGB c) {
 		int16_t x0 = v0.x;
 
 		int16_t y0 = v0.y;
@@ -86,7 +105,7 @@ public:
 
 		for (;;) { /* loop */
 			//drawPointDepth((x0+SCREEN_WIDTH) % SCREEN_WIDTH,y0,z0, r, g, b);
-			drawPointDepth((x0), y0, z0, r, g, b);
+			drawPointDepth((x0), y0, z0, c);
 			if (i-- == 0) break;
 			x1 -= dx;
 			if (x1 < 0) {
@@ -102,6 +121,41 @@ public:
 			if (z1 < 0) {
 				z1 += dm;
 				z0 += sz;
+			}
+		}
+	}
+
+	void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB c) {
+		//if (x0 > x1) {
+		//	if (x0 - x1 > 32)
+		//		x1 += SCREEN_WIDTH;
+		//}
+		//else {
+		//	if (x1 - x0 > 32)
+		//		x0 += SCREEN_WIDTH;
+		//}
+
+		int16_t dx = abs(x1 - x0);
+		int16_t sx = x0 < x1 ? 1 : -1;
+		int16_t dy = abs(y1 - y0);
+		int16_t sy = y0 < y1 ? 1 : -1;
+		int16_t dm = max(dx, dy);
+		int16_t i = dm; /* maximum difference */
+		x1 = dm / 2;
+		y1 = dm / 2;
+
+		for (;;) { /* loop */
+			putPixel(x0, y0, c);
+			if (i-- == 0) break;
+			x1 -= dx;
+			if (x1 < 0) {
+				x1 += dm;
+				x0 += sx;
+			}
+			y1 -= dy;
+			if (y1 < 0) {
+				y1 += dm;
+				y0 += sy;
 			}
 		}
 	}
@@ -150,6 +204,8 @@ public:
 			}
 		}
 	}
+
+
 
 	void drawFlatTopTriangle(const Vec3 &v0, const Vec3 &v1, const Vec3 &v2, Vec3 &c)
 	{
@@ -240,5 +296,8 @@ public:
 		return false;
 	}
 
+
+
 	float zBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+
 };
