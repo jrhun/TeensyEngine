@@ -1,5 +1,28 @@
 #pragma once
 
+#include "Geometry.h"
+#include "Vec3.h"
+#include <vector>
+
+class Sphere {
+public:
+	Sphere() {}
+
+	IndexedTriangleList<Vertex> getTriangles() {
+
+		std::vector<Vertex> vertices;
+
+
+
+
+		std::vector<size_t> indices;
+
+		return { vertices, indices };
+
+
+	}
+};
+
 void generateSphere() {
 	for (int i = 0; i < 16; i++) {
 		float lat = myMap(i, 0, 16, -PI / 2, PI / 2);

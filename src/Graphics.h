@@ -53,9 +53,22 @@ public:
 
 	void drawLineDepth(Vec3 &v0, Vec3 &v1, unsigned char r, unsigned char g, unsigned char b) {
 		int16_t x0 = v0.x;
+
 		int16_t y0 = v0.y;
 		int16_t z0 = v0.z;
 		int16_t x1 = v1.x;
+		if (x0 > x1) {
+			if (x0 - x1 > 32)
+				x1 += SCREEN_WIDTH;
+		}
+		else {
+			if (x1 - x0 > 32)
+				x0 += SCREEN_WIDTH;
+		}
+		//if (x0 < SCREEN_WIDTH / 2)
+		//	x0 += SCREEN_WIDTH;
+		//if (x1 < SCREEN_WIDTH/2)
+		//	x1 += SCREEN_WIDTH;
 		int16_t y1 = v1.y;
 		int16_t z1 = v1.z;
 
@@ -73,7 +86,7 @@ public:
 
 		for (;;) { /* loop */
 			//drawPointDepth((x0+SCREEN_WIDTH) % SCREEN_WIDTH,y0,z0, r, g, b);
-			drawPointDepth((x0+ SCREEN_WIDTH) % SCREEN_WIDTH, y0, z0, r, g, b);
+			drawPointDepth((x0), y0, z0, r, g, b);
 			if (i-- == 0) break;
 			x1 -= dx;
 			if (x1 < 0) {

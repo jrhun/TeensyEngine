@@ -64,30 +64,16 @@ public:
 		//		Mat3 m = Mat3::RotationY(angley);
 		//		Vec3 v(x,y,z);
 		//		v = v * m;
-		//		//v.z += 1;
-		//		sst.Transform(v);
+		//		v.z += 1;
+		//		sst.TransformSphere(v);
 		//		gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16, (i * 255 / 32) % 255);
 		//	}
 		//}
 
 
 		solidCube();
-		//float x1 = cos(anglex);
-		//float x2 = cos(anglex + PI / 2);
-		//float z1 = sin(anglex);
-		//float z2 = sin(anglex + PI / 2);
-		//float y1 = 0.25;
-		//float y2 = -0.25;
-		//Vec3 a(x1, y1, z1);
-		//Vec3 b(x2, y1, z2);
-		//Vec3 c(x1, y2, z1);
-		//sst.TransformSphere(a);
-		//sst.TransformSphere(b);
-		//sst.TransformSphere(c);
-		//Vec3 col(0, 0, 255);
-		//gfx.drawTriangle(a, b, c, col);
-
 		//wireFrame();
+		//grid();
 
 	}
 
@@ -98,8 +84,16 @@ public:
 			float x = (i * 2.0) / 16.0f - 1.0f;
 			for (int j = 0; j < 8; j++) {
 				float y = (j * 2.0) / 16.0f - 0.5f;
-				Vec3 v(x * 2, y * 2, cameraOffset);
-				sst.Transform(v);
+				Vec3 v(x *8, y *8, 0);
+
+				Mat3 m = Mat3::RotationY(-anglex);
+				v = v * m;
+				float xOff = cameraOffset * cos(anglex+PI/2);
+				float zOff = cameraOffset * sin(anglex+PI/2);
+				v.x += xOff;
+				v.z += zOff;
+				//v.z += 2;
+				sst.TransformSphere(v);
 				gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16, (i * 255 / 32) % 255);
 
 			}
@@ -122,10 +116,14 @@ public:
 	void wireFrame() {
 		auto lines = cube.getLines(2.0f);
 		for (auto &v : lines.vertices) {
-			Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
+			Mat3 m = Mat3::RotationY(angley)  * Mat3::RotationX(anglex);
 			v = v * m;
-			v.z -= cameraOffset;
-			sst.Transform(v);
+			//v.z -= cameraOffset;
+			float xOff = cameraOffset * cos(anglex+PI);
+			float zOff = cameraOffset * sin(anglex+PI);
+			v.x += xOff;
+			v.z += zOff;
+			sst.TransformSphere(v);
 		}
 		for (size_t i = 0; i < lines.indices.size() / 2; i++) {
 			gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], 0, 50, 255);

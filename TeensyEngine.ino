@@ -1,6 +1,6 @@
 #include "data.h"
 #include "ledControl.h"
-#include "src\Engine.h"
+#include "srch\Engine.h"
 
 
 GraphicsFastLED gfx_t(&ledControl);
@@ -10,6 +10,7 @@ void setup() {
   // put your setup code here, to run once:
 //  engine.init();
   ledControl.init();
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -19,5 +20,10 @@ void loop() {
     engine.updateModel();
     engine.composeFrame();
     ledControl.show();
+  }
+  EVERY_N_MILLISECONDS(1000) {
+    Serial.print("FPS: ");
+    Serial.println(FastLED.getFPS());
+//    tftDisplayFPS();
   }
 }
