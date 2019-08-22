@@ -90,7 +90,7 @@ public:
 		// manage the Oszillators
 		UpdateTimers();
 
-		gfx.fade(64);
+		gfx.fade(32);
 
 		// draw just a line defined by 5 oszillators
 		//Vec3 a(multiTimer[3].count, multiTimer[4].count, 255);

@@ -12,18 +12,6 @@ class Graphics {
 public:
 	Graphics()  {}
 
-	//struct mRGB {
-	//	mRGB(int r, int g, int b) : r(r), g(g), b(b) {}
-	//	mRGB(int x) : r((x >> 16) & 0xFF), g((x >> 8) & 0xFF), b((x >> 0) & 0xFF) {}
-	//	union {
-	//		unsigned char raw[3];
-	//		struct {
-	//			char r, g, b;
-	//		};
-	//	};
-
-	//};
-
 	virtual void init() {}
 	virtual void show() {}
 	virtual void clear() {}
@@ -43,13 +31,6 @@ public:
 
 	void drawPointDepth(Vec3 &v, unsigned char r, unsigned char g, unsigned char b) {
 		drawPointDepth(v, CRGB(r, g, b));
-		//if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
-		//	float z = v.z;
-		//	r = r * z / 255;
-		//	g = g * z / 255;
-		//	b = b * z / 255;
-		//	putPixel(int(v.x) % SCREEN_WIDTH, v.y, r, g, b);
-		//}
 	}
 
 	void drawPointDepth(Vec3 &v, CRGB c) {
@@ -84,10 +65,6 @@ public:
 			if (x1 - x0 > 32)
 				x0 += SCREEN_WIDTH;
 		}
-		//if (x0 < SCREEN_WIDTH / 2)
-		//	x0 += SCREEN_WIDTH;
-		//if (x1 < SCREEN_WIDTH/2)
-		//	x1 += SCREEN_WIDTH;
 		int16_t y1 = v1.y;
 		int16_t z1 = v1.z;
 
@@ -164,8 +141,6 @@ public:
 		const Vec3* pv0 = &v0;
 		const Vec3* pv1 = &v1;
 		const Vec3* pv2 = &v2;
-
-		// offset x by screen width to x 
 
 		// sorting vertices by y
 		if (pv1->y < pv0->y) std::swap(pv0, pv1);
