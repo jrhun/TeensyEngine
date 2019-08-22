@@ -12,6 +12,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Patterns">
+      <UniqueIdentifier>{c240aafe-eb10-4152-b00b-f2612625fd8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
@@ -55,6 +58,18 @@
     </ClInclude>
     <ClInclude Include="src\Sphere.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternList.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\Patterns.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\FastLED_PC.h">
+      <Filter>src\Patterns</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
