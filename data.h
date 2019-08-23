@@ -66,6 +66,12 @@ uint8_t noiseFloor = 65;
 
 } //end nameSpace Data
 
+float GuiVars1 = 1.0;
+float GuiVars2 = 1.0;
+float GuiVars3 = 1.0;
+float GuiVars4 = 1.0;
+float GuiVars5 = 1.0;
+float GuiVars6 = 1.0;
 
 
 uint8_t vars[NUM_VARS] = {

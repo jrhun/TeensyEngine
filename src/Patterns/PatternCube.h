@@ -29,7 +29,7 @@ public:
 			offsetDir = -1.0f;
 		if (cameraOffset < 2)
 			offsetDir = 1.0f;
-		//cameraOffset += 0.01 * offsetDir;
+		cameraOffset += 0.01 * offsetDir;
 
 		return 0;
 	}

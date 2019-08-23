@@ -9,7 +9,7 @@
 #include "PatternSpiral.h"
 #include "PatternCube.h"
 #include "PatternParametric.h"
-
+#include "PatternWireFrame.h"
 
 
 class PatternController {
@@ -21,10 +21,12 @@ public:
 	PatternSpiral		spiral;
 	PatternCube			cube3d;
 	PatternParametric	parametric;
+	PatternWireFrame	wireFrame;
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 4;
+	static const uint8_t numPatterns = 5;
 	Pattern *patternList[numPatterns] = {
+		&wireFrame,
 		&spiral,
 		&beachWaves,
 		&cube3d,
