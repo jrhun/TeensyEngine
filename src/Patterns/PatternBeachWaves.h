@@ -29,7 +29,7 @@ public:
 			gfx.putPixel(x1, y, c1);
 			gfx.putPixel(x2, y, c2);
 		}
-
+		blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 120);
 		
 
 		//      uint16_t offset = millis() - now;
