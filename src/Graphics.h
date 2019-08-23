@@ -34,15 +34,15 @@ public:
 	}
 
 	void drawPointDepth(Vec3 &v, CRGB c) {
-		if (testAndSetZ(int(v.x) % SCREEN_WIDTH, v.y, v.z)) {
+		if (testAndSetZ(int16_t(v.x), v.y, v.z)) {
 			c.nscale8_video(v.z);
-			putPixel(int(v.x) % SCREEN_WIDTH, v.y, c);
+			putPixel(int16_t(v.x) % SCREEN_WIDTH, v.y, c);
 		}
 	}
 	void drawPointDepth(int16_t x, int16_t y, int16_t z, CRGB c) {
-		if (testAndSetZ(x % SCREEN_WIDTH, y, z)) {
+		if (testAndSetZ(x, y, z)) {
 			c.nscale8_video(z);
-			putPixel(int(x) % SCREEN_WIDTH, y, c);
+			putPixel(x% SCREEN_WIDTH, y, c);
 		}
 	}
 
@@ -260,8 +260,8 @@ public:
 	}
 	
 
-	bool testAndSetZ(int x, int y, float depth) {
-		x = (x + SCREEN_WIDTH) % SCREEN_WIDTH;
+	bool testAndSetZ(int16_t x, int16_t y, float depth) {
+		x %= SCREEN_WIDTH;
 		if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT) {
 			float &val = zBuffer[x + y * SCREEN_WIDTH];
 			if (depth > val) {

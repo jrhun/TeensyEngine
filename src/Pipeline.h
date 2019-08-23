@@ -47,19 +47,6 @@ public:
 
 		// take into account borders
 		// assumes that we won't be drawing triangles wider than 32 in x axis around borders
-		//const float lower = SCREEN_WIDTH / 4;
-		//const float upper = 3 * SCREEN_WIDTH / 4;
-		//if (v0.x > upper || v1.x > upper || v2.x > upper) {
-		//	//oneGreater = true;
-		//	//if (oneGreater) {
-		//		if (v0.x < lower)
-		//			v0.x += SCREEN_WIDTH;
-		//		if (v1.x < lower)
-		//			v1.x += SCREEN_WIDTH;
-		//		if (v2.x < lower)
-		//			v2.x += SCREEN_WIDTH;
-		//	//}
-		//}
 		float max = 0;
 		if (v0.x > v1.x and v0.x > v2.x) 
 			max = v0.x;
@@ -68,53 +55,12 @@ public:
 		else 
 			max = v2.x;
 
-		if (max - v0.x > 32)
-			v0.x += 64;
-		if (max - v1.x > 32)
-			v1.x += 64;
-		if (max - v2.x > 32)
-			v2.x += 64;
-
-		//if (v0.x > v1.x and v0.x > v2.x) {
-		//	// v0
-		//	if (v0.x - v1.x > 32) {
-		//		v1.x += 64;
-		//	}
-		//	if (v0.x - v2.x > 32) {
-		//		v2.x += 64;
-		//	}
-		//}
-		//else if (v1.x > v0.x and v1.x > v2.x) {
-		//	// v1
-		//	if (v1.x - v0.x > 32) {
-		//		v0.x += 64;
-		//	}
-		//	if (v1.x - v2.x > 32) {
-		//		v2.x += 64;
-		//	}
-		//}
-		//else { // v2 largest
-		//	if (v2.x - v0.x > 32) {
-		//		v0.x += 64;
-		//	}
-		//	if (v2.x - v1.x > 32) {
-		//		v1.x += 64;
-		//	}
-		//}
-
-		//if (abs(v0.x - v1.x) > SCREEN_WIDTH / 2) {
-		//	// HOW DID WE GET HERE??
-		//	DebugBreak();
-		//}
-		//else if (abs(v2.x - v1.x) > SCREEN_WIDTH / 2) {
-		//	// HOW DID WE GET HERE??
-		//	DebugBreak();
-		//}
-		//else if (abs(v2.x - v0.x) > SCREEN_WIDTH / 2) {
-		//	// HOW DID WE GET HERE??
-		//	DebugBreak();
-		//}
-
+		if (max - v0.x > SCREEN_WIDTH/2)
+			v0.x += SCREEN_WIDTH;
+		if (max - v1.x > SCREEN_WIDTH / 2)
+			v1.x += SCREEN_WIDTH;
+		if (max - v2.x > SCREEN_WIDTH / 2)
+			v2.x += SCREEN_WIDTH;
 
 
 		unsigned char hue = ((triangle_index / 2) * 40) % 256;
