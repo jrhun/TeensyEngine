@@ -184,6 +184,7 @@ public:
 
 	void drawFlatTopTriangle(const Vec3 &v0, const Vec3 &v1, const Vec3 &v2, Vec3 &c)
 	{
+		
 		// calulcate slopes in screen space
 		float m0 = (v2.x - v0.x) / (v2.y - v0.y);
 		float m1 = (v2.x - v1.x) / (v2.y - v1.y);

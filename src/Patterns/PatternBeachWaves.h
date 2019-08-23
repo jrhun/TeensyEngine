@@ -13,7 +13,7 @@ public:
 
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
-		gfx.fade();// ledControl.fade();
+		gfx.fade(64);// ledControl.fade();
 
 		for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 			uint8_t x1 = beat8(20);
@@ -29,6 +29,7 @@ public:
 			gfx.putPixel(x1, y, c1);
 			gfx.putPixel(x2, y, c2);
 		}
+
 		
 
 		//      uint16_t offset = millis() - now;
