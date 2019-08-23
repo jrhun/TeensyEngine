@@ -8,6 +8,7 @@
 #include "PatternBeachWaves.h"
 #include "PatternSpiral.h"
 #include "PatternCube.h"
+#include "PatternParametric.h"
 
 
 
@@ -19,13 +20,15 @@ public:
 	PatternBeachWaves	beachWaves;
 	PatternSpiral		spiral;
 	PatternCube			cube3d;
+	PatternParametric	parametric;
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 3;
+	static const uint8_t numPatterns = 4;
 	Pattern *patternList[numPatterns] = {
 		&spiral,
 		&beachWaves,
-		&cube3d
+		&cube3d,
+		&parametric
 		
 	};
 

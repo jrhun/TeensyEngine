@@ -101,6 +101,58 @@ public:
 			}
 		}
 	}
+	void drawLineDepth(GSVertex &v0, GSVertex &v1) {
+		//Vec3 delta = v0.pos - v1.pos;
+
+
+		//int16_t x0 = v0.x;
+		//int16_t y0 = v0.y;
+		//int16_t z0 = v0.z;
+		//int16_t x1 = v1.x;
+		//if (x0 > x1) {
+		//	if (x0 - x1 > 32)
+		//		x1 += SCREEN_WIDTH;
+		//}
+		//else {
+		//	if (x1 - x0 > 32)
+		//		x0 += SCREEN_WIDTH;
+		//}
+		//int16_t y1 = v1.y;
+		//int16_t z1 = v1.z;
+
+		//int16_t dx = abs(x1 - x0);
+		//int16_t sx = x0 < x1 ? 1 : -1;
+		//int16_t dy = abs(y1 - y0);
+		//int16_t sy = y0 < y1 ? 1 : -1;
+		//int16_t dz = abs(z1 - z0);
+		//int16_t sz = z0 < z1 ? 1 : -1;
+		//int16_t dm = max(max(dx, dy), dz);
+		//int16_t i = dm; /* maximum difference */
+		//x1 = dm / 2;
+		//y1 = dm / 2;
+		//z1 = dm / 2; /* error offset */
+
+		//for (;;) { /* loop */
+		//	//drawPointDepth((x0+SCREEN_WIDTH) % SCREEN_WIDTH,y0,z0, r, g, b);
+		//	drawPointDepth((x0), y0, z0, c);
+		//	if (i-- == 0) break;
+		//	x1 -= dx;
+		//	if (x1 < 0) {
+		//		x1 += dm;
+		//		x0 += sx;
+		//	}
+		//	y1 -= dy;
+		//	if (y1 < 0) {
+		//		y1 += dm;
+		//		y0 += sy;
+		//	}
+		//	z1 -= dz;
+		//	if (z1 < 0) {
+		//		z1 += dm;
+		//		z0 += sz;
+		//	}
+		//}
+	}
 
 	void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB c) {
 		//if (x0 > x1) {
