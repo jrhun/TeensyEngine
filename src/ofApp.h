@@ -32,6 +32,10 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider floatSlider4;
 		ofxFloatSlider floatSlider5;
 		ofxFloatSlider floatSlider6;
+		ofxIntSlider   intSliderFade;
+		ofxIntSlider   intSliderBlur;
+		ofxIntSlider   intSliderSpiral;
+		ofxIntSlider   intSliderNoiseSmear;
 };
 
 #endif

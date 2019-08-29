@@ -16,20 +16,22 @@ public:
 		gfx.resetZ();
 		auto lines1 = cube.getLines(2.0f);
 		auto lines2 = cube.getLines(2.0f);
-		Mat3 m1 = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
-		float xOff = (cameraOffset + 3) * cos(angle + PI);
-		float zOff = (cameraOffset + 3) * sin(angle + PI);
 		for (auto &v : lines1.vertices) {
-			v = v * m1;
+			Mat3 m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
+			v = v * m;
+			//v.z -= cameraOffset;
+			float xOff = (cameraOffset+3) * cos(angle + PI);
+			float zOff = (cameraOffset+3) * sin(angle + PI);
 			v.x += xOff;
 			v.z += zOff;
 			engine.sst.TransformSphere(v);
 		}
-		Mat3 m2 = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
-		xOff = (-cameraOffset + 3) * cos(angle);
-		zOff = (-cameraOffset + 3) * sin(angle);
 		for (auto &v : lines2.vertices) {
-			v = v * m2;			
+			Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
+			v = v * m;
+			//v.z -= cameraOffset;
+			float xOff = (-cameraOffset + 3) * cos(angle);
+			float zOff = (-cameraOffset + 3) * sin(angle);
 			v.x += xOff;
 			v.z += zOff;
 			engine.sst.TransformSphere(v);

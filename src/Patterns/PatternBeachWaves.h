@@ -14,15 +14,17 @@ public:
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
 
-		if (Pattern::useDefaultEffect)
-			gfx.fade(64);// ledControl.fade();
-		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127);
+		if (Pattern::useDefaultEffect) {
+			gfx.fade(2);// ledControl.fade();
+			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 182);
+		}
+		//
 
 		for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 			uint8_t x1 = beat8(20);
 			uint8_t x2 = beat8(23);
-			x1 = myMap(x1, 0, 255, 0, SCREEN_WIDTH) + y;
-			x2 = myMap(x2, 0, 255, SCREEN_WIDTH, 0) + SCREEN_WIDTH - y;
+			x1 = myMap(x1, 0, 255, 0, SCREEN_WIDTH) + (SCREEN_HEIGHT - y) * (inoise8(beat8(10)));
+			x2 = myMap(x2, 0, 255, SCREEN_WIDTH, 0) + SCREEN_WIDTH - (SCREEN_HEIGHT - y) * (inoise8(beat8(10)));
 			x1 %= SCREEN_WIDTH;
 			x2 %= SCREEN_WIDTH;
 			uint8_t h1 = Data::getHue() + y * 2 + random8(10);

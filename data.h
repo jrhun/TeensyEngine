@@ -109,6 +109,11 @@ float GuiVars4 = 0.87;
 float GuiVars5 = 1.5;
 float GuiVars6 = 1.2;
 
+uint8_t FxFade = 128;
+uint8_t FxBlur = 0;
+uint8_t FxSpiral = 0;
+uint8_t FxNoiseSmear = 0;
+
 
 uint8_t vars[NUM_VARS] = {
   7, 25, 4, 1, 1, 0

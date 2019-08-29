@@ -24,7 +24,7 @@ Engine engine(gfx);
 
 
 #include "../Effects.h"
-#include "Particle.h"
+#include "../Particle.h"
 
 //#include "../VariableControl.h"
 

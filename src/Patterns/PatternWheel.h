@@ -2,6 +2,7 @@
 
 #include "Pattern.h"
 #include "../../data.h"
+#include "../Particle.h"
 
 class PatternWheelBlur : public Pattern {
 public:
@@ -25,8 +26,9 @@ public:
 			gfx.putPixel(x+1, y+1, c);
 		}
 
-		if (Pattern::useDefaultEffect)
+		if (Pattern::useDefaultEffect) {
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
+		}
 
 		offset += 0.4;
 		angle += 30;
@@ -39,18 +41,36 @@ public:
 
 };
 
+//class WheelPS : public ParticleSystem {
+//public:
+//	WheelPS() {}
+//
+//	Particle getParticle() {
+//		Particle p;
+//		p.pos = Vec3(0.0f, 0.0f, 0.0f );
+//
+//		return p;
+//	}
+//
+//};
+
 class PatternWheelPart : public Pattern {
 public: 
 	PatternWheelPart() : Pattern("Wheel (Particles)") {
 	}
 
 	void start() {
-		//ParticleSystem::init();
+		ps.init();
 	}
 	uint8_t drawFrame() {
-		//ps.addParticle();
-		//ps.run();
+		gfx.resetZ();
+		if (Pattern::useDefaultEffect) {
+			gfx.fade(128);
+		}
+		ps.addParticle();
+		ps.addParticle();
+		ps.run();
 		return 0;
 	}
-	//ParticleSystem ps;
+	ParticleSystem ps;
 };
