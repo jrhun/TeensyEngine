@@ -34,7 +34,7 @@ void ofApp::setup() {
 	gui.add(intSliderFade.setup("Fade", 128, 0, 255));
 	gui.add(intSliderBlur.setup("Blur", 0, 0, 255));
 	gui.add(intSliderSpiral.setup("Spiral", 0, 0, 255));
-	gui.add(indSliderNoiseSmear.setup("Noise smear", 0, 0, 255));
+	gui.add(intSliderNoiseSmear.setup("Noise smear", 0, 0, 255));
 }
 
 //--------------------------------------------------------------
@@ -52,7 +52,10 @@ void ofApp::draw() {
 	GuiVars4 = floatSlider4;
 	GuiVars5 = floatSlider5;
 	GuiVars6 = floatSlider6;
-
+	FxFade	 = intSliderFade;
+	FxBlur   = intSliderBlur;
+	FxSpiral = intSliderSpiral;
+	FxNoiseSmear = intSliderNoiseSmear;
 
 	patterns.run();
 

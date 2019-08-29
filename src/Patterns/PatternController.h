@@ -95,9 +95,14 @@ public:
 			//gfx.show();
 #endif
 			gfx.show();
-			gfx.fade(guiFade);
-			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 128)
+			if (!Pattern::useDefaultEffect) {
+				if (FxFade)
+					gfx.fade(FxFade);
+				if (FxBlur)
+					blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
+				if (FxSpiral)
+					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
+			}
 
 		}
 		if (now - nextHueUpdate > 1000 / 60) {

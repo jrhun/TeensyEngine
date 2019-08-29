@@ -16,7 +16,9 @@ public:
 
 
 	uint8_t drawFrame() {
-		gfx.fade(128);
+		if (Pattern::useDefaultEffect) {
+			gfx.fade(128);
+		}
 		gfx.resetZ();
 		const int maxI = 64;
 		float step = (PI) / (maxI - 1);
