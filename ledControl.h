@@ -15,12 +15,19 @@
 #define LAST_VISIBLE_LED    1920  //(NUM_STRIPS * NUM_LEDS_PER_STRIP)
 //#define FPS                 60
 
+/*
+#if !defined(pgm_read_byte)
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#endif
+#if !defined(pgm_read_word)
 #define pgm_read_word(addr) (*(const unsigned short *)(addr))
+#endif
+#if !defined(pgm_read_pointer)
 #define pgm_read_pointer(addr) ((void *)pgm_read_word(addr))
-
+#endif
+*/
 CRGBArray < NUM_LEDS > leds;
-uint8_t zBuffer[ROWS * COLS];
+//uint8_t zBuffer[ROWS * COLS];
 //CRGB scratchArray[NUM_LEDS]; // have global as ESP doesn't like variables on the stack
 CRGBPalette16 currentPalette;
 CRGBPalette16 targetPalette;
@@ -152,6 +159,7 @@ class Leds : public FastLED_GFX {
     Leds() : FastLED_GFX(COLS, ROWS) {}
 
     void init() {
+      #if defined(ESP32)
       FastLED.addLeds<WS2812B, 13, GRB>(leds, 0 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 12, GRB>(leds, 1 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 14, GRB>(leds, 2 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
@@ -160,7 +168,10 @@ class Leds : public FastLED_GFX {
       FastLED.addLeds<WS2812B, 25, GRB>(leds, 5 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 33, GRB>(leds, 6 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 32, GRB>(leds, 7 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-
+      #elif defined(__IMXRT1052__) || defined(__IMXRT1062__) 
+      FastLED.addLeds<NUM_STRIPS, WS2812B, LED1, GRB>(leds, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      #endif // teensy 4.x
+      
       FastLED.setBrightness( Data::brightness );
       FastLED.setTemperature( OvercastSky );
       //      FastLED.setMaxPowerInVoltsAndMilliamps(5, 5000);
@@ -223,7 +234,7 @@ class Leds : public FastLED_GFX {
 
     CRGB getColour(uint8_t offset = 0) {
       CRGB colour = ColorFromPalette( currentPalette, Data::hue + offset);
-      if (adjustGamma)
+      if (Data::adjustGamma)
         adjustGamma(colour);
       return colour;
     }
@@ -287,133 +298,6 @@ class Leds : public FastLED_GFX {
           err += dx;
         }
       }
-    }
-
-    void resetZbuffer() {
-      for (uint16_t i = 0; i < ROWS * COLS; i++) {
-        zBuffer[i] = 0;
-      }
-    }
-    static const int8_t zMax = 32;
-
-    static void changeToScreenSpace(int8_t &x, int8_t &y, int8_t z) {
-      // maps x/y in place to perspective
-      // X/Y/Z should be centered around 0/0/0 to work correctly
-      const float cameraDistance = 2;
-      float p = (z + zMax) / (zMax * 2.0);// scale 0 to 1
-      p = 1 / (cameraDistance - p);
-      // perspective and offset to screen space mid point
-      x = int8_t(x * p) + COLS / 2;
-      y = int8_t(y * p) + ROWS / 2;
-    }
-    static void changeToScreenSpace(int8_t &x, int8_t z, bool isX = true) {
-      const float cameraDistance = 2;
-      float p = (z + zMax) / (zMax * 2.0);// scale 0 to 1
-      p = 1 / (cameraDistance - p);
-      x = int8_t(x * p) + isX ? COLS / 2 : ROWS / 2;
-    }
-    void drawPointZ(int8_t x, int8_t y, int8_t z, uint8_t hue) {
-      uint8_t iz = map(z, -zMax, zMax, 0, 255);
-      if (y >= 0 and y < ROWS) {
-        uint16_t index = (x + COLS) % COLS + y * COLS;
-        if (iz > zBuffer[index]) {
-          zBuffer[index] = iz;
-          CRGB col = CHSV((Data::getHue() + hue) % 256, map(z, -zMax, zMax, 64, 255), iz);
-          drawPixel((x + COLS) % COLS, y, col);
-        }
-      }
-    }
-    void drawLineZ(int16_t x1, int16_t y1, int16_t z1, int16_t x2, int16_t y2, int16_t z2, uint8_t hue) {
-      // z axis affects brightness and saturation
-      // uses Z buffer
-      uint8_t dx =  abs(x2 - x1);
-      uint8_t dy =  abs(y2 - y1);
-      uint8_t dz =  abs(z2 - z1);
-      int8_t sx = x1 < x2 ? 1 : -1;
-      int8_t sy = y1 < y2 ? 1 : -1;
-      int8_t sz = z1 < z2 ? 1 : -1;
-      uint8_t dm = max(max(dx, dy), dz);
-      uint8_t i = dm;
-      x2 = y2 = z2 = dm / 2;
-      for (;;) {
-        uint8_t z = map(z1, -zMax, zMax, 0, 255);
-        if (y1 >= 0 and y1 < ROWS) {
-          uint16_t index = (x1 + COLS) % COLS + y1 * COLS;
-          if (z > zBuffer[index]) {
-            zBuffer[index] = z;
-            CRGB col = CHSV((Data::getHue() + hue + abs(dm - i)) % 256, map(z1, -zMax, zMax, 64, 255), z);
-            drawPixel((x1 + COLS) % COLS, y1, col);
-          }
-          hue++;
-        }
-        if (i-- == 0) break;
-        x2 -= dx;
-        if (x2 < 0) {
-          x2 += dm;
-          x1 += sx;
-        }
-        y2 -= dy;
-        if (y2 < 0) {
-          y2 += dm;
-          y1 += sy;
-        }
-        z2 -= dz;
-        if (z2 < 0) {
-          z2 += dm;
-          z1 += sz;
-        }
-      }
-    }
-
-    size_t write(uint8_t c) {
-      if (!gfxFont) { // 'Classic' built-in font
-
-        if (c == '\n') {
-          cursor_y += textsize * 8;
-          cursor_x  = 0;
-        } else if (c == '\r') {
-          // skip em
-        } else {
-          if (wrap && ((cursor_x + textsize * 6) >= _width * 2)) { // Heading off edge?
-            cursor_x  = 0;            // Reset x to zero
-            cursor_y += textsize * 8; // Advance y one line
-          }
-          cursor_x %= _width; //wrap around
-          drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-          cursor_x += textsize * 6;
-        }
-
-      } else { // Custom font
-
-        if (c == '\n') {
-          cursor_x  = 0;
-          cursor_y += (int16_t)textsize *
-                      (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
-        } else if (c != '\r') {
-          uint8_t first = pgm_read_byte(&gfxFont->first);
-          if ((c >= first) && (c <= (uint8_t)pgm_read_byte(&gfxFont->last))) {
-            uint8_t   c2    = c - pgm_read_byte(&gfxFont->first);
-            GFXglyphFL *glyph = &(((GFXglyphFL *)pgm_read_pointer(&gfxFont->glyph))[c2]);
-            uint8_t   w     = pgm_read_byte(&glyph->width),
-                      h     = pgm_read_byte(&glyph->height);
-            if ((w > 0) && (h > 0)) { // Is there an associated bitmap?
-              int16_t xo = (int8_t)pgm_read_byte(&glyph->xOffset); // sic
-              if (wrap && ((cursor_x + textsize * (xo + w)) >= _width * 2)) {
-                // Drawing character would go off right edge; wrap to new line
-                cursor_x  = 0;
-
-                cursor_y += (int16_t)textsize *
-                            (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
-              }
-              cursor_x %= _width; //wrap around
-              drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-            }
-            cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
-          }
-        }
-
-      }
-      return 1;
     }
 
     void drawRGBBitmap(int16_t x, int16_t y,
@@ -500,6 +384,7 @@ Leds ledControl;
 
 
 
+#if defined (ESP32)
 // -- The core to run FastLED.show()
 #define FASTLED_SHOW_CORE 0
 
@@ -540,7 +425,7 @@ void FastLEDshowTask(void *pvParameters)
   }
 }
 
-
+#endif //ESP32
 
 
 #endif //LEDS_H

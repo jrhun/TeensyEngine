@@ -46,7 +46,7 @@ public:
 		// 
 	}
 
-	Cube cube;
+	//Cube cube;
 
 	void composeFrame() {
 		// pipeline!
@@ -56,7 +56,7 @@ public:
 		//generate list of vertex
 		//send to pipeline
 
-		solidCube();
+		//solidCube();
 		
 		//wireFrame();
 		//grid();
@@ -86,47 +86,66 @@ public:
 		}
 	}
 
-	void solidCube() {
-		auto it = cube.getTriangles<Vertex>(2.0f);
-		for (auto &v : it.vertices) {
-			Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
-			v.pos = v.pos * m;
-			float xOff = cameraOffset * cos(anglex);
-			float zOff = cameraOffset * sin(anglex);
-			v.pos.x += xOff;
-			v.pos.z += zOff;
-		}
-		pipeline.Draw(it);
-	}
+	//void solidCube() {
+	//	auto it = cube.getTriangles<Vertex>(2.0f);
+	//	for (auto &v : it.vertices) {
+	//		Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
+	//		v.pos = v.pos * m;
+	//		float xOff = cameraOffset * cos(anglex);
+	//		float zOff = cameraOffset * sin(anglex);
+	//		v.pos.x += xOff;
+	//		v.pos.z += zOff;
+	//	}
+	//	pipeline.Draw(it);
+	//}
 
-	void wireFrame() {
-		auto lines = cube.getLines(2.0f);
-		for (auto &v : lines.vertices) {
-			Mat3 m = Mat3::RotationY(angley)  * Mat3::RotationX(anglex);
-			v = v * m;
-			//v.z -= cameraOffset;
-			float xOff = cameraOffset * cos(anglex+PI);
-			float zOff = cameraOffset * sin(anglex+PI);
-			v.x += xOff;
-			v.z += zOff;
-			sst.TransformSphere(v);
-		}
-		for (size_t i = 0; i < lines.indices.size() / 2; i++) {
-			gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], 0, 50, 255);
-		}
-	}
+	//void wireFrame() {
+	//	auto lines = cube.getLines(2.0f);
+	//	for (auto &v : lines.vertices) {
+	//		Mat3 m = Mat3::RotationY(angley)  * Mat3::RotationX(anglex);
+	//		v = v * m;
+	//		//v.z -= cameraOffset;
+	//		float xOff = cameraOffset * cos(anglex+PI);
+	//		float zOff = cameraOffset * sin(anglex+PI);
+	//		v.x += xOff;
+	//		v.z += zOff;
+	//		sst.TransformSphere(v);
+	//	}
+	//	//map indicies to hue offset
+	//	// 
+	//	auto getIndicesHue = [this](int i) {
+	//		switch (i) {
+	//		//front face
+	//		case 0: 
+	//		case 1: 
+	//		case 2: 
+	//		case 3:
+	//			return 0;
+	//		case 4:
+	//		case 5:
+	//		case 6:
+	//		case 7:
+	//			return 40;
+	//		}
+	//	};
+	//	for (size_t i = 0; i < lines.indices.size() / 2; i++) {
+	//		uint8_t hue1 = getIndicesHue(lines.indices.at(i * 2));
+	//		uint8_t hue2 = getIndicesHue(lines.indices.at(i * 2 + 1));
+	//		gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], hue1, hue2);
+	//	}
+	//}
 
-	void drawTest() {
-		gfx.resetZ();
-		for (int i = 0; i < 20; i++) {
-			for (int j = 0; j < 20; j++) {
-				Vec3 a(i, i, 0);
-				Vec3 b(i + 30, i, 255);
-				gfx.drawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
-				//gfx->putPixel(i, i+j, (i / 20.0) * (j / 20.0) * 255);
-			}
-		}
-	}
+	//void drawTest() {
+	//	gfx.resetZ();
+	//	for (int i = 0; i < 20; i++) {
+	//		for (int j = 0; j < 20; j++) {
+	//			Vec3 a(i, i, 0);
+	//			Vec3 b(i + 30, i, 255);
+	//			gfx.drawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
+	//			//gfx->putPixel(i, i+j, (i / 20.0) * (j / 20.0) * 255);
+	//		}
+	//	}
+	//}
 
 	void init() {
 		gfx.init();

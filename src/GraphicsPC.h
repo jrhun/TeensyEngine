@@ -113,6 +113,6 @@ public:
 
 	int scale = 8;
 	uint8_t hue = 0;
-	CRGB leds[SCREEN_WIDTH * SCREEN_HEIGHT];
+	/*CRGB leds[SCREEN_WIDTH * SCREEN_HEIGHT];*/
 };
 

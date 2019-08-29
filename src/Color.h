@@ -1982,7 +1982,227 @@ public:
 
 
 
+void fill_raw_noise8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint16_t x, int scale, uint16_t time) {
+	uint32_t _xx = x;
+	uint32_t scx = scale;
+	for (int o = 0; o < octaves; o++) {
+		for (int i = 0, xx = _xx; i < num_points; i++, xx += scx) {
+			pData[i] = qadd8(pData[i], inoise8(xx, time) >> o);
+		}
 
+		_xx <<= 1;
+		scx <<= 1;
+	}
+}
+
+void fill_raw_noise16into8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint32_t x, int scale, uint32_t time) {
+	uint32_t _xx = x;
+	uint32_t scx = scale;
+	for (int o = 0; o < octaves; o++) {
+		for (int i = 0, xx = _xx; i < num_points; i++, xx += scx) {
+			uint32_t accum = (inoise16(xx, time)) >> o;
+			accum += (pData[i] << 8);
+			if (accum > 65535) { accum = 65535; }
+			pData[i] = accum >> 8;
+		}
+
+		_xx <<= 1;
+		scx <<= 1;
+	}
+}
+
+void fill_raw_2dnoise8(uint8_t *pData, int width, int height, uint8_t octaves, q44 freq44, fract8 amplitude, int skip, uint16_t x, int scalex, uint16_t y, int scaley, uint16_t time) {
+	if (octaves > 1) {
+		fill_raw_2dnoise8(pData, width, height, octaves - 1, freq44, amplitude, skip + 1, x*freq44, freq44 * scalex, y*freq44, freq44 * scaley, time);
+	}
+	else {
+		// amplitude is always 255 on the lowest level
+		amplitude = 255;
+	}
+
+	scalex *= skip;
+	scaley *= skip;
+
+	fract8 invamp = 255 - amplitude;
+	uint16_t xx = x;
+	for (int i = 0; i < height; i++, y += scaley) {
+		uint8_t *pRow = pData + (i*width);
+		xx = x;
+		for (int j = 0; j < width; j++, xx += scalex) {
+			uint8_t noise_base = inoise8(xx, y, time);
+			noise_base = (0x80 & noise_base) ? (noise_base - 127) : (127 - noise_base);
+			noise_base = scale8(noise_base << 1, amplitude);
+			if (skip == 1) {
+				pRow[j] = scale8(pRow[j], invamp) + noise_base;
+			}
+			else {
+				for (int ii = i; ii < (i + skip) && ii < height; ii++) {
+					uint8_t *pRow = pData + (ii*width);
+					for (int jj = j; jj < (j + skip) && jj < width; jj++) {
+						pRow[jj] = scale8(pRow[jj], invamp) + noise_base;
+					}
+				}
+			}
+		}
+	}
+}
+
+void fill_raw_2dnoise8(uint8_t *pData, int width, int height, uint8_t octaves, uint16_t x, int scalex, uint16_t y, int scaley, uint16_t time) {
+	fill_raw_2dnoise8(pData, width, height, octaves, q44(2, 0), 128, 1, x, scalex, y, scaley, time);
+}
+
+void fill_raw_2dnoise16(uint16_t *pData, int width, int height, uint8_t octaves, q88 freq88, fract16 amplitude, int skip, uint32_t x, int scalex, uint32_t y, int scaley, uint32_t time) {
+	if (octaves > 1) {
+		fill_raw_2dnoise16(pData, width, height, octaves - 1, freq88, amplitude, skip, x *freq88, scalex *freq88, y * freq88, scaley * freq88, time);
+	}
+	else {
+		// amplitude is always 255 on the lowest level
+		amplitude = 65535;
+	}
+
+	scalex *= skip;
+	scaley *= skip;
+	fract16 invamp = 65535 - amplitude;
+	for (int i = 0; i < height; i += skip, y += scaley) {
+		uint16_t *pRow = pData + (i*width);
+		for (int j = 0, xx = x; j < width; j += skip, xx += scalex) {
+			uint16_t noise_base = inoise16(xx, y, time);
+			noise_base = (0x8000 & noise_base) ? noise_base - (32767) : 32767 - noise_base;
+			noise_base = scale16(noise_base << 1, amplitude);
+			if (skip == 1) {
+				pRow[j] = scale16(pRow[j], invamp) + noise_base;
+			}
+			else {
+				for (int ii = i; ii < (i + skip) && ii < height; ii++) {
+					uint16_t *pRow = pData + (ii*width);
+					for (int jj = j; jj < (j + skip) && jj < width; jj++) {
+						pRow[jj] = scale16(pRow[jj], invamp) + noise_base;
+					}
+				}
+			}
+		}
+	}
+}
+
+int32_t nmin = 11111110;
+int32_t nmax = 0;
+
+void fill_raw_2dnoise16into8(uint8_t *pData, const int width, const int height, uint8_t octaves, q44 freq44, fract8 amplitude, int skip, uint32_t x, int scalex, uint32_t y, int scaley, uint32_t time) {
+	if (octaves > 1) {
+		fill_raw_2dnoise16into8(pData, width, height, octaves - 1, freq44, amplitude, skip + 1, x*freq44, scalex *freq44, y*freq44, scaley * freq44, time);
+	}
+	else {
+		// amplitude is always 255 on the lowest level
+		amplitude = 255;
+	}
+
+	scalex *= skip;
+	scaley *= skip;
+	uint32_t xx;
+	fract8 invamp = 255 - amplitude;
+	for (int i = 0; i < height; i += skip, y += scaley) {
+		uint8_t *pRow = pData + (i*width);
+		xx = x;
+		for (int j = 0; j < width; j += skip, xx += scalex) {
+			uint16_t noise_base = inoise16(xx, y, time);
+			noise_base = (0x8000 & noise_base) ? noise_base - (32767) : 32767 - noise_base;
+			noise_base = scale8(noise_base >> 7, amplitude);
+			if (skip == 1) {
+				pRow[j] = qadd8(scale8(pRow[j], invamp), noise_base);
+			}
+			else {
+				for (int ii = i; ii < (i + skip) && ii < height; ii++) {
+					uint8_t *pRow = pData + (ii*width);
+					for (int jj = j; jj < (j + skip) && jj < width; jj++) {
+						pRow[jj] = scale8(pRow[jj], invamp) + noise_base;
+					}
+				}
+			}
+		}
+	}
+}
+
+void fill_raw_2dnoise16into8(uint8_t *pData, const int width, const int height, uint8_t octaves, uint32_t x, int scalex, uint32_t y, int scaley, uint32_t time) {
+	fill_raw_2dnoise16into8(pData, width, height, octaves, q44(2, 0), 171, 1, x, scalex, y, scaley, time);
+}
+
+
+void fill_2dnoise8(CRGB *leds, int width, int height, bool serpentine,
+	uint8_t octaves, uint16_t x, int xscale, uint16_t y, int yscale, uint16_t time,
+	uint8_t hue_octaves, uint16_t hue_x, int hue_xscale, uint16_t hue_y, uint16_t hue_yscale, uint16_t hue_time, bool blend) {
+	uint8_t *V = new uint8_t[height*width];
+	uint8_t *H = new uint8_t[height*width];
+
+	memset(V, 0, height*width);
+	memset(H, 0, height*width);
+
+	fill_raw_2dnoise8((uint8_t*)V, width, height, octaves, x, xscale, y, yscale, time);
+	fill_raw_2dnoise8((uint8_t*)H, width, height, hue_octaves, hue_x, hue_xscale, hue_y, hue_yscale, hue_time);
+
+	int w1 = width - 1;
+	int h1 = height - 1;
+	for (int i = 0; i < height; i++) {
+		int wb = i * width;
+		for (int j = 0; j < width; j++) {
+			CRGB led(CHSV(H[(h1 - i) + (w1 - j) * width], 255, V[i+ j * width]));
+
+			int pos = j;
+			if (serpentine && (i & 0x1)) {
+				pos = w1 - j;
+			}
+
+			if (blend) {
+				leds[wb + pos] >>= 1; leds[wb + pos] += (led >>= 1);
+			}
+			else {
+				leds[wb + pos] = led;
+			}
+		}
+	}
+	delete[] V;
+	delete[] H;
+}
+
+void fill_2dnoise16(CRGB *leds, const int width, const int height, bool serpentine,
+	uint8_t octaves, uint32_t x, int xscale, uint32_t y, int yscale, uint32_t time,
+	uint8_t hue_octaves, uint16_t hue_x, int hue_xscale, uint16_t hue_y, uint16_t hue_yscale, uint16_t hue_time, bool blend, uint16_t hue_shift) {
+	uint8_t *V = new uint8_t[height*width];
+	uint8_t *H = new uint8_t[height*width];
+
+	memset(V, 0, height*width);
+	memset(H, 0, height*width);
+
+	fill_raw_2dnoise16into8((uint8_t*)V, width, height, octaves, q44(2, 0), 171, 1, x, xscale, y, yscale, time);
+	// fill_raw_2dnoise16into8((uint8_t*)V,width,height,octaves,x,xscale,y,yscale,time);
+	// fill_raw_2dnoise8((uint8_t*)V,width,height,hue_octaves,x,xscale,y,yscale,time);
+	fill_raw_2dnoise8((uint8_t*)H, width, height, hue_octaves, hue_x, hue_xscale, hue_y, hue_yscale, hue_time);
+
+
+	int w1 = width - 1;
+	int h1 = height - 1;
+	hue_shift >>= 8;
+
+	for (int i = 0; i < height; i++) {
+		int wb = i * width;
+		for (int j = 0; j < width; j++) {
+			CRGB led(CHSV(hue_shift + (H[(h1 - i) + (w1 - j) * width]), 196, V[i + j * width]));
+
+			int pos = j;
+			if (serpentine && (i & 0x1)) {
+				pos = w1 - j;
+			}
+
+			if (blend) {
+				leds[wb + pos] >>= 1; leds[wb + pos] += (led >>= 1);
+			}
+			else {
+				leds[wb + pos] = led;
+			}
+		}
+	}
+	delete[] V;
+	delete[] H;
+}
 
 
 

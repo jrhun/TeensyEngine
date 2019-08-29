@@ -2,6 +2,7 @@
 #define DATA_H
 
 // PIN DEFINITIONS
+#if defined(ESP32)
 #define EN_A_PIN        34
 #define EN_B_PIN        35
 #define JOY_CENTRE_PIN  22
@@ -11,14 +12,49 @@
 #define JOY_RIGHT_PIN   3
 
 #define EQ_RESET_PIN    19
-#define EQ_STROBE_PIN      21
+#define EQ_STROBE_PIN   21
 #define OLED_LED_PIN    1
-#define EQ_AUDIO_PIN   36  // ADC1 CH0
+#define EQ_AUDIO_PIN    36  // ADC1 CH0
 #define AMP_IN_PIN      39
 
 #define OLED_DC 16
 #define OLED_RS 17
 #define OLED_CS 5
+
+#endif // esp32 defines
+// teensy 4.x
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__) 
+#define EN_A_PIN        1
+#define EN_B_PIN        0
+#define JOY_CENTRE_PIN  5
+#define JOY_UP_PIN      4
+#define JOY_LEFT_PIN    6
+#define JOY_DOWN_PIN    2
+#define JOY_RIGHT_PIN   3
+
+#define EQ_RESET_PIN    9
+#define EQ_STROBE_PIN   10
+#define EQ_AUDIO_PIN    26  //A12
+#define MIC_IN_PIN      27  //A13
+#define AMP_IN_PIN      21  //A7
+#define VOLTS_IN_PIN    20  //A6
+
+#define OLED_DC         32
+#define OLED_RS         31
+#define OLED_CS         30 
+#define OLED_LED_PIN    33
+
+#define LED1            19
+#define LED2            18
+#define LED3            14
+#define LED4            15
+#define LED5            17
+#define LED6            16
+#define LED7            22
+#define LED8            23
+
+
+#endif // teensy 4.x
 
 #define NUM_VARS    6
 #define NUM_BUTTONS 6
@@ -35,43 +71,43 @@ typedef std::string String;
 #endif
 
 namespace Data {
-//  public:
-// VARS
+	//  public:
+	// VARS
 
-// Led control variables
-uint8_t brightness = 24;
-uint8_t fadeAmount = 48;
-bool adjustGamma = false;
+	// Led control variables
+	uint8_t brightness = 24;
+	uint8_t fadeAmount = 48;
+	bool adjustGamma = false;
 
-uint8_t hueScale = 3;
-uint8_t hueInc = 1;
-uint16_t hue = 0;
-uint8_t getHue() {
-  return hue / hueScale;
-}
-void incHue() {
-  hue = (hue + hueInc) % (256 * hueScale);
-}
+	uint8_t hueScale = 3;
+	uint8_t hueInc = 1;
+	uint16_t hue = 0;
+	uint8_t getHue() {
+		return hue / hueScale;
+	}
+	void incHue() {
+		hue = (hue + hueInc) % (256 * hueScale);
+	}
 
-//pattern vars
-uint8_t FPS = 90;
+	//pattern vars
+	uint8_t FPS = 90;
 
-// UI variables
-uint8_t currentPattern = 0;
-uint8_t currentPalette = 0;
+	// UI variables
+	uint8_t currentPattern = 0;
+	uint8_t currentPalette = 0;
 
-// audio vars
-uint8_t noiseFloor = 65;
+	// audio vars
+	uint8_t noiseFloor = 65;
 
 
 } //end nameSpace Data
 
-float GuiVars1 = 1.0;
-float GuiVars2 = 1.0;
-float GuiVars3 = 1.0;
-float GuiVars4 = 1.0;
-float GuiVars5 = 1.0;
-float GuiVars6 = 1.0;
+float GuiVars1 = 1.6; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
+float GuiVars2 = 0.6;
+float GuiVars3 = 1.25;
+float GuiVars4 = 0.87;
+float GuiVars5 = 1.5;
+float GuiVars6 = 1.2;
 
 
 uint8_t vars[NUM_VARS] = {
@@ -86,7 +122,7 @@ String varsName[NUM_VARS] = {
 };
 
 
-bool buttons[NUM_BUTTONS] = { 0, 1, 1, 1, 0, 0}; // gamma, dither, on
+bool buttons[NUM_BUTTONS] = { 0, 1, 1, 1, 0, 0 }; // gamma, dither, on
 
 
 
@@ -117,22 +153,22 @@ gamma6[] = {
 
 static const uint8_t PROGMEM
 decayData[] = {
-  255, 225, 199, 175, 155, 136, 120, 106,
-  94, 83, 73, 64, 57, 50, 44, 39,
-  35, 30, 27, 24, 21, 18, 16, 14,
-  13, 11, 10, 9, 8, 7, 6, 5,
-  5, 4, 4, 3, 3, 2, 2, 2,
-  2, 2, 1, 1, 1, 1, 1, 1,
-  1, 1, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0
+	0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,1,1,
+	1,1,1,1,1,1,2,2,
+	2,2,2,3,3,4,4,5,
+	5,6,7,8,9,10,11,13,
+	14,16,18,21,24,27,30,35,
+	39,44,50,57,64,73,83,94,
+	106,120,136,155,175,199,225,255
 };
 
-uint8_t decay(uint8_t i) {
-  uint8_t d = i / 4;
-  uint8_t r = i % 4; //0 1 2 3
-  if (d == 63)
-    return decayData[d];
-  return (decayData[d] * (3 - r) + decayData[d + 1] * r) / 3;
+uint8_t decayExp(uint8_t i) {
+	uint8_t d = i / 4;
+	uint8_t r = i % 4; //0 1 2 3
+	if (d == 63)
+		return decayData[d];// *r + decayData[d - 1] * (3 - r);
+	return (decayData[d] * (3 - r) + decayData[d + 1] * r) / 3;
 }
 
 #endif //DATA_H
