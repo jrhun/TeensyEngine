@@ -22,7 +22,7 @@ public:
 		vertices.emplace_back(side, side, side); // 7
 
 		return { 
-			vertices, {
+			std::move(vertices), {
 				0,1,	1,3,	3,2,	2,0,
 				0,4,	1,5,	3,7,	2,6,
 				4,5,	5,7,	7,6,	6,4}
@@ -45,7 +45,7 @@ public:
 		vertices.emplace_back(-side, side, side); // 6
 		vertices.emplace_back(side, side, side); // 7
 
-		std::vector<V> verts(vertices.size());
+		std::vector<V> verts(8); // teensyduino does't work if we pass size_t to it
 		for (size_t i = 0; i < vertices.size(); i++)
 		{
 			verts[i].pos = vertices[i];

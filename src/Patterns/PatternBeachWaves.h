@@ -13,7 +13,10 @@ public:
 
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
-		gfx.fade(64);// ledControl.fade();
+
+		if (Pattern::useDefaultEffect)
+			gfx.fade(64);// ledControl.fade();
+		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127);
 
 		for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 			uint8_t x1 = beat8(20);

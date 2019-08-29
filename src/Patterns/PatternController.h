@@ -10,6 +10,7 @@
 #include "PatternCube.h"
 #include "PatternParametric.h"
 #include "PatternWireFrame.h"
+#include "PatternWheel.h"
 
 
 class PatternController {
@@ -17,27 +18,32 @@ public:
 	PatternController() {}
 
 	//add patterns as members here
-	PatternBeachWaves	beachWaves;
-	PatternSpiral		spiral;
-	PatternCube			cube3d;
 	PatternParametric	parametric;
+	PatternSpiral		spiral;
+	PatternBeachWaves	beachWaves;
 	PatternWireFrame	wireFrame;
+	PatternCube			cube3d;
+	PatternWheelPart	WheelParticles;
+	PatternWheelBlur	WheelBlur;
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 5;
+	static const uint8_t numPatterns = 7;
 	Pattern *patternList[numPatterns] = {
-		&wireFrame,
+		&WheelParticles,
+		&WheelBlur,
+		&parametric,
 		&spiral,
-		&beachWaves,
+		&wireFrame,
 		&cube3d,
-		&parametric
+		&beachWaves
+		
 		
 	};
 
-	char* getCurrentPatternName() {
+	const char* getCurrentPatternName() {
 		return getCurrentPattern()->getName(); //patternList[Data::currentPattern].getName();
 	}
-	char* getPatternName(uint8_t i) {
+	const char* getPatternName(uint8_t i) {
 		if (i < size()) return  patternList[i]->getName();
 		else return (char*)"Invalid";
 	}
@@ -89,6 +95,10 @@ public:
 			//gfx.show();
 #endif
 			gfx.show();
+			gfx.fade(guiFade);
+			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
+			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 128)
+
 		}
 		if (now - nextHueUpdate > 1000 / 60) {
 			nextHueUpdate = now;

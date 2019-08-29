@@ -146,6 +146,15 @@ public:
 		temp.Hadamard(rhs);
 		return temp;
 	}
+
+	static _Vec3 getRandom() {
+		// returns random vector between 0 and 1 for each axis
+		_Vec3 v;
+		v.x = random16() / 65536.0f;
+		v.y = random16() / 65536.0f;
+		v.z = random16() / 65536.0f;
+		return v;
+	}
 public:
 	T x;
 	T y;

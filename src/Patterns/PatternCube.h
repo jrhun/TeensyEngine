@@ -7,10 +7,14 @@
 
 class PatternCube : public Pattern {
 public: 
-	PatternCube() : Pattern("Cube 3d") {}
+	PatternCube() : Pattern("Cube 3d")  {
+	}
 
 	uint8_t drawFrame() {
-		gfx.fade(150);
+
+		if (Pattern::useDefaultEffect)
+			gfx.fade(150);
+		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);
 		engine.resetZ();
 		auto it = cube.getTriangles<Vertex>(2.0f);
 		for (auto &v : it.vertices) {
@@ -38,4 +42,5 @@ public:
 	float offsetDir = 1.0;
 	float angle = 0;
 	Cube cube;
+	//VariableControl<float> v; 
 };

@@ -176,6 +176,13 @@
     <ClInclude Include="src\Patterns\PatternWireFrame.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="data.h" />
+    <ClInclude Include="src\VariableControl.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternWheel.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
