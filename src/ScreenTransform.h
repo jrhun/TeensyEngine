@@ -20,8 +20,10 @@ public:
 	}
 
 	Vec3& Transform(Vec3 &v) {
-		return TransformSphere(v);
 		if (v.z < 0) {
+			v.x = 0;
+			v.y = 0;
+			v.z = 0;
 			return v;
 		}
 		float invZ = 1.0f / v.z;
@@ -30,7 +32,7 @@ public:
 		// z goes from model space -1 to 4
 		// screen space 1 to 6 centered around 2
 		// z 2 = alpha of 255, set back cull to z > 6
-		v.z = 255 - ((constrain(v.z, 2, 6) - 2) * zScale);
+		v.z = 255 - ((constrain(v.z, 1, 3) - 1) * 64);
 		v.x = (v.x * height / 2) + (width / 2);
 		v.y = (v.y * height / 2) + (height / 2);
 		return v;
@@ -46,7 +48,7 @@ public:
 		else {
 			v.x = myMap(theta, 0, -PI, width / 2, width); // 0 inclusive, -pi exclusive
 		}
-		v.z = 255 - ((constrain(L, 1, 3) - 1) * zScale * 2);
+		v.z = 255 - ((constrain(L, 1, 3) - 1) * 64);
 		v.y = (v.y * height / 2) + (height / 2);
 		return v;
 
