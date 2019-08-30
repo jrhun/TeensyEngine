@@ -16,10 +16,10 @@ public:
 	//	alpha(0.0f),
 	//	col(0, 0, 0)
 	//{}
-	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col) {}
+	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col), mass(p.mass) {}
 
 	void applyForce(Vec3 &force) {
-		acc += (force / mass);
+		acc += force;// (force / mass);
 	}
 
 	void update() {
@@ -42,7 +42,7 @@ public:
 	Vec3 pos = { 0.0f,0.0f,0.0f };
 	Vec3 vel = { 0.0f,0.0f,0.0f };
 	Vec3 acc = { 0.0f,0.0f,0.0f };
-	float mass = 0; 
+	float mass = 1.0f; 
 	float alpha = 0;
 	CRGB col = CRGB::Black;
 };
@@ -71,6 +71,7 @@ public:
 		p.acc = Vec3(0.0f, 0.0f, 0.0f);
 		p.alpha = 255.0f;
 		p.col = gfx.getColour(random8(40));
+		p.mass = 1.0f;
 		return p;
 	}
 
@@ -107,17 +108,20 @@ public:
 	}
 
 	void applyForce(Vec3 f) {
-		for (auto p : particles) {
-			if (!p.isDead())
-				p.applyForce(f);
+		for (int i = 0; i < particles.size(); i++) {
+			particles[i].applyForce(f);
 		}
+		//for (auto p : particles) {
+			//if (!p.isDead())
+			//p.acc += f;// .applyForce(f);
+		//}
 		//for (int i = 0; i < numParticles; i++) {
 		//	particles[i]->applyForce(f);
 		//}
 	}
 
 	virtual void decreaseLife(Particle &p) {
-		p.alpha -= 2;
+		p.alpha -= 1;
 	}
 
 	void run() {
@@ -164,10 +168,10 @@ public:
 			p.update();
 			
 			// render particle
-			Vec3 pos = p.pos * m;
-			pos.z += 2;
+			Vec3 pos = p.pos;// *m;
+			//pos.z += 2;
 			
-			engine.sst.Transform(pos);
+			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
 			gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(p.alpha, 0, 255, 128, 255)));
 

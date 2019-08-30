@@ -6,11 +6,13 @@
 // include all patterns
 #include "Pattern.h"
 #include "PatternBeachWaves.h"
-#include "PatternSpiral.h"
 #include "PatternCube.h"
+#include "PatternFire.h"
 #include "PatternParametric.h"
+#include "PatternSpiral.h"
 #include "PatternWireFrame.h"
 #include "PatternWheel.h"
+
 
 
 class PatternController {
@@ -18,20 +20,24 @@ public:
 	PatternController() {}
 
 	//add patterns as members here
-	PatternParametric	parametric;
-	PatternSpiral		spiral;
 	PatternBeachWaves	beachWaves;
 	PatternBeachWaves2	beachWaves2;
-	PatternWireFrame	wireFrame;
 	PatternCube			cube3d;
-	PatternWheelPart	WheelParticles;
+	PatternFire			fire;
+	PatternParametric	parametric;
+	PatternSpiral		spiral;
+	PatternWireFrame	wireFrame;
 	PatternWheelBlur	WheelBlur;
+	PatternWheelPart	WheelParticles;
+
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 8;
+	static const uint8_t numPatterns = 9;
 	Pattern *patternList[numPatterns] = {
-		&beachWaves2,
 		&WheelParticles,
+		&fire, 
+		&beachWaves2,
+		
 		&WheelBlur,
 		&parametric,
 		&spiral,

@@ -148,11 +148,11 @@ public:
 	}
 
 	static _Vec3 getRandom() {
-		// returns random vector between 0 and 1 for each axis
+		// returns random vector between -1 and 1 for each axis
 		_Vec3 v;
-		v.x = random16() / 65536.0f;
-		v.y = random16() / 65536.0f;
-		v.z = random16() / 65536.0f;
+		v.x = (random16() - 32768) / 32768.0f;
+		v.y = (random16() - 32768) / 32768.0f;
+		v.z = (random16() - 32768) / 32768.0f;
 		return v;
 	}
 public:

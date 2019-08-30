@@ -48,28 +48,31 @@ public:
 	Particle getParticle() {
 		static bool lastSide = true;
 		Particle p;
-		p.pos = Vec3(0.0f, 0.0f, 0.0f);
+		p.pos = Vec3(0.0f, 1.5f, 0.0f);
 		float t;
 		if (lastSide)	t = theta;
 		else			t = TWO_PI - theta;
 		//lastSide = !lastSide;
-		//p.pos.x = 2 * cos(t);
-		//p.pos.z = 2 * sin(t);
-		//p.vel = { GuiVars1 - 1, GuiVars2 -1, GuiVars3 -1 };
-		p.vel = { GuiVars1 - 1, GuiVars2 - 1, GuiVars3 - 1 };
+		p.pos.x = 2 * cos(t);
+		p.pos.z = 2 * sin(t);
+
+		p.vel.x = 0.4 * cos(t*6);
+		p.vel.z = 0.4 * sin(t*6);
+		p.vel.y = -1.5;// (GuiVars2 - 1);
+		//p.vel = { GuiVars1 - 1, GuiVars2 - 1, GuiVars3 - 1 };
 		//p.vel *= 0.1; // -0.1 to 0.1
 		p.vel *= 0.1;
-		float rx = ((random8() - 127) / 1270.0); // gives value between -0.01 to 0.01
-		float ry = ((random8() - 127) / 1270.0);
-		p.vel.x += rx;
-		p.vel.y += ry;
-		// Vec3::getRandom() - Vec3(0.5f, 0.5f, 0.5f);
+		Vec3 ran = Vec3::getRandom(); //-1 to 1
+		ran *= 0.02;
+		p.vel += ran;
 		//p.vel *= 0.1;
+		p.acc = Vec3(0.0f, 0.0f, 0.0f);
 		p.alpha = 255.0f;
 		p.col = gfx.getColour(random8(30) + (t)* 6);
+		p.mass = 1.0f;
 		return p;
 	}
-	void incTheta(float d = 0.05) {
+	void incTheta(float d = 0.02) {
 		theta += d;
 		if (theta > TWO_PI)
 			theta -= TWO_PI;
@@ -92,6 +95,8 @@ public:
 		if (Pattern::useDefaultEffect) {
 			gfx.fade(128);
 		}
+		//ps.applyForce(Vec3(0.0f, 0.005*(GuiVars6-1), 0.0f)); // gravity
+		ps.applyForce(Vec3(0.0f, 0.0075, 0.0f)); // gravity
 		ps.addParticle();
 		ps.addParticle();
 		ps.run();

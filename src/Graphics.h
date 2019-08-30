@@ -135,8 +135,10 @@ public:
 		float step = delta / dm;
 		for (;;) { /* loop */
 			//c.setHSV(hue1 + step, myMap(z0, 0, 255, 150, 255), 255);
-			c = getColour(hue);
-			c.nscale8_video(fade);
+			//c = getColour(hue);
+			//c.nscale8_video(fade);
+			uint8_t h = Data::getHue() + hue;
+			c = CHSV(h, myMap(z0, 0, 255, 128, 255), fade);
 			hue += step;
 			if (hue < 0)
 				hue += 255;
