@@ -21,14 +21,16 @@ public:
 	PatternParametric	parametric;
 	PatternSpiral		spiral;
 	PatternBeachWaves	beachWaves;
+	PatternBeachWaves2	beachWaves2;
 	PatternWireFrame	wireFrame;
 	PatternCube			cube3d;
 	PatternWheelPart	WheelParticles;
 	PatternWheelBlur	WheelBlur;
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 7;
+	static const uint8_t numPatterns = 8;
 	Pattern *patternList[numPatterns] = {
+		&beachWaves2,
 		&WheelParticles,
 		&WheelBlur,
 		&parametric,

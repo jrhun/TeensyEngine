@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vec3.h"
+#include "Mat.h"
 #include "Color.h"
 #include <vector>
 
@@ -65,8 +66,6 @@ public:
 	virtual Particle getParticle() {
 		Particle p;
 		p.pos = Vec3( 0.0f, 0.0f, 0.0f ); //{ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 255.0f };
-		p.pos.x = 2 * cos(theta);
-		p.pos.z = 2 * sin(theta);
 		p.vel = Vec3::getRandom() - Vec3(0.5f, 0.5f, 0.5f);
 		p.vel *= 0.1;
 		p.acc = Vec3(0.0f, 0.0f, 0.0f);
@@ -83,7 +82,6 @@ public:
 		p.col = gfx.getColour(random8(40));
 	}
 
-	float theta = 0;
 
 	//Particle * nextFreeParticle() {
 	//	for (auto p : particlesStorage) {
@@ -149,14 +147,29 @@ public:
 		//	}
 		//}
 
-		auto end = std::remove_if(particles.begin(), particles.end(), [this](Particle &p) {
+		static float rotateX = 0, rotateY = 0;
+		Mat3 m = Mat3::RotationY(rotateX) * Mat3::RotationY(rotateY);
+		rotateX += (GuiVars4 - 1) * 0.1;
+		rotateY += (GuiVars5 - 1) * 0.1;
+		if (rotateX >  TWO_PI)
+			rotateX -= TWO_PI;
+		if (rotateX < -TWO_PI)
+			rotateX += TWO_PI;
+		if (rotateY >  TWO_PI)
+			rotateY -= TWO_PI;
+		if (rotateY < -TWO_PI)
+			rotateY += TWO_PI;
+		auto end = std::remove_if(particles.begin(), particles.end(), [this, m](Particle &p) {
 			// update particle
 			p.update();
 			
 			// render particle
-			Vec3 pos = p.pos;
-			engine.sst.TransformSphere(pos);
-			gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(p.alpha, 0, 255, 64, 255)));
+			Vec3 pos = p.pos * m;
+			pos.z += 2;
+			
+			engine.sst.Transform(pos);
+			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
+			gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(p.alpha, 0, 255, 128, 255)));
 
 			// decrease alpha/life
 			decreaseLife(p);
@@ -166,10 +179,6 @@ public:
 			return false;
 		});
 		particles.erase(end, particles.end());
-
-		//theta += 0.04;
-		if (theta > TWO_PI)
-			theta -= TWO_PI;
 
 	}
 
