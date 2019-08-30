@@ -32,7 +32,7 @@ public:
 		// z goes from model space -1 to 4
 		// screen space 1 to 6 centered around 2
 		// z 2 = alpha of 255, set back cull to z > 6
-		v.z = 255 - ((constrain(v.z, 1, 3) - 1) * 64);
+		v.z = 255 - ((constrain(v.z, 1, 4) - 1) * 64);
 		v.x = (v.x * height / 2) + (width / 2);
 		v.y = (v.y * height / 2) + (height / 2);
 		return v;

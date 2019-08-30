@@ -17,10 +17,11 @@ public:
 
 	uint8_t drawFrame() {
 		if (Pattern::useDefaultEffect) {
-			gfx.fade(128);
+			gfx.fade(30);
+			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}
 		gfx.resetZ();
-		const int maxI = 64;
+		const int maxI = 40;
 		float step = (PI) / (maxI - 1);
 		m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
 		for (int i = 0; i < maxI; i++) {
@@ -29,7 +30,7 @@ public:
 			//CRGB c2 = gfx.getColour(i / 2 + 40);
 			//c1.nscale8_video(min(i*4, 255));
 			//c2.nscale8_video(min(i * 4, 255));
-			drawLine(t, i / 1, i / 1 + 32, min(i * 10, 255));
+			drawLine(t, i / 1, i / 1 + 32, min(i * 12, 255));
 		}
 		offset += 0.1;
 

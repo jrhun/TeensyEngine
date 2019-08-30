@@ -31,6 +31,19 @@ Engine engine(gfx);
 
 
 
+// thoughts
+
+// spinning circles, multiple
+
+// particle system + perlin noise
+// perline noise gives us "hot spots" that are more likely to generate particles
+// either with a random direction or a direction according to perlin noise
+// could give an interesting "scalar field" effect
+
+// can also use perlin noise to generate smoke like effect
+
+// replace uses of random with perlin noise, or perlin + random
+// i.e higher perlin noise is added to random, to give some extra structure to noise
 
 
 
