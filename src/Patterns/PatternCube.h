@@ -6,8 +6,8 @@
 
 
 class PatternCube : public Pattern {
-public: 
-	PatternCube() : Pattern("Cube 3d")  {
+public:
+	PatternCube() : Pattern("Cube 3d") {
 	}
 
 	uint8_t drawFrame() {
@@ -19,22 +19,34 @@ public:
 		engine.resetZ();
 		auto it1 = cube.getTriangles<Vertex>(2.0f);
 		auto it2 = cube.getTriangles<Vertex>(2.0f);
+		Vec3 light1 = {
+			float((cameraOffset + 3) * cos(angle + PI)),
+			0.0f,
+			float((cameraOffset + 3) * sin(angle + PI))
+		};
 		for (auto &v : it1.vertices) {
 			Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
 			v.pos = v.pos * m;
-			v.pos.x += (cameraOffset + 3) * cos(angle + PI);
-			v.pos.z += (cameraOffset + 3) * sin(angle + PI);
+			v.pos += light1;
+			//v.pos.x += (cameraOffset + 3) * cos(angle + PI);
+			//v.pos.z += (cameraOffset + 3) * sin(angle + PI);
 		}
 
+		Vec3 light2 = {
+			float((-cameraOffset + 3) * cos(angle)),
+			0.0f,
+			float((-cameraOffset + 3) * sin(angle))
+		};
 		for (auto &v : it2.vertices) {
 			Mat3 m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
 			v.pos = v.pos * m;
-			v.pos.x += (-cameraOffset+3) * cos(angle);
-			v.pos.z += (-cameraOffset+3) * sin(angle);
+			v.pos += light2;
+			//v.pos.x += (-cameraOffset + 3) * cos(angle);
+			//v.pos.z += (-cameraOffset + 3) * sin(angle);
 		}
 
-		engine.pipeline.Draw(it1);
-		engine.pipeline.Draw(it2);
+		engine.pipeline.Draw(it1, light1);
+		engine.pipeline.Draw(it2, light2);
 
 		angle += 0.01;
 		if (angle >= TWO_PI)

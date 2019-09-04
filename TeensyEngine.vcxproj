@@ -214,6 +214,7 @@
     <ClInclude Include="src\Patterns\PatternBeachWaves.h" />
     <ClInclude Include="src\Patterns\PatternController.h" />
     <ClInclude Include="src\Patterns\PatternCube.h" />
+    <ClInclude Include="src\Patterns\PatternFire.h" />
     <ClInclude Include="src\Patterns\PatternParametric.h" />
     <ClInclude Include="src\Patterns\PatternSpiral.h" />
     <ClInclude Include="src\Patterns\PatternWheel.h" />
