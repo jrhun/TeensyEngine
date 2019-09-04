@@ -27,13 +27,35 @@ public:
 			// cull backfacing triangles with cross product (%) shenanigans
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
 			{
-				ProcessTriangle(v0, v1, v2, i);
+				float dot = ((v1.pos - v0.pos) % (v2.pos - v1.pos)).GetNormalized() * v0.pos.GetNormalized();
+				ProcessTriangle(v0, v1, v2, i, -dot);
 
 			}
 		}
 	}
 
-	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index) {
+	void Draw(const IndexedTriangleList<Vertex>& it, Vec3 light) {
+		//Process vertices
+		//std::vector<Vertex> verticesOut(vertices.size());
+		//std::transform(it.vertices.begin(), it.vertices.end(), 
+		//	verticesOut.begin(), transformFn)
+
+		// assemble triangles
+		for (size_t i = 0, end = it.indices.size() / 3; i < end; i++) {
+			const auto& v0 = it.vertices[it.indices[i * 3]];
+			const auto& v1 = it.vertices[it.indices[i * 3 + 1]];
+			const auto& v2 = it.vertices[it.indices[i * 3 + 2]];
+			// cull backfacing triangles with cross product (%) shenanigans
+			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
+			{
+				float dot = ((v1.pos - v0.pos) % (v2.pos - v1.pos)).GetNormalized() * light.GetNormalized();
+				ProcessTriangle(v0, v1, v2, i, -dot);
+
+			}
+		}
+	}
+
+	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index, float dot = 1.0f) {
 		// GS returns triangle which has copies of vertexs
 		Vec3 v0 = v00.pos;
 		Vec3 v1 = v10.pos;
@@ -47,47 +69,28 @@ public:
 
 		// take into account borders
 		// assumes that we won't be drawing triangles wider than 32 in x axis around borders
-		float max = 0;
+		float _max = 0;
 		if (v0.x > v1.x and v0.x > v2.x) 
-			max = v0.x;
+			_max = v0.x;
 		else if (v1.x > v0.x and v1.x > v2.x) 
-			max = v1.x;
+			_max = v1.x;
 		else 
-			max = v2.x;
+			_max = v2.x;
 
-		if (max - v0.x > SCREEN_WIDTH/2)
+		if (_max - v0.x > SCREEN_WIDTH/2)
 			v0.x += SCREEN_WIDTH;
-		if (max - v1.x > SCREEN_WIDTH / 2)
+		if (_max - v1.x > SCREEN_WIDTH / 2)
 			v1.x += SCREEN_WIDTH;
-		if (max - v2.x > SCREEN_WIDTH / 2)
+		if (_max - v2.x > SCREEN_WIDTH / 2)
 			v2.x += SCREEN_WIDTH;
 
 
-		unsigned char hue = ((triangle_index / 2) * 40) % 256;
-		Vec3 c;
-		switch (triangle_index / 2) {
-		case 0:
-			c = { 255,0,0 };
-			break;
-		case 1:
-			c = { 255,255,0 };
-			break;
-		case 2:
-			c = { 0,255,0 };
-			break;
-		case 3:
-			c = { 0,255,255 };
-			break;
-		case 4:
-			c = { 0,0,255 };
-			break;
-		case 5:
-			c = { 255,0,255 };
-			break;
-		};
+		unsigned char hue = ((triangle_index / 16) * 5) % 256;
 
 		CRGB colour;// = CHSV(hue, 255, 255);
-		colour.setHSV(hue, 255, 255);
+		float al = max(min(int(255.0f * dot), 255), 64);
+		colour.setHSV(hue, 255, al);
+		Vec3 c;
 		c.x = colour.r;
 		c.y = colour.g;
 		c.z = colour.b;

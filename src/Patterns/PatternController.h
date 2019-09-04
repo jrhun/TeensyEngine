@@ -10,8 +10,10 @@
 #include "PatternFire.h"
 #include "PatternParametric.h"
 #include "PatternSpiral.h"
+#include "PatternSuperShape.h"
 #include "PatternWireFrame.h"
 #include "PatternWheel.h"
+
 
 
 
@@ -26,19 +28,21 @@ public:
 	PatternFire			fire;
 	PatternParametric	parametric;
 	PatternSpiral		spiral;
+	PatternSuperShape	superShape;
 	PatternWireFrame	wireFrame;
-	PatternWheelBlur	WheelBlur;
-	PatternWheelPart	WheelParticles;
+	PatternWheelBlur	wheelBlur;
+	PatternWheelPart	wheelParticles;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 9;
+	static const uint8_t numPatterns = 10;
 	Pattern *patternList[numPatterns] = {
-		&WheelParticles,
+		&superShape,
+		&wheelParticles,
 		&fire, 
 		&beachWaves2,
 		
-		&WheelBlur,
+		&wheelBlur,
 		&parametric,
 		&spiral,
 		&wireFrame,

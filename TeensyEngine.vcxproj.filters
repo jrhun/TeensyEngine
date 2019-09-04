@@ -183,6 +183,9 @@
     <ClInclude Include="src\Patterns\PatternWheel.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="src\Patterns\PatternFire.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
