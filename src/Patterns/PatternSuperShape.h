@@ -21,8 +21,11 @@ public:
 		
 		int shape2 = (shape1 + 1) % numShapes;
 
-		auto it1 = getVerts<Vertex>(1, 1.2f);
-		auto it2 = getVerts<Vertex>(3, 1.2f);
+		static float s = 0;
+
+
+		auto it1 = getVerts<Vertex>(0, 1.1f);
+		auto it2 = getVerts<Vertex>(1, 1.7f);
 
 		Vec3 light = {
 			float((cameraOffset + 3) * cos(angle + PI)),
@@ -41,11 +44,20 @@ public:
 		}
 
 		//smoothly interpolated between two shapes
-		int beat = beatsin16(20, 0, 2048);
+		int beat = beatsin16(5, 0, 2048);
 		float inter =  beat / 2048.0f;
 		for (auto i = 0; i < it1.vertices.size(); i++) {
 			it1.vertices[i].pos = interpolate(it1.vertices[i].pos, it2.vertices[i].pos, inter);
 		}
+		engine.pipeline.Draw(it1, light);
+
+		// flip position
+		for (auto &v : it1.vertices) {
+			v.pos.x = -v.pos.x;
+			v.pos.z = -v.pos.z;
+		}
+		light.x = -light.x;
+		light.z = -light.z;
 		engine.pipeline.Draw(it1, light);
 
 

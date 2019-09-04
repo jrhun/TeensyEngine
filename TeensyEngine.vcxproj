@@ -196,6 +196,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data.h" />
+    <ClInclude Include="src\Effects.h" />
+    <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\Cube.h" />
@@ -217,6 +219,7 @@
     <ClInclude Include="src\Patterns\PatternFire.h" />
     <ClInclude Include="src\Patterns\PatternParametric.h" />
     <ClInclude Include="src\Patterns\PatternSpiral.h" />
+    <ClInclude Include="src\Patterns\PatternSuperShape.h" />
     <ClInclude Include="src\Patterns\PatternWheel.h" />
     <ClInclude Include="src\Patterns\PatternWireFrame.h" />
     <ClInclude Include="src\Pipeline.h" />

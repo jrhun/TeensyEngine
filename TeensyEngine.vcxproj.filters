@@ -186,6 +186,15 @@
     <ClInclude Include="src\Patterns\PatternFire.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="src\Effects.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Noise.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternSuperShape.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
