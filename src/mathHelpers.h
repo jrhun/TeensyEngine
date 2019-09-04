@@ -55,8 +55,8 @@ inline uint8_t constrain(int x, int min, int max) {
 	return (int)ofClamp(x, min, max);
 }
 
-inline float myMap(float x, float inMin, float inMax, float outMin, float outMax) {
-	return ofMap(x, inMin, inMax, outMin, outMax);
+inline float myMap(float x, float inMin, float inMax, float outMin, float outMax, bool clamp = false) {
+	return ofMap(x, inMin, inMax, outMin, outMax, clamp);
 }
 
 #endif

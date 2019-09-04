@@ -1,7 +1,11 @@
 #pragma once
 
+#ifndef SCREEN_WIDTH
 #define SCREEN_WIDTH	64
+#endif
+#ifndef SCREEN_HEIGHT
 #define SCREEN_HEIGHT	32
+#endif
 
 #include "Vec3.h"
 #include "Geometry.h"

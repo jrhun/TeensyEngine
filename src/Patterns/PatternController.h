@@ -114,6 +114,8 @@ public:
 					blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
 				if (FxSpiral)
 					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
+				if (FxNoiseSmear)
+					standardNoiseSmearing();
 			}
 
 		}

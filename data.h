@@ -59,6 +59,13 @@
 #define NUM_VARS    6
 #define NUM_BUTTONS 6
 
+#ifndef SCREEN_WIDTH
+#define SCREEN_WIDTH	64
+#endif
+#ifndef SCREEN_HEIGHT
+#define SCREEN_HEIGHT	32
+#endif
+
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #if defined(ARDUINO)

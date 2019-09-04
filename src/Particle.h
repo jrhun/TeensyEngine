@@ -16,7 +16,7 @@ public:
 	//	alpha(0.0f),
 	//	col(0, 0, 0)
 	//{}
-	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col), mass(p.mass) {}
+	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col), hue(p.hue), mass(p.mass) {}
 
 	void applyForce(Vec3 &force) {
 		acc += force;// (force / mass);
@@ -26,6 +26,14 @@ public:
 		vel += acc;
 		pos += vel;
 		acc *= 0;
+
+		if (pos.y >= 1.5f) {
+			pos.y = 1.5f;
+			//vel.y = 0;
+			vel.y = -vel.y * 0.5;
+			vel *= 0.9;
+		}
+
 		//if (pos.y <= 0 || pos.y >= SCREEN_HEIGHT)
 		//	alpha = 0;
 		//if (pos.x < 0)
@@ -45,6 +53,7 @@ public:
 	float mass = 1.0f; 
 	float alpha = 0;
 	CRGB col = CRGB::Black;
+	uint8_t hue = 0;
 };
 
 constexpr int maxParticles = 500;
@@ -71,6 +80,7 @@ public:
 		p.acc = Vec3(0.0f, 0.0f, 0.0f);
 		p.alpha = 255.0f;
 		p.col = gfx.getColour(random8(40));
+		p.hue = Data::getHue() + random8(40);
 		p.mass = 1.0f;
 		return p;
 	}
@@ -81,6 +91,7 @@ public:
 		p.acc = { 0.0f, 0.0f, 0.0f };
 		p.alpha = 255.0f;
 		p.col = gfx.getColour(random8(40));
+		p.hue = Data::getHue() + random8(40);
 	}
 
 
@@ -173,7 +184,10 @@ public:
 			
 			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
-			gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(p.alpha, 0, 255, 128, 255)));
+			float dis = myMap(p.pos.Len(), 2, 4, 255, 128, true);
+			CRGB c = CHSV(p.hue, dis, constrain(p.alpha, 0, 255));
+			gfx.drawPointDepth(pos, c);
+			//gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(constrain(p.alpha, 0, 255), 0, 255, 64, 255)));
 
 			// decrease alpha/life
 			decreaseLife(p);

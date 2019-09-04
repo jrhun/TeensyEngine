@@ -13,16 +13,16 @@ public:
 	uint8_t drawFrame() {
 
 		for (uint8_t i = 0; i < 6; i++) {
-			uint8_t x = offset + ((cos8(angle / 32) - 128) / 256.0) * myMap(i, 0, (6 - 1), -32, 32);
-			uint8_t y = (SCREEN_HEIGHT / 2) + ((sin8(angle / 32) - 128) / 256.0) * myMap(i, 0, 6 - 1, -32, 32);
-			CRGB c = gfx.getColour((i * 12) + random8(26));
+			uint8_t x = offset + ((cos8(angle / 32) - 128) / 256.0) * myMap(i, 0, (6 - 1), -30, 30);
+			uint8_t y = (SCREEN_HEIGHT / 2) + ((sin8(angle / 32) - 128) / 256.0) * myMap(i, 0, 6 - 1, -30, 30);
+			CRGB c = gfx.getColour((i * 12)  + random8(10));
 			x %= SCREEN_WIDTH;
 			gfx.putPixel(x, y, c);
-			c = gfx.getColour((i * 12) + random8(26));
+			c = gfx.getColour((i * 12) + random8(10));
 			gfx.putPixel(x + 1, y, c);
-			c = gfx.getColour((i * 12) + random8(26));
+			c = gfx.getColour((i * 12) + random8(10));
 			gfx.putPixel(x, y + 1, c);
-			c = gfx.getColour((i * 12) + random8(26));
+			c = gfx.getColour((i * 12) + random8(10));
 			gfx.putPixel(x + 1, y + 1, c);
 		}
 
@@ -56,8 +56,8 @@ public:
 		p.pos.x = 2 * cos(t);
 		p.pos.z = 2 * sin(t);
 
-		p.vel.x = 0.4 * cos(t*6);
-		p.vel.z = 0.4 * sin(t*6);
+		p.vel.x = 0.5 * cos(t*6);
+		p.vel.z = 0.5 * sin(t*6);
 		p.vel.y = -1.5;// (GuiVars2 - 1);
 		//p.vel = { GuiVars1 - 1, GuiVars2 - 1, GuiVars3 - 1 };
 		//p.vel *= 0.1; // -0.1 to 0.1
@@ -69,6 +69,7 @@ public:
 		p.acc = Vec3(0.0f, 0.0f, 0.0f);
 		p.alpha = 255.0f;
 		p.col = gfx.getColour(random8(30) + (t)* 6);
+		p.hue = int(Data::getHue() + random8(30) + (t) * 6) % 256;
 		p.mass = 1.0f;
 		return p;
 	}
@@ -98,7 +99,7 @@ public:
 		//ps.applyForce(Vec3(0.0f, 0.005*(GuiVars6-1), 0.0f)); // gravity
 		ps.applyForce(Vec3(0.0f, 0.0075, 0.0f)); // gravity
 		ps.addParticle();
-		ps.addParticle();
+		//ps.addParticle();
 		ps.run();
 		ps.incTheta();
 		return 0;
