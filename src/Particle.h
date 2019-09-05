@@ -119,7 +119,7 @@ public:
 	}
 
 	void applyForce(Vec3 f) {
-		for (int i = 0; i < particles.size(); i++) {
+		for (unsigned int i = 0; i < particles.size(); i++) {
 			particles[i].applyForce(f);
 		}
 		//for (auto p : particles) {

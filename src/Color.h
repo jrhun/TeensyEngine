@@ -10,7 +10,7 @@
 
 #include "Patterns/FastLED_PC.h"
 
-#include "Noise.h"
+
 
 struct CRGB;
 struct CHSV;

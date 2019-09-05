@@ -46,7 +46,7 @@ public:
 		//smoothly interpolated between two shapes
 		int beat = beatsin16(5, 0, 2048);
 		float inter =  beat / 2048.0f;
-		for (auto i = 0; i < it1.vertices.size(); i++) {
+		for (unsigned int i = 0; i < it1.vertices.size(); i++) {
 			it1.vertices[i].pos = interpolate(it1.vertices[i].pos, it2.vertices[i].pos, inter);
 		}
 		engine.pipeline.Draw(it1, light);
