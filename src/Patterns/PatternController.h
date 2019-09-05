@@ -9,6 +9,7 @@
 #include "PatternCube.h"
 #include "PatternFire.h"
 #include "PatternParametric.h"
+#include "PatternRaymarcher.h"
 #include "PatternSpiral.h"
 #include "PatternSuperShape.h"
 #include "PatternWireFrame.h"
@@ -27,6 +28,7 @@ public:
 	PatternCube			cube3d;
 	PatternFire			fire;
 	PatternParametric	parametric;
+	PatternRaymarcher	raymarcher;
 	PatternSpiral		spiral;
 	PatternSuperShape	superShape;
 	PatternWireFrame	wireFrame;
@@ -35,8 +37,9 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 10;
+	static const uint8_t numPatterns = 11;
 	Pattern *patternList[numPatterns] = {
+		&raymarcher,
 		&superShape,
 		&wheelParticles,
 		&fire, 

@@ -36,6 +36,17 @@ public:
 		z /= length;
 		return *this;
 	}
+	_Vec3&	Clamp()
+	{
+		x = CLAMP(x, 0.0f, 1.0f);
+		y = CLAMP(y, 0.0f, 1.0f);
+		z = CLAMP(z, 0.0f, 1.0f);
+		return *this;
+	}
+	_Vec3	Abs() const
+	{
+		return { abs(x), abs(y), abs(z) };
+	}
 	_Vec3	GetNormalized() const
 	{
 		_Vec3 norm = *this;
@@ -60,11 +71,25 @@ public:
 		z += rhs.z;
 		return *this;
 	}
+	_Vec3&	operator+=(const T &rhs)
+	{
+		x += rhs;
+		y += rhs;
+		z += rhs;
+		return *this;
+	}
 	_Vec3&	operator-=(const _Vec3 &rhs)
 	{
 		x -= rhs.x;
 		y -= rhs.y;
 		z -= rhs.z;
+		return *this;
+	}
+	_Vec3&	operator-=(const T &rhs)
+	{
+		x -= rhs;
+		y -= rhs;
+		z -= rhs;
 		return *this;
 	}
 	T		operator*(const _Vec3 &rhs) const
@@ -74,6 +99,14 @@ public:
 	_Vec3	operator+(const _Vec3 &rhs) const
 	{
 		return _Vec3(*this) += rhs;
+	}
+	_Vec3	operator+(const T &rhs) const
+	{
+		return _Vec3(*this) += rhs;
+	}
+	_Vec3	operator-(const T &rhs) const
+	{
+		return _Vec3(*this) -= rhs;
 	}
 	_Vec3	operator-(const _Vec3 &rhs) const
 	{

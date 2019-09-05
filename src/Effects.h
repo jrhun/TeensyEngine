@@ -196,7 +196,7 @@ inline void TextureBlock(int xo, int yo)
 
 	int  TX1, TY1, TX2, TY2, tx, ty;
 	int x, y, xi = (xo << 4), yi = (yo << 4);
-	float a, b, c, d;
+	//float a, b, c, d;
 	CRGB *Tptr;
 
 	Tptr = &(leds[xi + (yi * SCREEN_WIDTH)]);
@@ -239,7 +239,8 @@ void flowMap() {
 
 
 	int x, y, xi, yi, xh, xl, yh, yl;
-	float xv, yv, Xspring, Yspring, ext, length, norm, scaler;
+	float Xspring, Yspring, length, norm, scaler;
+	//float xv, yv, ext;
 
 	// firstly calculate the forces on all points
 	for (y = 1; y < OFFSET_Y - 1; y++)
