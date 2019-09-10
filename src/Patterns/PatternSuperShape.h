@@ -3,11 +3,13 @@
 #include "Pattern.h"
 #include "../../data.h"
 #include "../Geometry.h"
+#include "../Cube.h"
 
 class PatternSuperShape : public Pattern {
 public:
 	PatternSuperShape() : Pattern("Super Shape") {
-
+		cube = getVerts<Vertex>(0, 1.1f);
+		sphere = getVerts<Vertex>(1, 1.1f);
 	}
 
 	float cameraOffset = 0.0;
@@ -15,30 +17,47 @@ public:
 	float angle = 0;
 	int shape1 = 0;
 
+	IndexedTriangleList<Vertex> cube;
+	IndexedTriangleList<Vertex> sphere;
+
+	void start() {
+
+	}
+
 	uint8_t drawFrame() {
+		if (Pattern::useDefaultEffect) {
+			gfx.fade(128);
+		}
+
 		engine.resetZ();
 
-		
-		int shape2 = (shape1 + 1) % numShapes;
-
-		static float s = 0;
+		//int shape2 = (shape1 + 1) % numShapes;
+		//static float s = 0;
 
 
-		auto it1 = getVerts<Vertex>(0, 1.1f);
-		auto it2 = getVerts<Vertex>(1, 1.7f);
+		//auto it1 = getVerts<Vertex>(0, 1.1f);
+		//auto it2 = getVerts<Vertex>(1, 1.7f);
+
+		auto it1 = cube;
+		auto it2 = sphere;
 
 		Vec3 light = {
 			float((cameraOffset + 3) * cos(angle + PI)),
 			0.0f,
 			float((cameraOffset + 3) * sin(angle + PI))
 		};
+
+		Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
 		for (auto &v : it1.vertices) {
-			Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
 			v.pos = v.pos * m;
 			v.pos += light;
 		}
+
+		//engine.pipeline.Draw(it1, light);
+
+
 		for (auto &v : it2.vertices) {
-			Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
+			/*Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);*/
 			v.pos = v.pos * m;
 			v.pos += light;
 		}
@@ -51,7 +70,7 @@ public:
 		}
 		engine.pipeline.Draw(it1, light);
 
-		// flip position
+		//// flip position
 		for (auto &v : it1.vertices) {
 			v.pos.x = -v.pos.x;
 			v.pos.z = -v.pos.z;
@@ -90,15 +109,13 @@ public:
 	template<class V>
 	IndexedTriangleList<V> getVerts(int shapeIndex, float radius = 1.0f) {
 		std::vector<V> vertices;
-		std::vector<size_t> indices;
-		const int latDiv = 16;
+		std::vector<uint16_t> indices;
+		const int latDiv = 8;
 		const int longDiv = 16;
 
 		const Vec3 base = { 0.0f, radius, 0.0f };
 		const float lattitudeAngle = PI / latDiv;
 		const float longitudeAngle = 2.0f * PI / longDiv;
-
-		const int bpm = 5;
 
 		for (int lat = 1; lat < latDiv; lat++) {
 			//const auto latBase = base * Mat3::RotationZ(lattitudeAngle * lat);
@@ -118,7 +135,8 @@ public:
 
 				vertices.emplace_back();
 				//vertices.back().pos = latBase * Mat3::RotationY(longitudeAngle * lon);
-				vertices.back().pos = { x, y, z };
+				Vec3 p = Vec3(x, y, z);
+				vertices.back().pos = p;// { x, y, z };
 			}
 		}
 		// add the cap vertices

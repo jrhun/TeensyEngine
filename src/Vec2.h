@@ -81,6 +81,12 @@ public:
 		y -= rhs.y;
 		return *this;
 	}
+	_Vec2&	operator-=(const T &rhs)
+	{
+		x -= rhs;
+		y -= rhs;
+		return *this;
+	}
 	T		operator*(const _Vec2 &rhs) const
 	{
 		return x * rhs.x + y * rhs.y;
