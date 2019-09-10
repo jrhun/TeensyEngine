@@ -16,20 +16,22 @@ public:
 			gfx.fade(128);
 		}
 		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);
+
 		engine.resetZ();
+
 		auto it1 = cube.getTriangles<Vertex>(2.0f);
 		auto it2 = cube.getTriangles<Vertex>(2.0f);
+
 		Vec3 light1 = {
 			float((cameraOffset + 3) * cos(angle + PI)),
 			0.0f,
 			float((cameraOffset + 3) * sin(angle + PI))
 		};
+
+		Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
 		for (auto &v : it1.vertices) {
-			Mat3 m = Mat3::RotationX(angle)  * Mat3::RotationY(angle);
 			v.pos = v.pos * m;
 			v.pos += light1;
-			//v.pos.x += (cameraOffset + 3) * cos(angle + PI);
-			//v.pos.z += (cameraOffset + 3) * sin(angle + PI);
 		}
 
 		Vec3 light2 = {
@@ -37,8 +39,10 @@ public:
 			0.0f,
 			float((-cameraOffset + 3) * sin(angle))
 		};
+
+		m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
 		for (auto &v : it2.vertices) {
-			Mat3 m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
+			
 			v.pos = v.pos * m;
 			v.pos += light2;
 			//v.pos.x += (-cameraOffset + 3) * cos(angle);

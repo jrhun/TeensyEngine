@@ -15,6 +15,12 @@ public:
 		y(y),
 		z(z)
 	{}
+	_Vec3(T v)
+		:
+		x(v),
+		y(v),
+		z(v)
+	{}
 	template <typename T2>
 	explicit operator _Vec3<T2>() const
 	{
@@ -43,6 +49,7 @@ public:
 		z = CLAMP(z, 0.0f, 1.0f);
 		return *this;
 	}
+
 	_Vec3	Abs() const
 	{
 		return { abs(x), abs(y), abs(z) };
@@ -197,3 +204,11 @@ public:
 typedef _Vec3<float> Vec3;
 typedef _Vec3<double> Ved3;
 typedef _Vec3<int> Vei3;
+
+Vec3&	cos(Vec3 &v)
+{
+	v.x = cos(v.x);
+	v.y = cos(v.y);
+	v.z = cos(v.z);
+	return v;
+}

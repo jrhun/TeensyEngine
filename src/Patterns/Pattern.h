@@ -85,4 +85,4 @@ public:
 
 };
 
-bool Pattern::useDefaultEffect = false;
+bool Pattern::useDefaultEffect = true;

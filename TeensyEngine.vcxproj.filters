@@ -201,6 +201,9 @@
     <ClInclude Include="src\Vec2.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Patterns\PatternPictures.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
