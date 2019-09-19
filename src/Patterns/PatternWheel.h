@@ -53,12 +53,12 @@ public:
 		if (lastSide)	t = theta;
 		else			t = TWO_PI - theta;
 		//lastSide = !lastSide;
-		p.pos.x = 2 * cos(t);
-		p.pos.z = 2 * sin(t);
+		p.pos.x = 2.1 * cos(t);
+		p.pos.z = 2.1 * sin(t);
 
 		p.vel.x = 0.5 * cos(t*6);
 		p.vel.z = 0.5 * sin(t*6);
-		p.vel.y = -1.5;// (GuiVars2 - 1);
+		p.vel.y = -1.45;// (GuiVars2 - 1);
 		//p.vel = { GuiVars1 - 1, GuiVars2 - 1, GuiVars3 - 1 };
 		//p.vel *= 0.1; // -0.1 to 0.1
 		p.vel *= 0.1;

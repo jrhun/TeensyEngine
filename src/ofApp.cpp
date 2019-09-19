@@ -7,6 +7,8 @@
 #include "Patterns/PatternController.h"
 #include "../data.h"
 
+#include "Menu.h"
+
 
 
 //--------------------------------------------------------------

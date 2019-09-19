@@ -49,13 +49,17 @@ public:
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
 			{
 				float dot = ((v1.pos - v0.pos) % (v2.pos - v1.pos)).GetNormalized() * light.GetNormalized();
-				ProcessTriangle(v0, v1, v2, i, -dot);
+				if (end == 12)
+					ProcessTriangle(v0, v1, v2, i, -dot, true);
+				else 
+					ProcessTriangle(v0, v1, v2, i, -dot);
+
 
 			}
 		}
 	}
 
-	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index, float dot = 1.0f) {
+	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index, float dot = 1.0f, bool cube = false) {
 		// GS returns triangle which has copies of vertexs
 		Vec3 v0 = v00.pos;
 		Vec3 v1 = v10.pos;
@@ -84,8 +88,11 @@ public:
 		if (_max - v2.x > SCREEN_WIDTH / 2)
 			v2.x += SCREEN_WIDTH;
 
-
-		unsigned char hue = ((triangle_index / 16) * 5) % 256;
+		unsigned char hue;
+		if (cube)
+			hue = ((triangle_index / 2) * 40) % 256;
+		else 
+			hue = ((triangle_index / 16) * 5) % 256;
 
 		CRGB colour;// = CHSV(hue, 255, 255);
 		float al = max(min(int(255.0f * dot), 255), 64);
