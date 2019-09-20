@@ -1,5 +1,4 @@
 #include <SPI.h>
-#include <TFT_eSPI.h>
 #include <Encoder.h> // paul strofen library
 
 #include "data.h"
@@ -7,6 +6,8 @@
 #include "src\Patterns\PatternController.h"
 
 // Use hardware SPI
+#if 0
+#include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite sText = TFT_eSprite(&tft);
 
@@ -20,8 +21,12 @@ TFT_eSprite sText = TFT_eSprite(&tft);
 #define TFT_TEXT        0xE719
 #define TFT_FPS         5
 
+#endif
+
 bool updateDisplay = true;
 bool displayFPS = true;
+
+
 
 // ENCODER & Buttons
 Encoder encoder(EN_A_PIN, EN_B_PIN);
@@ -50,6 +55,7 @@ void longPress() {
 
 }
 
+#if 0
 // Display functions
 void drawBattery() {
 
@@ -80,7 +86,7 @@ void tftDisplayFPS() {
   tft.print(p);
 }
 
-
+#endif
 
 
 
@@ -124,7 +130,10 @@ void uiLoop() {
     }
   }
 
+
+
   // display handle
+  #if 0
   static unsigned long lastTFTUpdate = 0;
   if (millis() - lastTFTUpdate > (1000 / TFT_FPS)) {
     lastTFTUpdate = millis();
@@ -133,7 +142,7 @@ void uiLoop() {
 
   if (updateDisplay) {
     updateDisplay = false;
-
+    
     sText.setColorDepth(1);
     sText.createSprite(240, 320);
     sText.fillSprite(TFT_BLACK);// grey fill
@@ -161,13 +170,15 @@ void uiLoop() {
     if (displayFPS) {
       tftDisplayFPS();
     }
+    
   }
+  #endif
 
   //backlight
   //  ledcWrite(0, backlightLevel); // chanel 0
 }
 
-
+#if 0
 // TODO: put uiLoop onto low priority thread on core 1 while main runs on core 0
 TaskHandle_t uiTaskHandle;
 
@@ -177,12 +188,15 @@ void uiTask(void * parameter) {
   }
 }
 
+#endif
 void uiSetup() {
+
+  #if 0
   tft.begin();
   tft.setRotation(2);
 
   tft.fillScreen(TFT_BACKGROUND);// grey fill
-
+  #endif
 
 
   //buttons

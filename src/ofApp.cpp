@@ -37,6 +37,8 @@ void ofApp::setup() {
 	gui.add(intSliderBlur.setup("Blur", 0, 0, 255));
 	gui.add(intSliderSpiral.setup("Spiral", 0, 0, 255));
 	gui.add(intSliderNoiseSmear.setup("Noise smear", 0, 0, 255));
+
+	menu.display();
 }
 
 //--------------------------------------------------------------
@@ -82,6 +84,28 @@ void ofApp::keyPressed(int key) {
 		//spacebar
 
 	}
+	if (key == 'a') { //left
+		menu.left();
+	}
+	if (key == 'd') { //right
+		menu.right();
+	}
+	if (key == 'w') { //up
+		menu.up();
+	}
+	if (key == 's') {
+		menu.down();
+	}
+	if (key == 'q') {
+		menu.dec();
+	}
+	if (key == 'e') {
+		menu.inc();
+	}
+	if (key == 'f') {
+		menu.press();
+	}
+	menu.display();
 }
 
 //--------------------------------------------------------------

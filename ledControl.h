@@ -183,6 +183,27 @@ class Leds : public FastLED_GFX {
       setTextSize(1);
       setTextWrap(true);
       FastLED.setDither( 0 );
+
+      #if 1
+      //test strips
+      uint8_t j = 0;
+      while(true){
+      setTextSize(2);
+      j += 5;
+      for (int i = 0; i < 8; i++) {
+        
+//        leds(i*NUM_LEDS_PER_STRIP + 10, i*NUM_LEDS_PER_STRIP + 15).fill_solid(CHSV(i * 26, 255, 255));
+        leds(i*NUM_LEDS_PER_STRIP + 17, i*NUM_LEDS_PER_STRIP + 17 + i).fill_solid(CRGB::Red);
+        setTextColor(CHSV(j, 255, 255));
+        setCursor(1+ i * COLS / 8, 10);
+        print(i);
+      }
+      setTextSize(1);
+      FastLED.show();
+      delay(50);
+      }
+      delay(10000);
+      #endif
     }
 
     void show() {

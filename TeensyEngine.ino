@@ -21,6 +21,6 @@ void loop() {
   EVERY_N_MILLISECONDS(1000) {
     Serial.print("FPS: ");
     Serial.println(FastLED.getFPS());
-    tftDisplayFPS();
+//    tftDisplayFPS();
   }
 }
