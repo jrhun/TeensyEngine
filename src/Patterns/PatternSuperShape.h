@@ -90,7 +90,7 @@ public:
 		if (angle >= TWO_PI)
 			angle -= TWO_PI;
 
-		return 0;
+		return returnVal;
 	}
 
 	static float supershape(float theta, float m, float n1, float n2, float n3) {

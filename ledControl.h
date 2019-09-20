@@ -184,7 +184,7 @@ class Leds : public FastLED_GFX {
       setTextWrap(true);
       FastLED.setDither( 0 );
 
-      #if 1
+      #if 0
       //test strips
       uint8_t j = 0;
       while(true){

@@ -100,7 +100,7 @@ public:
 		offset--;
 		if (offset < 0)
 			offset = SCREEN_WIDTH * 6;
-		return 0;
+		return returnVal;
 	}
 
 

@@ -75,7 +75,7 @@ public:
 			offsetDir = 1.0f;
 		cameraOffset += 0.01 * offsetDir;
 
-		return 0;
+		return returnVal;
 	}
 
 	float cameraOffset = 0;
