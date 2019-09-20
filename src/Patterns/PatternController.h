@@ -12,7 +12,7 @@
 #include "PatternPictures.h"
 #include "PatternRaymarcher.h"
 #include "PatternSpiral.h"
-#include "PatternSuperShape.h"
+//#include "PatternSuperShape.h"
 #include "PatternWireFrame.h"
 #include "PatternWheel.h"
 
@@ -32,18 +32,18 @@ public:
 	PatternWorld		world;
 	PatternRaymarcher	raymarcher;
 	PatternSpiral		spiral;
-	PatternSuperShape	superShape;
+	//PatternSuperShape	superShape;
 	PatternWireFrame	wireFrame;
 	PatternWheelBlur	wheelBlur;
 	PatternWheelPart	wheelParticles;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 12;
+	static const uint8_t numPatterns = 11;
 	Pattern *patternList[numPatterns] = {
 		&world,
 		&raymarcher,
-		&superShape,
+		//&superShape,
 		&wheelParticles,
 		&fire, 
 		&beachWaves2,

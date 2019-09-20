@@ -3,7 +3,7 @@
 
 
 
-#include <vector>
+//#include <vector>
 #include "../data.h"
 #include "Patterns/PatternController.h"
 
@@ -182,6 +182,13 @@ public:
 		return "";
 	}
 
+	virtual String getDataExtended() {
+		return "";
+	}
+
+	bool hasSelection = false;
+	bool hasAction = false;
+
 	// UI interface for each menu item
 	virtual void left() {}
 	virtual void right() {}
@@ -216,10 +223,45 @@ public:
 
 class MenuPatternList : public MenuAbstract {
 public: 
-	MenuPatternList() : MenuAbstract("Change pattern") {}
+	MenuPatternList() : MenuAbstract("Change pattern") {
+		hasSelection = true;
+	}
 
 	const char* getData() {
 		return to_string(Data::currentPattern).c_str();
+	}
+
+	String getDataExtended() {
+		String r = "";
+		for (uint8_t i = 0; i < patterns.numPatterns + 1; i++) {
+			if (i == Data::currentPattern)
+				r += "x ";
+			else if (i == selectedPattern)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < patterns.numPatterns)
+				r += patterns.getPatternName(i);
+			else
+				r += "Back";
+			r += "\n";
+		}
+		return r;
+	}
+
+	uint8_t selectedPattern = Data::currentPattern;
+
+
+	void up() {
+		if (selectedPattern <= patterns.numPatterns)
+			selectedPattern++;
+			//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
+	}
+	void down() {
+		if (selectedPattern > 0)
+			selectedPattern--;
+		//selectedPattern = (selectedPattern - 1 + (patterns.numPatterns+1)) % (patterns.numPatterns+1);
 	}
 
 	void inc() {
@@ -227,6 +269,11 @@ public:
 	}
 	void dec() {
 		patterns.dec();
+	}
+
+	void press() {
+		if (selectedPattern < patterns.numPatterns)
+			patterns.set(selectedPattern);
 	}
 };
 
@@ -280,26 +327,78 @@ public:
 		return "";
 	}
 
-	virtual const char* getItemData(size_t i) {
+	virtual String getItemData(size_t i) {
 		return "";
 	}
 	
+	String getPageData() {
+		String r = "";
+
+		if (selected) {
+			r += getItemName(currentItem);
+			r += "\n";
+			r += getItemData(currentItem);
+			r += "\n";
+		}
+		else {
+			for (size_t i = 0; i < getNumItems(); i++) {
+				if (i == currentItem) {
+					r += ">";
+				}
+				else {
+					r += " ";
+				}
+				r += getItemName(i);
+				r += "/t";
+				r += getItemData(i);
+				r += "/n";
+			}
+		}
+		return r;
+	}
+
 	virtual size_t getNumItems() {
 		return 0;
 	}
 
-	virtual size_t getCurrentItem() {
-		return 0;
+	virtual MenuAbstract *getCurrentItem() {
+		return nullptr;
 	}
+	size_t currentItem = 0;
 
-	// no UI interface for page? just passes through to items
+	// if an item is selected, can display a seperate page with details for it
+	bool selected = false;
+
 	virtual void left() {}
 	virtual void right() {}
-	virtual void up() {}
-	virtual void down() {}
-	virtual void press() {}
-	virtual void inc() {}
-	virtual void dec() {}
+	virtual void up() {
+		if (selected)
+			getCurrentItem()->up();
+		else 
+			currentItem = (currentItem + 1) % getNumItems();
+	}
+	virtual void down() {
+		if (selected)
+			getCurrentItem()->down();
+		else
+			currentItem = (currentItem - 1 + getNumItems()) % getNumItems();
+	}
+
+	void press() {
+		if (getCurrentItem()->hasSelection) {
+			if (selected)
+				getCurrentItem()->press(); // only press when leaving selection
+			selected = !selected;
+		}
+		else if (getCurrentItem()->hasAction)
+			getCurrentItem()->press();
+	}
+	void inc() {
+		getCurrentItem()->inc();
+	}
+	void dec() {
+		getCurrentItem()->dec();
+	}
 };
 
 
@@ -320,22 +419,24 @@ public:
 		return "";
 	}
 
-	const char* getItemData(size_t i) {
+	String getItemData(size_t i) {
 		if (i < numItems) {
-			return (items[i]->getData());
+			if (selected)
+				return (items[i]->getDataExtended());
+			else 
+				return (items[i]->getData());
 		}
 		return "";
 	}
 
-	size_t getCurrentItem() {
-		return currentItem;
+	MenuAbstract *getCurrentItem() {
+		return items[currentItem];
 	}
 
 	MenuCurrentPattern CurrentPattern;
 	MenuPatternList PatternList;
 
 	static const size_t numItems = 2;
-	size_t currentItem = 0;
 	MenuAbstract *items[numItems] = {
 		&CurrentPattern,
 		&PatternList,
@@ -352,7 +453,7 @@ public:
 
 
 	size_t getNumItems() {
-		return PagePattern::numItems;
+		return PageColour::numItems;
 	}
 
 	const char* getItemName(size_t i) {
@@ -362,14 +463,18 @@ public:
 		return "";
 	}
 
-	const char* getItemData(size_t i) {
-		if (i < numItems)
-			return items[i]->getData();
+	String getItemData(size_t i) {
+		if (i < numItems) {
+			if (selected)
+				return (items[i]->getDataExtended());
+			else
+				return (items[i]->getData());
+		}
 		return "";
 	}
 
-	size_t getCurrentItem() {
-		return currentItem;
+	MenuAbstract *getCurrentItem() {
+		return items[currentItem];
 	}
 
 
@@ -377,7 +482,6 @@ public:
 	MenuCurrentPalette CurrentPalette;
 
 	static const size_t numItems = 1;
-	size_t currentItem = 0;
 	MenuAbstract *items[numItems] = {
 		&CurrentPalette
 	};
@@ -391,7 +495,7 @@ public:
 
 
 	size_t getNumItems() {
-		return PagePattern::numItems;
+		return PageEffects::numItems;
 	}
 
 	const char* getItemName(size_t i) {
@@ -400,20 +504,23 @@ public:
 		return "";
 	}
 
-	const char* getItemData(size_t i) {
-		if (i < numItems)
-			return items[i]->getData();
+	String getItemData(size_t i) {
+		if (i < numItems) {
+			if (selected)
+				return (items[i]->getDataExtended());
+			else
+				return (items[i]->getData());
+		}
 		return "";
 	}
 
-	size_t getCurrentItem() {
-		return currentItem;
+	MenuAbstract *getCurrentItem() {
+		return items[currentItem];
 	}
 
 
 	//menu items
 	static const size_t numItems = 1;
-	size_t currentItem = 0;
 	MenuAbstract *items[numItems] = {
 		&default
 	};
@@ -426,7 +533,7 @@ public:
 	PageHeadbands() : MenuPage("Headbands") {}
 
 	size_t getNumItems() {
-		return PagePattern::numItems;
+		return PageHeadbands::numItems;
 	}
 
 	const char* getItemName(size_t i) {
@@ -435,20 +542,23 @@ public:
 		return "";
 	}
 
-	const char* getItemData(size_t i) {
-		if (i < numItems)
-			return items[i]->getData();
+	String getItemData(size_t i) {
+		if (i < numItems) {
+			if (selected)
+				return (items[i]->getDataExtended());
+			else
+				return (items[i]->getData());
+		}
 		return "";
 	}
 
-	size_t getCurrentItem() {
-		return currentItem;
+	MenuAbstract *getCurrentItem() {
+		return items[currentItem];
 	}
 
 
 	//menu items
 	static const size_t numItems = 1;
-	size_t currentItem = 0;
 	MenuAbstract *items[numItems] = {
 		&default
 	};
@@ -461,7 +571,7 @@ public:
 	PageSettings() : MenuPage("Settings") {}
 
 	size_t getNumItems() {
-		return PagePattern::numItems;
+		return PageSettings::numItems;
 	}
 
 	const char* getItemName(size_t i) {
@@ -470,20 +580,23 @@ public:
 		return "";
 	}
 
-	const char* getItemData(size_t i) {
-		if (i < numItems)
-			return items[i]->getData();
+	String getItemData(size_t i) {
+		if (i < numItems) {
+			if (selected)
+				return (items[i]->getDataExtended());
+			else
+				return (items[i]->getData());
+		}
 		return "";
 	}
 
-	size_t getCurrentItem() {
-		return currentItem;
+	MenuAbstract *getCurrentItem() {
+		return items[currentItem];
 	}
 
 
 	//menu items
 	static const size_t numItems = 1;
-	size_t currentItem = 0;
 	MenuAbstract *items[numItems] = {
 		&default
 	};
@@ -514,6 +627,14 @@ public:
 		&Settings
 	};
 
+	void nextPage() {
+		currentPageIndex = (currentPageIndex + 1) % numPages;
+	}
+
+	void previousPage() {
+		currentPageIndex = (currentPageIndex - 1 + numPages) % numPages;
+	}
+
 	// 
 	const char* getPageName(size_t i) {
 		if (i >= numPages)
@@ -521,12 +642,12 @@ public:
 		return pages[i]->getName();
 	}
 
-	const char* getPageData(size_t i) {
+	String getPageData(size_t i) {
 		if (i >= numPages)
 			return "";
 		String r;
 		for (size_t j = 0; j < (pages[i]->getNumItems()); j++) {
-			if (j == pages[i]->getCurrentItem()) {
+			if (j == pages[i]->currentItem) {
 				r += ">";
 			}
 			else {
@@ -538,7 +659,7 @@ public:
 			r += "/n";
 
 		}
-		return r.c_str();
+		return r;
 	}
 
 	MenuPage *currentPage() {
@@ -558,25 +679,33 @@ public:
 	}
 
 	void left() {
-
+		previousPage(); 
 	}
 	void right() {
-
+		nextPage();
 	}
 	void up() {
-
+		currentPage()->up();
 	}
 	void down() {
-
+		currentPage()->down();
 	}
 	void press() {
-
+		currentPage()->press();
 	}
 	void inc() {
-
+		currentPage()->inc();
 	}
 	void dec() {
+		currentPage()->dec();
+	}
 
+	void display() {
+		
+		String r = currentPage()->getName();
+		// log current page name
+		r = currentPage()->getPageData(); 
+		//log page data
 	}
 };
 
