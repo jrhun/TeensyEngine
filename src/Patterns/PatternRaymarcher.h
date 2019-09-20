@@ -22,7 +22,7 @@ public:
 		//if (offset > TWO_PI) {
 		//	offset -= TWO_PI;
 		//}
-		return 0;
+		return returnVal;
 	}
 
 	float offset = 0;

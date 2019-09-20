@@ -12,11 +12,12 @@
 #include "../../ledControl.h"
 #include "../GraphicsFastLED.h"
 GraphicsFastLED gfx(&ledControl);
+#define returnVal 10
 #else 
 #include "FastLED_PC.h"
 #include "../GraphicsPC.h"
 GraphicsPC gfx;
-
+#define returnVal 0
 #endif
 
 #include "../Engine.h"

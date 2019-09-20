@@ -33,7 +33,8 @@ public:
 		offset += 0.25;
 		angle += 20;
 		//offset %= SCREEN_WIDTH;
-		return 0;
+		
+		return returnVal;
 	}
 
 	float offset = 0;
@@ -102,7 +103,7 @@ public:
 		//ps.addParticle();
 		ps.run();
 		ps.incTheta();
-		return 0;
+		return returnVal;
 	}
 	WheelPS ps;
 };

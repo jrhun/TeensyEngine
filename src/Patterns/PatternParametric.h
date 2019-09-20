@@ -43,7 +43,7 @@ public:
 		angle += 0.01;
 		if (angle >= TWO_PI)
 			angle -= TWO_PI;
-		return 0;
+		return returnVal;
 	}
 
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {

@@ -158,7 +158,7 @@ public:
 		if (xOffset > SCREEN_WIDTH)
 			xOffset -= SCREEN_WIDTH;
 
-		return 0;
+		return returnVal;
 	}
 
 	Vec3 a = Vec3(0, 0, 255);
