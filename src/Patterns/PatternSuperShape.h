@@ -8,8 +8,8 @@
 class PatternSuperShape : public Pattern {
 public:
 	PatternSuperShape() : Pattern("Super Shape") {
-		cube = getVerts<Vertex>(0, 1.1f);
-		sphere = getVerts<Vertex>(1, 1.1f);
+		//cube = getVerts<Vertex>(0, 1.1f);
+		//sphere = getVerts<Vertex>(1, 1.1f);
 	}
 
 	float cameraOffset = 0.0;
@@ -17,8 +17,9 @@ public:
 	float angle = 0;
 	int shape1 = 0;
 
-	IndexedTriangleList<Vertex> cube;
-	IndexedTriangleList<Vertex> sphere;
+
+	//IndexedTriangleList<Vertex> cube;
+	//IndexedTriangleList<Vertex> sphere;
 
 	void start() {
 
@@ -35,11 +36,11 @@ public:
 		//static float s = 0;
 
 
-		//auto it1 = getVerts<Vertex>(0, 1.1f);
-		//auto it2 = getVerts<Vertex>(1, 1.7f);
+		auto it1 = getVerts<Vertex>(0, 1.1f);
+		auto it2 = getVerts<Vertex>(1, 1.7f);
 
-		auto it1 = cube;
-		auto it2 = sphere;
+		//IndexedTriangleList<Vertex> it1 = cube;
+		//auto it2 = sphere;
 
 		Vec3 light = {
 			float((cameraOffset + 3) * cos(angle + PI)),
