@@ -5,6 +5,7 @@
 
 // include all patterns
 #include "Pattern.h"
+#include "PatternBasic.h"
 #include "PatternBeachWaves.h"
 #include "PatternCube.h"
 #include "PatternFire.h"
@@ -12,10 +13,22 @@
 #include "PatternPictures.h"
 #include "PatternRaymarcher.h"
 #include "PatternSpiral.h"
-//#include "PatternSuperShape.h"
+#include "PatternSuperShape.h"
 #include "PatternWireFrame.h"
 #include "PatternWheel.h"
 
+//todo next
+//BPM generator/trigger
+// types
+// -exponential decay
+// -sin
+// -ramp
+// -triangle
+// link to a variable in each pattern
+
+// patterns
+// DNA spiral
+// pictures
 
 
 
@@ -24,6 +37,7 @@ public:
 	PatternController() {}
 
 	//add patterns as members here
+	PatternRowThenCol	rowThenCol;
 	PatternBeachWaves	beachWaves;
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
@@ -32,18 +46,20 @@ public:
 	PatternWorld		world;
 	PatternRaymarcher	raymarcher;
 	PatternSpiral		spiral;
-	//PatternSuperShape	superShape;
+	PatternSuperShape	superShape;
 	PatternWireFrame	wireFrame;
 	PatternWheelBlur	wheelBlur;
 	PatternWheelPart	wheelParticles;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 11;
+	static const uint8_t numPatterns = 12;
 	Pattern *patternList[numPatterns] = {
-		&world,
-		&raymarcher,
 		//&superShape,
+		&rowThenCol,
+		&raymarcher,
+		&world,
+		
 		&wheelParticles,
 		&fire, 
 		&beachWaves2,

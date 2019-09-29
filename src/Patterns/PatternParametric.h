@@ -21,7 +21,7 @@ public:
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}
 		gfx.resetZ();
-		const int maxI = 40;
+		const int maxI = 100;
 		float step = (PI) / (maxI - 1);
 		m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
 		for (int i = 0; i < maxI; i++) {
@@ -32,7 +32,7 @@ public:
 			//c2.nscale8_video(min(i * 4, 255));
 			drawLine(t, i / 1, i / 1 + 32, min(i * 12, 255));
 		}
-		offset += 0.1;
+		offset += 0.05;
 
 		centerA.x = 2.5 * cos(angle + PI);
 		centerA.z = 2.5 * sin(angle + PI);
@@ -40,7 +40,7 @@ public:
 		centerB.x = 2.5 * cos(angle + PI + PI);
 		centerB.z = 2.5 * sin(angle + PI + PI);
 
-		angle += 0.01;
+		angle += 0.005;
 		if (angle >= TWO_PI)
 			angle -= TWO_PI;
 		return returnVal;

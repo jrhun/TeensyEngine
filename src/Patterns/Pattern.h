@@ -86,4 +86,4 @@ public:
 
 };
 
-bool Pattern::useDefaultEffect = true;
+bool Pattern::useDefaultEffect = false;

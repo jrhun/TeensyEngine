@@ -3,6 +3,11 @@
 
 #include "data.h"
 
+//things to try stop flickering
+//1
+//#define FASTLED_ALLOW_INTERRUPTS
+//2
+// change first pin to one earlier i.e 25 and skip first NUM_LEDS_PER_STRIP
 #include <FastLED.h>
 #include <FastLED_GFX.h>
 #include <Fonts/PicopixelFL.h>
@@ -168,9 +173,10 @@ class Leds : public FastLED_GFX {
       FastLED.addLeds<WS2812B, 25, GRB>(leds, 5 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 33, GRB>(leds, 6 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       FastLED.addLeds<WS2812B, 32, GRB>(leds, 7 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      // teensy 4.x
       #elif defined(__IMXRT1052__) || defined(__IMXRT1062__) 
-      FastLED.addLeds<NUM_STRIPS, WS2812B, LED1, GRB>(leds, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      #endif // teensy 4.x
+      FastLED.addLeds<NUM_STRIPS, WS2812B, 19, GRB>(leds, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      #endif 
       
       FastLED.setBrightness( Data::brightness );
       FastLED.setTemperature( OvercastSky );

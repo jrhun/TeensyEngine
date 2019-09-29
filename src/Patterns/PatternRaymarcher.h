@@ -10,7 +10,11 @@ public:
 	PatternRaymarcher() : Pattern("Raymarcher") {}
 
 	uint8_t drawFrame() {
-		gfx.clear();
+		//gfx.clear();
+		if (Pattern::useDefaultEffect) {
+
+			gfx.fade(64);
+		}
 
 		renderRays();
 
@@ -145,7 +149,7 @@ public:
 	// ro=ray origin, rd=ray direction
 	Vec3 ray_march(Vec3 ro, Vec3 rd) {
 		float totalDistanceTraveled = 0.0f;
-		const int NUMBER_OF_STEPS = 8;
+		const int NUMBER_OF_STEPS = 10;
 		const float MINIMUM_HIT_DISTANCE = 0.02;
 		const float MAXIMUM_TRACE_DISTANCE = 3.0;
 
@@ -195,9 +199,9 @@ public:
 				//return (normal + 1.0f) * 128;
 			}
 
-			if (totalDistanceTraveled > MAXIMUM_TRACE_DISTANCE - MINIMUM_HIT_DISTANCE) // miss
+			if (totalDistanceTraveled > (MAXIMUM_TRACE_DISTANCE - MINIMUM_HIT_DISTANCE)) // miss
 			{
-				break;
+				return Vec3(0.0, 0.0, 0.0);
 			}
 
 			// accumulate the distance traveled thus far
@@ -307,18 +311,18 @@ public:
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
 				Vec3 c = { 0.0f,0.0f,0.0f };
+				Vec3 o = Vec3(0.0, 0.0, 0.0);;
 #if AA>1
 				for (int m = 0; m < AA; m++)
 					for (int n = 0; n < AA; n++)
 					{
 						// pixel coordinates
-						Vec3 o = Vec3(float(m), float(n), 0.0) / float(AA);
+						o = Vec3(float(m), float(n), 0.0) / float(AA);
 						o -= Vec3(0.5f, 0.5f, 0.0);
 						o *= 0.1;
 						//Vec2 p = (-iResolution.xy + 2.0*(fragCoord + o)) / iResolution.y;
 #else    
 				/*vec2 p = (-iResolution.xy + 2.0*fragCoord) / iResolution.y;*/
-						Vec3 o = Vec3(0.0, 0.0, 0.0);
 #endif
 
 						float uvX = i / (SCREEN_HEIGHT / 2.0f) - 1.0;
@@ -334,24 +338,30 @@ public:
 
 						rd += o;
 
-						Vec3 col = ray_march(ro, rd.GetNormalized());
-						col.Clamp();
+						//Vec3 col = ray_march(ro, rd.GetNormalized());
+						//col.Clamp();
 
-						c += col;
+						//c += col;
+
+						c = ray_march(ro, rd.GetNormalized());
+
+
 #if AA>1
 					}
 				c /= float(AA*AA);
 #endif
 
 				//gamma
-				c.x = pow(c.x, 0.45f);
-				c.y = pow(c.y, 0.45f);
-				c.z = pow(c.z, 0.45f);
+				//c.x = pow(c.x, 0.45f);
+				//c.y = pow(c.y, 0.45f);
+				//c.z = pow(c.z, 0.45f);
 
 				//0..1 - 0..255
 				c *= 255;
 
-				gfx.putPixel(i, j, CRGB(c.x, c.y, c.z));
+				//if (c.x != 0 and c.y != 0 and c.z != 0) {
+					gfx.putPixel(i, j, CRGB(c.x, c.y, c.z));
+				//}
 			}
 		}
 	}
