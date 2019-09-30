@@ -9,6 +9,7 @@
 #include "PatternBeachWaves.h"
 #include "PatternCube.h"
 #include "PatternFire.h"
+#include "PatternNoise.h"
 #include "PatternParametric.h"
 #include "PatternPictures.h"
 #include "PatternRaymarcher.h"
@@ -42,19 +43,27 @@ public:
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
 	PatternFire			fire;
+	PatternNoise1		noise1;
 	PatternParametric	parametric;
-	PatternWorld		world;
+	PatternParametric2	parametricSpiral;
 	PatternRaymarcher	raymarcher;
+	PatternSparks		sparks;
 	PatternSpiral		spiral;
 	PatternSuperShape	superShape;
+	PatternVWaves		verticalWaves;
 	PatternWireFrame	wireFrame;
 	PatternWheelBlur	wheelBlur;
 	PatternWheelPart	wheelParticles;
+	PatternWorld		world;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 12;
+	static const uint8_t numPatterns = 16;
 	Pattern *patternList[numPatterns] = {
+		&noise1,
+		&parametricSpiral,
+		&verticalWaves,
+		&sparks,
 		//&superShape,
 		&rowThenCol,
 		&raymarcher,

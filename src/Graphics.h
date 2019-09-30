@@ -27,6 +27,7 @@ public:
 	virtual void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {};
 	virtual void putPixel(int x, int y, CRGB c) {};
 	virtual void putPixel(int x, int y, unsigned char h) {};
+	virtual void blendPixel(int x, int y, CRGB c, uint8_t a=128) {};
 
 
 	void drawPointDepth(int16_t x, int16_t y, int16_t z, unsigned char r, unsigned char g, unsigned char b) {

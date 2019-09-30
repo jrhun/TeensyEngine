@@ -42,7 +42,7 @@ public:
 	}
 
 	uint8_t At(uint8_t x, uint8_t y) {
-		if (x < SCREEN_WIDTH and y < SCREEN_HEIGHT) {
+		if (x < SCREEN_WIDTH and y < SCREEN_WIDTH) {
 			return noise[x][y];
 		}
 		return 0;
@@ -54,9 +54,9 @@ public:
 	uint16_t xScale;
 	uint16_t yScale;
 
-	uint16_t speed = 256;
+	uint16_t speed = 32;
 
-	uint8_t noise[SCREEN_WIDTH][SCREEN_HEIGHT];
+	uint8_t noise[SCREEN_WIDTH][SCREEN_WIDTH];
 
 	uint8_t noiseSmoothing = 240;
 
@@ -64,7 +64,7 @@ private:
 	void fillNoise8bit() {
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			int ioffset = xScale * i;
-			for (int j = 0; j < SCREEN_HEIGHT; j++) {
+			for (int j = 0; j < SCREEN_WIDTH; j++) {
 				int joffset = yScale * j;
 
 				uint8_t data = inoise16(xOffset + ioffset, yOffset + joffset, zOffset) >> 8;
