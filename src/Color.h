@@ -2213,171 +2213,1780 @@ inline uint8_t lsrX4(uint8_t dividend)
 	return dividend;
 }
 
-//
-//CRGB ColorFromPalette(const CRGBPalette16& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
-//{
-//	//      hi4 = index >> 4;
-//	uint8_t hi4 = lsrX4(index);
-//	uint8_t lo4 = index & 0x0F;
-//
-//	// const CRGB* entry = &(pal[0]) + hi4;
-//	// since hi4 is always 0..15, hi4 * sizeof(CRGB) can be a single-byte value,
-//	// instead of the two byte 'int' that avr-gcc defaults to.
-//	// So, we multiply hi4 X sizeof(CRGB), giving hi4XsizeofCRGB;
-//	uint8_t hi4XsizeofCRGB = hi4 * sizeof(CRGB);
-//	// We then add that to a base array pointer.
-//	const CRGB* entry = (CRGB*)((uint8_t*)(&(pal[0])) + hi4XsizeofCRGB);
-//
-//	uint8_t blend = lo4 && (blendType != NOBLEND);
-//
-//	uint8_t red1 = entry->red;
-//	uint8_t green1 = entry->green;
-//	uint8_t blue1 = entry->blue;
-//
-//
-//	if (blend) {
-//
-//		if (hi4 == 15) {
-//			entry = &(pal[0]);
-//		}
-//		else {
-//			entry++;
-//		}
-//
-//		uint8_t f2 = lo4 << 4;
-//		uint8_t f1 = 255 - f2;
-//
-//		//    rgb1.nscale8(f1);
-//		uint8_t red2 = entry->red;
-//		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
-//		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
-//		red1 += red2;
-//
-//		uint8_t green2 = entry->green;
-//		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
-//		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
-//		green1 += green2;
-//
-//		uint8_t blue2 = entry->blue;
-//		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
-//		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
-//		blue1 += blue2;
-//
-//		cleanup_R1();
-//	}
-//
-//	if (brightness != 255) {
-//		if (brightness) {
-//			brightness++; // adjust for rounding
-//			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
-//			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
-//			if (red1) {
-//				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
-//#if !(FASTLED_SCALE8_FIXED==1)
-//				red1++;
-//#endif
-//			}
-//			if (green1) {
-//				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
-//#if !(FASTLED_SCALE8_FIXED==1)
-//				green1++;
-//#endif
-//			}
-//			if (blue1) {
-//				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
-//#if !(FASTLED_SCALE8_FIXED==1)
-//				blue1++;
-//#endif
-//			}
-//			cleanup_R1();
-//		}
-//		else {
-//			red1 = 0;
-//			green1 = 0;
-//			blue1 = 0;
-//		}
-//	}
-//
-//	return CRGB(red1, green1, blue1);
-//}
-//
-//
-//
-//CRGB ColorFromPalette(const TProgmemRGBPalette16& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
-//{
-//	//      hi4 = index >> 4;
-//	uint8_t hi4 = lsrX4(index);
-//	uint8_t lo4 = index & 0x0F;
-//
-//	CRGB entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]) + hi4);
-//
-//
-//	uint8_t red1 = entry.red;
-//	uint8_t green1 = entry.green;
-//	uint8_t blue1 = entry.blue;
-//
-//	uint8_t blend = lo4 && (blendType != NOBLEND);
-//
-//	if (blend) {
-//
-//		if (hi4 == 15) {
-//			entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]));
-//		}
-//		else {
-//			entry = FL_PGM_READ_DWORD_NEAR(&(pal[1]) + hi4);
-//		}
-//
-//		uint8_t f2 = lo4 << 4;
-//		uint8_t f1 = 255 - f2;
-//
-//		uint8_t red2 = entry.red;
-//		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
-//		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
-//		red1 += red2;
-//
-//		uint8_t green2 = entry.green;
-//		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
-//		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
-//		green1 += green2;
-//
-//		uint8_t blue2 = entry.blue;
-//		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
-//		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
-//		blue1 += blue2;
-//
-//		cleanup_R1();
-//	}
-//
-//	if (brightness != 255) {
-//		if (brightness) {
-//			brightness++; // adjust for rounding
-//			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
-//			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
-//			if (red1) {
-//				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
-//				red1++;
-//			}
-//			if (green1) {
-//				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
-//				green1++;
-//			}
-//			if (blue1) {
-//				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
-//				blue1++;
-//			}
-//			cleanup_R1();
-//		}
-//		else {
-//			red1 = 0;
-//			green1 = 0;
-//			blue1 = 0;
-//		}
-//	}
-//
-//	return CRGB(red1, green1, blue1);
-//}
 
 
+
+
+
+//PALETTES
+
+class CRGBPalette16;
+class CRGBPalette32;
+class CRGBPalette256;
+class CHSVPalette16;
+class CHSVPalette32;
+class CHSVPalette256;
+typedef uint32_t TProgmemRGBPalette16[16];
+typedef uint32_t TProgmemHSVPalette16[16];
+#define TProgmemPalette16 TProgmemRGBPalette16
+typedef uint32_t TProgmemRGBPalette32[32];
+typedef uint32_t TProgmemHSVPalette32[32];
+#define TProgmemPalette32 TProgmemRGBPalette32
+
+typedef const uint8_t TProgmemRGBGradientPalette_byte;
+typedef const TProgmemRGBGradientPalette_byte *TProgmemRGBGradientPalette_bytes;
+typedef TProgmemRGBGradientPalette_bytes TProgmemRGBGradientPalettePtr;
+typedef union {
+	struct {
+		uint8_t index;
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+	};
+	uint32_t dword;
+	uint8_t  bytes[4];
+} TRGBGradientPaletteEntryUnion;
+
+typedef uint8_t TDynamicRGBGradientPalette_byte;
+typedef const TDynamicRGBGradientPalette_byte *TDynamicRGBGradientPalette_bytes;
+typedef TDynamicRGBGradientPalette_bytes TDynamicRGBGradientPalettePtr;
+
+#define FL_PROGMEM
+#define FL_PGM_READ_BYTE_NEAR(x)  (*((const  uint8_t*)(x)))
+#define FL_PGM_READ_WORD_NEAR(x)  (*((const uint16_t*)(x)))
+#define FL_PGM_READ_DWORD_NEAR(x) (*((const uint32_t*)(x)))
+
+typedef enum { NOBLEND = 0, LINEARBLEND = 1 } TBlendType;
+
+#define DEFINE_GRADIENT_PALETTE(X) \
+  extern const TProgmemRGBGradientPalette_byte X[] =
+
+#define DECLARE_GRADIENT_PALETTE(X) \
+  extern const TProgmemRGBGradientPalette_byte X[] 
+
+void UpscalePalette(const class CRGBPalette16& srcpal16, class CRGBPalette256& destpal256);
+void UpscalePalette(const class CHSVPalette16& srcpal16, class CHSVPalette256& destpal256);
+
+// Convert a 16-entry palette to a 32-entry palette
+void UpscalePalette(const class CRGBPalette16& srcpal16, class CRGBPalette32& destpal32);
+void UpscalePalette(const class CHSVPalette16& srcpal16, class CHSVPalette32& destpal32);
+
+// Convert a 32-entry palette to a 256-entry palette
+void UpscalePalette(const class CRGBPalette32& srcpal32, class CRGBPalette256& destpal256);
+void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& destpal256);
+
+CRGB ColorFromPalette(const CRGBPalette16& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+CRGB ColorFromPalette(const TProgmemRGBPalette16& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+CRGB ColorFromPalette(const CRGBPalette256& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = NOBLEND);
+
+CHSV ColorFromPalette(const CHSVPalette16& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+CHSV ColorFromPalette(const CHSVPalette256& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = NOBLEND);
+
+CRGB ColorFromPalette(const CRGBPalette32& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+CRGB ColorFromPalette(const TProgmemRGBPalette32& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+CHSV ColorFromPalette(const CHSVPalette32& pal,
+	uint8_t index,
+	uint8_t brightness = 255,
+	TBlendType blendType = LINEARBLEND);
+
+class CHSVPalette16 {
+public:
+	CHSV entries[16];
+	CHSVPalette16() {};
+	CHSVPalette16(const CHSV& c00, const CHSV& c01, const CHSV& c02, const CHSV& c03,
+		const CHSV& c04, const CHSV& c05, const CHSV& c06, const CHSV& c07,
+		const CHSV& c08, const CHSV& c09, const CHSV& c10, const CHSV& c11,
+		const CHSV& c12, const CHSV& c13, const CHSV& c14, const CHSV& c15)
+	{
+		entries[0] = c00; entries[1] = c01; entries[2] = c02; entries[3] = c03;
+		entries[4] = c04; entries[5] = c05; entries[6] = c06; entries[7] = c07;
+		entries[8] = c08; entries[9] = c09; entries[10] = c10; entries[11] = c11;
+		entries[12] = c12; entries[13] = c13; entries[14] = c14; entries[15] = c15;
+	};
+
+	CHSVPalette16(const CHSVPalette16& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CHSVPalette16& operator=(const CHSVPalette16& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+
+	CHSVPalette16(const TProgmemHSVPalette16& rhs)
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			CRGB xyz = FL_PGM_READ_DWORD_NEAR(rhs + i);
+			entries[i].hue = xyz.red;
+			entries[i].sat = xyz.green;
+			entries[i].val = xyz.blue;
+		}
+	}
+	CHSVPalette16& operator=(const TProgmemHSVPalette16& rhs)
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			CRGB xyz = FL_PGM_READ_DWORD_NEAR(rhs + i);
+			entries[i].hue = xyz.red;
+			entries[i].sat = xyz.green;
+			entries[i].val = xyz.blue;
+		}
+		return *this;
+	}
+
+	inline CHSV& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CHSV& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CHSV& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CHSV& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CHSV*()
+	{
+		return &(entries[0]);
+	}
+
+	bool operator==(const CHSVPalette16 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint8_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CHSVPalette16 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	CHSVPalette16(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 16, c1);
+	}
+	CHSVPalette16(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2);
+	}
+	CHSVPalette16(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2, c3);
+	}
+	CHSVPalette16(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2, c3, c4);
+	}
+
+};
+
+class CRGBPalette16 {
+public:
+	CRGB entries[16];
+	CRGBPalette16() {};
+	CRGBPalette16(const CRGB& c00, const CRGB& c01, const CRGB& c02, const CRGB& c03,
+		const CRGB& c04, const CRGB& c05, const CRGB& c06, const CRGB& c07,
+		const CRGB& c08, const CRGB& c09, const CRGB& c10, const CRGB& c11,
+		const CRGB& c12, const CRGB& c13, const CRGB& c14, const CRGB& c15)
+	{
+		entries[0] = c00; entries[1] = c01; entries[2] = c02; entries[3] = c03;
+		entries[4] = c04; entries[5] = c05; entries[6] = c06; entries[7] = c07;
+		entries[8] = c08; entries[9] = c09; entries[10] = c10; entries[11] = c11;
+		entries[12] = c12; entries[13] = c13; entries[14] = c14; entries[15] = c15;
+	};
+
+	CRGBPalette16(const CRGBPalette16& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CRGBPalette16(const CRGB rhs[16])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+	}
+	CRGBPalette16& operator=(const CRGBPalette16& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+	CRGBPalette16& operator=(const CRGB rhs[16])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+		return *this;
+	}
+
+	//CRGBPalette16(const CHSVPalette16& rhs)
+	//{
+	//	for (uint8_t i = 0; i < 16; i++) {
+	//		entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+	//	}
+	//}
+	CRGBPalette16(const CHSV rhs[16])
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+	}
+	//CRGBPalette16& operator=(const CHSVPalette16& rhs)
+	//{
+	//	for (uint8_t i = 0; i < 16; i++) {
+	//		entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+	//	}
+	//	return *this;
+	//}
+	CRGBPalette16& operator=(const CHSV rhs[16])
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+		return *this;
+	}
+
+	CRGBPalette16(const TProgmemRGBPalette16& rhs)
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			entries[i] = FL_PGM_READ_DWORD_NEAR(rhs + i);
+		}
+	}
+	CRGBPalette16& operator=(const TProgmemRGBPalette16& rhs)
+	{
+		for (uint8_t i = 0; i < 16; i++) {
+			entries[i] = FL_PGM_READ_DWORD_NEAR(rhs + i);
+		}
+		return *this;
+	}
+
+	bool operator==(const CRGBPalette16 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint8_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CRGBPalette16 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	inline CRGB& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CRGB& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CRGB& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CRGB& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CRGB*()
+	{
+		return &(entries[0]);
+	}
+
+	CRGBPalette16(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 16, c1);
+	}
+	CRGBPalette16(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2);
+	}
+	CRGBPalette16(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2, c3);
+	}
+	CRGBPalette16(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 16, c1, c2, c3, c4);
+	}
+
+	CRGBPalette16(const CRGB& c1)
+	{
+		fill_solid(&(entries[0]), 16, c1);
+	}
+	CRGBPalette16(const CRGB& c1, const CRGB& c2)
+	{
+		fill_gradient_RGB(&(entries[0]), 16, c1, c2);
+	}
+	CRGBPalette16(const CRGB& c1, const CRGB& c2, const CRGB& c3)
+	{
+		fill_gradient_RGB(&(entries[0]), 16, c1, c2, c3);
+	}
+	CRGBPalette16(const CRGB& c1, const CRGB& c2, const CRGB& c3, const CRGB& c4)
+	{
+		fill_gradient_RGB(&(entries[0]), 16, c1, c2, c3, c4);
+	}
+
+
+	// Gradient palettes are loaded into CRGB16Palettes in such a way
+	// that, if possible, every color represented in the gradient palette
+	// is also represented in the CRGBPalette16.
+	// For example, consider a gradient palette that is all black except
+	// for a single, one-element-wide (1/256th!) spike of red in the middle:
+	//     0,   0,0,0
+	//   124,   0,0,0
+	//   125, 255,0,0  // one 1/256th-palette-wide red stripe
+	//   126,   0,0,0
+	//   255,   0,0,0
+	// A naive conversion of this 256-element palette to a 16-element palette
+	// might accidentally completely eliminate the red spike, rendering the
+	// palette completely black.
+	// However, the conversions provided here would attempt to include a
+	// the red stripe in the output, more-or-less as faithfully as possible.
+	// So in this case, the resulting CRGBPalette16 palette would have a red
+	// stripe in the middle which was 1/16th of a palette wide -- the
+	// narrowest possible in a CRGBPalette16.
+	// This means that the relative width of stripes in a CRGBPalette16
+	// will be, by definition, different from the widths in the gradient
+	// palette.  This code attempts to preserve "all the colors", rather than
+	// the exact stripe widths at the expense of dropping some colors.
+	CRGBPalette16(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		*this = progpal;
+	}
+	CRGBPalette16& operator=(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		TRGBGradientPaletteEntryUnion* progent = (TRGBGradientPaletteEntryUnion*)(progpal);
+		TRGBGradientPaletteEntryUnion u;
+
+		// Count entries
+		uint16_t count = 0;
+		do {
+			u.dword = FL_PGM_READ_DWORD_NEAR(progent + count);
+			count++;;
+		} while (u.index != 255);
+
+		int8_t lastSlotUsed = -1;
+
+		u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		uint8_t istart8 = 0;
+		uint8_t iend8 = 0;
+		while (indexstart < 255) {
+			progent++;
+			u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			istart8 = indexstart / 16;
+			iend8 = indexend / 16;
+			if (count < 16) {
+				if ((istart8 <= lastSlotUsed) && (lastSlotUsed < 15)) {
+					istart8 = lastSlotUsed + 1;
+					if (iend8 < istart8) {
+						iend8 = istart8;
+					}
+				}
+				lastSlotUsed = iend8;
+			}
+			fill_gradient_RGB(&(entries[0]), istart8, rgbstart, iend8, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+	CRGBPalette16& loadDynamicGradientPalette(TDynamicRGBGradientPalette_bytes gpal)
+	{
+		TRGBGradientPaletteEntryUnion* ent = (TRGBGradientPaletteEntryUnion*)(gpal);
+		TRGBGradientPaletteEntryUnion u;
+
+		// Count entries
+		uint16_t count = 0;
+		do {
+			u = *(ent + count);
+			count++;;
+		} while (u.index != 255);
+
+		int8_t lastSlotUsed = -1;
+
+
+		u = *ent;
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		uint8_t istart8 = 0;
+		uint8_t iend8 = 0;
+		while (indexstart < 255) {
+			ent++;
+			u = *ent;
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			istart8 = indexstart / 16;
+			iend8 = indexend / 16;
+			if (count < 16) {
+				if ((istart8 <= lastSlotUsed) && (lastSlotUsed < 15)) {
+					istart8 = lastSlotUsed + 1;
+					if (iend8 < istart8) {
+						iend8 = istart8;
+					}
+				}
+				lastSlotUsed = iend8;
+			}
+			fill_gradient_RGB(&(entries[0]), istart8, rgbstart, iend8, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+
+};
+
+
+class CHSVPalette32 {
+public:
+	CHSV entries[32];
+	CHSVPalette32() {};
+	CHSVPalette32(const CHSV& c00, const CHSV& c01, const CHSV& c02, const CHSV& c03,
+		const CHSV& c04, const CHSV& c05, const CHSV& c06, const CHSV& c07,
+		const CHSV& c08, const CHSV& c09, const CHSV& c10, const CHSV& c11,
+		const CHSV& c12, const CHSV& c13, const CHSV& c14, const CHSV& c15)
+	{
+		for (uint8_t i = 0; i < 2; i++) {
+			entries[0 + i] = c00; entries[2 + i] = c01; entries[4 + i] = c02; entries[6 + i] = c03;
+			entries[8 + i] = c04; entries[10 + i] = c05; entries[12 + i] = c06; entries[14 + i] = c07;
+			entries[16 + i] = c08; entries[18 + i] = c09; entries[20 + i] = c10; entries[22 + i] = c11;
+			entries[24 + i] = c12; entries[26 + i] = c13; entries[28 + i] = c14; entries[30 + i] = c15;
+		}
+	};
+
+	CHSVPalette32(const CHSVPalette32& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CHSVPalette32& operator=(const CHSVPalette32& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+
+	CHSVPalette32(const TProgmemHSVPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			CRGB xyz = FL_PGM_READ_DWORD_NEAR(rhs + i);
+			entries[i].hue = xyz.red;
+			entries[i].sat = xyz.green;
+			entries[i].val = xyz.blue;
+		}
+	}
+	CHSVPalette32& operator=(const TProgmemHSVPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			CRGB xyz = FL_PGM_READ_DWORD_NEAR(rhs + i);
+			entries[i].hue = xyz.red;
+			entries[i].sat = xyz.green;
+			entries[i].val = xyz.blue;
+		}
+		return *this;
+	}
+
+	inline CHSV& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CHSV& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CHSV& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CHSV& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CHSV*()
+	{
+		return &(entries[0]);
+	}
+
+	bool operator==(const CHSVPalette32 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint8_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CHSVPalette32 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	CHSVPalette32(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 32, c1);
+	}
+	CHSVPalette32(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2);
+	}
+	CHSVPalette32(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2, c3);
+	}
+	CHSVPalette32(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2, c3, c4);
+	}
+
+};
+
+class CRGBPalette32 {
+public:
+	CRGB entries[32];
+	CRGBPalette32() {};
+	CRGBPalette32(const CRGB& c00, const CRGB& c01, const CRGB& c02, const CRGB& c03,
+		const CRGB& c04, const CRGB& c05, const CRGB& c06, const CRGB& c07,
+		const CRGB& c08, const CRGB& c09, const CRGB& c10, const CRGB& c11,
+		const CRGB& c12, const CRGB& c13, const CRGB& c14, const CRGB& c15)
+	{
+		for (uint8_t i = 0; i < 2; i++) {
+			entries[0 + i] = c00; entries[2 + i] = c01; entries[4 + i] = c02; entries[6 + i] = c03;
+			entries[8 + i] = c04; entries[10 + i] = c05; entries[12 + i] = c06; entries[14 + i] = c07;
+			entries[16 + i] = c08; entries[18 + i] = c09; entries[20 + i] = c10; entries[22 + i] = c11;
+			entries[24 + i] = c12; entries[26 + i] = c13; entries[28 + i] = c14; entries[30 + i] = c15;
+		}
+	};
+
+	CRGBPalette32(const CRGBPalette32& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CRGBPalette32(const CRGB rhs[32])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+	}
+	CRGBPalette32& operator=(const CRGBPalette32& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+	CRGBPalette32& operator=(const CRGB rhs[32])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+		return *this;
+	}
+
+	CRGBPalette32(const CHSVPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+		}
+	}
+	CRGBPalette32(const CHSV rhs[32])
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+	}
+	CRGBPalette32& operator=(const CHSVPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+		}
+		return *this;
+	}
+	CRGBPalette32& operator=(const CHSV rhs[32])
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+		return *this;
+	}
+
+	CRGBPalette32(const TProgmemRGBPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = FL_PGM_READ_DWORD_NEAR(rhs + i);
+		}
+	}
+	CRGBPalette32& operator=(const TProgmemRGBPalette32& rhs)
+	{
+		for (uint8_t i = 0; i < 32; i++) {
+			entries[i] = FL_PGM_READ_DWORD_NEAR(rhs + i);
+		}
+		return *this;
+	}
+
+	bool operator==(const CRGBPalette32 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint8_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CRGBPalette32 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	inline CRGB& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CRGB& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CRGB& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CRGB& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CRGB*()
+	{
+		return &(entries[0]);
+	}
+
+	CRGBPalette32(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 32, c1);
+	}
+	CRGBPalette32(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2);
+	}
+	CRGBPalette32(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2, c3);
+	}
+	CRGBPalette32(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 32, c1, c2, c3, c4);
+	}
+
+	CRGBPalette32(const CRGB& c1)
+	{
+		fill_solid(&(entries[0]), 32, c1);
+	}
+	CRGBPalette32(const CRGB& c1, const CRGB& c2)
+	{
+		fill_gradient_RGB(&(entries[0]), 32, c1, c2);
+	}
+	CRGBPalette32(const CRGB& c1, const CRGB& c2, const CRGB& c3)
+	{
+		fill_gradient_RGB(&(entries[0]), 32, c1, c2, c3);
+	}
+	CRGBPalette32(const CRGB& c1, const CRGB& c2, const CRGB& c3, const CRGB& c4)
+	{
+		fill_gradient_RGB(&(entries[0]), 32, c1, c2, c3, c4);
+	}
+
+
+	CRGBPalette32(const CRGBPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+	}
+	CRGBPalette32& operator=(const CRGBPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+		return *this;
+	}
+
+	CRGBPalette32(const TProgmemRGBPalette16& rhs)
+	{
+		CRGBPalette16 p16(rhs);
+		*this = p16;
+	}
+	CRGBPalette32& operator=(const TProgmemRGBPalette16& rhs)
+	{
+		CRGBPalette16 p16(rhs);
+		*this = p16;
+		return *this;
+	}
+
+
+	// Gradient palettes are loaded into CRGB16Palettes in such a way
+	// that, if possible, every color represented in the gradient palette
+	// is also represented in the CRGBPalette32.
+	// For example, consider a gradient palette that is all black except
+	// for a single, one-element-wide (1/256th!) spike of red in the middle:
+	//     0,   0,0,0
+	//   124,   0,0,0
+	//   125, 255,0,0  // one 1/256th-palette-wide red stripe
+	//   126,   0,0,0
+	//   255,   0,0,0
+	// A naive conversion of this 256-element palette to a 16-element palette
+	// might accidentally completely eliminate the red spike, rendering the
+	// palette completely black.
+	// However, the conversions provided here would attempt to include a
+	// the red stripe in the output, more-or-less as faithfully as possible.
+	// So in this case, the resulting CRGBPalette32 palette would have a red
+	// stripe in the middle which was 1/16th of a palette wide -- the
+	// narrowest possible in a CRGBPalette32.
+	// This means that the relative width of stripes in a CRGBPalette32
+	// will be, by definition, different from the widths in the gradient
+	// palette.  This code attempts to preserve "all the colors", rather than
+	// the exact stripe widths at the expense of dropping some colors.
+	CRGBPalette32(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		*this = progpal;
+	}
+	CRGBPalette32& operator=(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		TRGBGradientPaletteEntryUnion* progent = (TRGBGradientPaletteEntryUnion*)(progpal);
+		TRGBGradientPaletteEntryUnion u;
+
+		// Count entries
+		uint16_t count = 0;
+		do {
+			u.dword = FL_PGM_READ_DWORD_NEAR(progent + count);
+			count++;;
+		} while (u.index != 255);
+
+		int8_t lastSlotUsed = -1;
+
+		u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		uint8_t istart8 = 0;
+		uint8_t iend8 = 0;
+		while (indexstart < 255) {
+			progent++;
+			u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			istart8 = indexstart / 8;
+			iend8 = indexend / 8;
+			if (count < 16) {
+				if ((istart8 <= lastSlotUsed) && (lastSlotUsed < 31)) {
+					istart8 = lastSlotUsed + 1;
+					if (iend8 < istart8) {
+						iend8 = istart8;
+					}
+				}
+				lastSlotUsed = iend8;
+			}
+			fill_gradient_RGB(&(entries[0]), istart8, rgbstart, iend8, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+	CRGBPalette32& loadDynamicGradientPalette(TDynamicRGBGradientPalette_bytes gpal)
+	{
+		TRGBGradientPaletteEntryUnion* ent = (TRGBGradientPaletteEntryUnion*)(gpal);
+		TRGBGradientPaletteEntryUnion u;
+
+		// Count entries
+		uint16_t count = 0;
+		do {
+			u = *(ent + count);
+			count++;;
+		} while (u.index != 255);
+
+		int8_t lastSlotUsed = -1;
+
+
+		u = *ent;
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		uint8_t istart8 = 0;
+		uint8_t iend8 = 0;
+		while (indexstart < 255) {
+			ent++;
+			u = *ent;
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			istart8 = indexstart / 8;
+			iend8 = indexend / 8;
+			if (count < 16) {
+				if ((istart8 <= lastSlotUsed) && (lastSlotUsed < 31)) {
+					istart8 = lastSlotUsed + 1;
+					if (iend8 < istart8) {
+						iend8 = istart8;
+					}
+				}
+				lastSlotUsed = iend8;
+			}
+			fill_gradient_RGB(&(entries[0]), istart8, rgbstart, iend8, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+
+};
+
+class CHSVPalette256 {
+public:
+	CHSV entries[256];
+	CHSVPalette256() {};
+	CHSVPalette256(const CHSV& c00, const CHSV& c01, const CHSV& c02, const CHSV& c03,
+		const CHSV& c04, const CHSV& c05, const CHSV& c06, const CHSV& c07,
+		const CHSV& c08, const CHSV& c09, const CHSV& c10, const CHSV& c11,
+		const CHSV& c12, const CHSV& c13, const CHSV& c14, const CHSV& c15)
+	{
+		CHSVPalette16 p16(c00, c01, c02, c03, c04, c05, c06, c07,
+			c08, c09, c10, c11, c12, c13, c14, c15);
+		*this = p16;
+	};
+
+	CHSVPalette256(const CHSVPalette256& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CHSVPalette256& operator=(const CHSVPalette256& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+
+	CHSVPalette256(const CHSVPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+	}
+	CHSVPalette256& operator=(const CHSVPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+		return *this;
+	}
+
+	CHSVPalette256(const TProgmemRGBPalette16& rhs)
+	{
+		CHSVPalette16 p16(rhs);
+		*this = p16;
+	}
+	CHSVPalette256& operator=(const TProgmemRGBPalette16& rhs)
+	{
+		CHSVPalette16 p16(rhs);
+		*this = p16;
+		return *this;
+	}
+
+	inline CHSV& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CHSV& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CHSV& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CHSV& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CHSV*()
+	{
+		return &(entries[0]);
+	}
+
+	bool operator==(const CHSVPalette256 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint16_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CHSVPalette256 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	CHSVPalette256(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 256, c1);
+	}
+	CHSVPalette256(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2);
+	}
+	CHSVPalette256(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2, c3);
+	}
+	CHSVPalette256(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2, c3, c4);
+	}
+};
+
+
+class CRGBPalette256 {
+public:
+	CRGB entries[256];
+	CRGBPalette256() {};
+	CRGBPalette256(const CRGB& c00, const CRGB& c01, const CRGB& c02, const CRGB& c03,
+		const CRGB& c04, const CRGB& c05, const CRGB& c06, const CRGB& c07,
+		const CRGB& c08, const CRGB& c09, const CRGB& c10, const CRGB& c11,
+		const CRGB& c12, const CRGB& c13, const CRGB& c14, const CRGB& c15)
+	{
+		CRGBPalette16 p16(c00, c01, c02, c03, c04, c05, c06, c07,
+			c08, c09, c10, c11, c12, c13, c14, c15);
+		*this = p16;
+	};
+
+	CRGBPalette256(const CRGBPalette256& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+	}
+	CRGBPalette256(const CRGB rhs[256])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+	}
+	CRGBPalette256& operator=(const CRGBPalette256& rhs)
+	{
+		memmove(&(entries[0]), &(rhs.entries[0]), sizeof(entries));
+		return *this;
+	}
+	CRGBPalette256& operator=(const CRGB rhs[256])
+	{
+		memmove(&(entries[0]), &(rhs[0]), sizeof(entries));
+		return *this;
+	}
+
+	CRGBPalette256(const CHSVPalette256& rhs)
+	{
+		for (int i = 0; i < 256; i++) {
+			entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+		}
+	}
+	CRGBPalette256(const CHSV rhs[256])
+	{
+		for (int i = 0; i < 256; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+	}
+	CRGBPalette256& operator=(const CHSVPalette256& rhs)
+	{
+		for (int i = 0; i < 256; i++) {
+			entries[i] = rhs.entries[i]; // implicit HSV-to-RGB conversion
+		}
+		return *this;
+	}
+	CRGBPalette256& operator=(const CHSV rhs[256])
+	{
+		for (int i = 0; i < 256; i++) {
+			entries[i] = rhs[i]; // implicit HSV-to-RGB conversion
+		}
+		return *this;
+	}
+
+	CRGBPalette256(const CRGBPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+	}
+	CRGBPalette256& operator=(const CRGBPalette16& rhs16)
+	{
+		UpscalePalette(rhs16, *this);
+		return *this;
+	}
+
+	CRGBPalette256(const TProgmemRGBPalette16& rhs)
+	{
+		CRGBPalette16 p16(rhs);
+		*this = p16;
+	}
+	CRGBPalette256& operator=(const TProgmemRGBPalette16& rhs)
+	{
+		CRGBPalette16 p16(rhs);
+		*this = p16;
+		return *this;
+	}
+
+	bool operator==(const CRGBPalette256 rhs)
+	{
+		const uint8_t* p = (const uint8_t*)(&(this->entries[0]));
+		const uint8_t* q = (const uint8_t*)(&(rhs.entries[0]));
+		if (p == q) return true;
+		for (uint16_t i = 0; i < (sizeof(entries)); i++) {
+			if (*p != *q) return false;
+			p++;
+			q++;
+		}
+		return true;
+	}
+	bool operator!=(const CRGBPalette256 rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	inline CRGB& operator[] (uint8_t x) 
+	{
+		return entries[x];
+	}
+	inline const CRGB& operator[] (uint8_t x) const 
+	{
+		return entries[x];
+	}
+
+	inline CRGB& operator[] (int x) 
+	{
+		return entries[(uint8_t)x];
+	}
+	inline const CRGB& operator[] (int x) const 
+	{
+		return entries[(uint8_t)x];
+	}
+
+	operator CRGB*()
+	{
+		return &(entries[0]);
+	}
+
+	CRGBPalette256(const CHSV& c1)
+	{
+		fill_solid(&(entries[0]), 256, c1);
+	}
+	CRGBPalette256(const CHSV& c1, const CHSV& c2)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2);
+	}
+	CRGBPalette256(const CHSV& c1, const CHSV& c2, const CHSV& c3)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2, c3);
+	}
+	CRGBPalette256(const CHSV& c1, const CHSV& c2, const CHSV& c3, const CHSV& c4)
+	{
+		fill_gradient(&(entries[0]), 256, c1, c2, c3, c4);
+	}
+
+	CRGBPalette256(const CRGB& c1)
+	{
+		fill_solid(&(entries[0]), 256, c1);
+	}
+	CRGBPalette256(const CRGB& c1, const CRGB& c2)
+	{
+		fill_gradient_RGB(&(entries[0]), 256, c1, c2);
+	}
+	CRGBPalette256(const CRGB& c1, const CRGB& c2, const CRGB& c3)
+	{
+		fill_gradient_RGB(&(entries[0]), 256, c1, c2, c3);
+	}
+	CRGBPalette256(const CRGB& c1, const CRGB& c2, const CRGB& c3, const CRGB& c4)
+	{
+		fill_gradient_RGB(&(entries[0]), 256, c1, c2, c3, c4);
+	}
+
+	CRGBPalette256(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		*this = progpal;
+	}
+	CRGBPalette256& operator=(TProgmemRGBGradientPalette_bytes progpal)
+	{
+		TRGBGradientPaletteEntryUnion* progent = (TRGBGradientPaletteEntryUnion*)(progpal);
+		TRGBGradientPaletteEntryUnion u;
+		u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		while (indexstart < 255) {
+			progent++;
+			u.dword = FL_PGM_READ_DWORD_NEAR(progent);
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			fill_gradient_RGB(&(entries[0]), indexstart, rgbstart, indexend, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+	CRGBPalette256& loadDynamicGradientPalette(TDynamicRGBGradientPalette_bytes gpal)
+	{
+		TRGBGradientPaletteEntryUnion* ent = (TRGBGradientPaletteEntryUnion*)(gpal);
+		TRGBGradientPaletteEntryUnion u;
+		u = *ent;
+		CRGB rgbstart(u.r, u.g, u.b);
+
+		int indexstart = 0;
+		while (indexstart < 255) {
+			ent++;
+			u = *ent;
+			int indexend = u.index;
+			CRGB rgbend(u.r, u.g, u.b);
+			fill_gradient_RGB(&(entries[0]), indexstart, rgbstart, indexend, rgbend);
+			indexstart = indexend;
+			rgbstart = rgbend;
+		}
+		return *this;
+	}
+};
+
+CRGB ColorFromPalette(const CRGBPalette16& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	//      hi4 = index >> 4;
+	uint8_t hi4 = lsrX4(index);
+	uint8_t lo4 = index & 0x0F;
+
+	// const CRGB* entry = &(pal[0]) + hi4;
+	// since hi4 is always 0..15, hi4 * sizeof(CRGB) can be a single-byte value,
+	// instead of the two byte 'int' that avr-gcc defaults to.
+	// So, we multiply hi4 X sizeof(CRGB), giving hi4XsizeofCRGB;
+	uint8_t hi4XsizeofCRGB = hi4 * sizeof(CRGB);
+	// We then add that to a base array pointer.
+	const CRGB* entry = (CRGB*)((uint8_t*)(&(pal[0])) + hi4XsizeofCRGB);
+
+	uint8_t blend = lo4 && (blendType != NOBLEND);
+
+	uint8_t red1 = entry->red;
+	uint8_t green1 = entry->green;
+	uint8_t blue1 = entry->blue;
+
+
+	if (blend) {
+
+		if (hi4 == 15) {
+			entry = &(pal[0]);
+		}
+		else {
+			entry++;
+		}
+
+		uint8_t f2 = lo4 << 4;
+		uint8_t f1 = 255 - f2;
+
+		//    rgb1.nscale8(f1);
+		uint8_t red2 = entry->red;
+		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
+		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
+		red1 += red2;
+
+		uint8_t green2 = entry->green;
+		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
+		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
+		green1 += green2;
+
+		uint8_t blue2 = entry->blue;
+		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
+		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
+		blue1 += blue2;
+
+		cleanup_R1();
+	}
+
+	if (brightness != 255) {
+		if (brightness) {
+			brightness++; // adjust for rounding
+			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
+			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
+			if (red1) {
+				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				red1++;
+#endif
+			}
+			if (green1) {
+				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				green1++;
+#endif
+			}
+			if (blue1) {
+				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				blue1++;
+#endif
+			}
+			cleanup_R1();
+		}
+		else {
+			red1 = 0;
+			green1 = 0;
+			blue1 = 0;
+		}
+	}
+
+	return CRGB(red1, green1, blue1);
+}
+
+CRGB ColorFromPalette(const TProgmemRGBPalette16& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	//      hi4 = index >> 4;
+	uint8_t hi4 = lsrX4(index);
+	uint8_t lo4 = index & 0x0F;
+
+	CRGB entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]) + hi4);
+
+
+	uint8_t red1 = entry.red;
+	uint8_t green1 = entry.green;
+	uint8_t blue1 = entry.blue;
+
+	uint8_t blend = lo4 && (blendType != NOBLEND);
+
+	if (blend) {
+
+		if (hi4 == 15) {
+			entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]));
+		}
+		else {
+			entry = FL_PGM_READ_DWORD_NEAR(&(pal[1]) + hi4);
+		}
+
+		uint8_t f2 = lo4 << 4;
+		uint8_t f1 = 255 - f2;
+
+		uint8_t red2 = entry.red;
+		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
+		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
+		red1 += red2;
+
+		uint8_t green2 = entry.green;
+		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
+		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
+		green1 += green2;
+
+		uint8_t blue2 = entry.blue;
+		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
+		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
+		blue1 += blue2;
+
+		cleanup_R1();
+	}
+
+	if (brightness != 255) {
+		if (brightness) {
+			brightness++; // adjust for rounding
+			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
+			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
+			if (red1) {
+				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				red1++;
+#endif
+			}
+			if (green1) {
+				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				green1++;
+#endif
+			}
+			if (blue1) {
+				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				blue1++;
+#endif
+			}
+			cleanup_R1();
+		}
+		else {
+			red1 = 0;
+			green1 = 0;
+			blue1 = 0;
+		}
+	}
+
+	return CRGB(red1, green1, blue1);
+}
+
+
+CRGB ColorFromPalette(const CRGBPalette32& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	uint8_t hi5 = index;
+#if defined(__AVR__)
+	hi5 /= 2;
+	hi5 /= 2;
+	hi5 /= 2;
+#else
+	hi5 >>= 3;
+#endif
+	uint8_t lo3 = index & 0x07;
+
+	// const CRGB* entry = &(pal[0]) + hi5;
+	// since hi5 is always 0..31, hi4 * sizeof(CRGB) can be a single-byte value,
+	// instead of the two byte 'int' that avr-gcc defaults to.
+	// So, we multiply hi5 X sizeof(CRGB), giving hi5XsizeofCRGB;
+	uint8_t hi5XsizeofCRGB = hi5 * sizeof(CRGB);
+	// We then add that to a base array pointer.
+	const CRGB* entry = (CRGB*)((uint8_t*)(&(pal[0])) + hi5XsizeofCRGB);
+
+	uint8_t red1 = entry->red;
+	uint8_t green1 = entry->green;
+	uint8_t blue1 = entry->blue;
+
+	uint8_t blend = lo3 && (blendType != NOBLEND);
+
+	if (blend) {
+
+		if (hi5 == 31) {
+			entry = &(pal[0]);
+		}
+		else {
+			entry++;
+		}
+
+		uint8_t f2 = lo3 << 5;
+		uint8_t f1 = 255 - f2;
+
+		uint8_t red2 = entry->red;
+		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
+		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
+		red1 += red2;
+
+		uint8_t green2 = entry->green;
+		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
+		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
+		green1 += green2;
+
+		uint8_t blue2 = entry->blue;
+		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
+		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
+		blue1 += blue2;
+
+		cleanup_R1();
+
+	}
+
+	if (brightness != 255) {
+		if (brightness) {
+			brightness++; // adjust for rounding
+			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
+			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
+			if (red1) {
+				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				red1++;
+#endif
+			}
+			if (green1) {
+				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				green1++;
+#endif
+			}
+			if (blue1) {
+				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				blue1++;
+#endif
+			}
+			cleanup_R1();
+		}
+		else {
+			red1 = 0;
+			green1 = 0;
+			blue1 = 0;
+		}
+	}
+
+	return CRGB(red1, green1, blue1);
+}
+
+
+CRGB ColorFromPalette(const TProgmemRGBPalette32& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	uint8_t hi5 = index;
+#if defined(__AVR__)
+	hi5 /= 2;
+	hi5 /= 2;
+	hi5 /= 2;
+#else
+	hi5 >>= 3;
+#endif
+	uint8_t lo3 = index & 0x07;
+
+	CRGB entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]) + hi5);
+
+	uint8_t red1 = entry.red;
+	uint8_t green1 = entry.green;
+	uint8_t blue1 = entry.blue;
+
+	uint8_t blend = lo3 && (blendType != NOBLEND);
+
+	if (blend) {
+
+		if (hi5 == 31) {
+			entry = FL_PGM_READ_DWORD_NEAR(&(pal[0]));
+		}
+		else {
+			entry = FL_PGM_READ_DWORD_NEAR(&(pal[1]) + hi5);
+		}
+
+		uint8_t f2 = lo3 << 5;
+		uint8_t f1 = 255 - f2;
+
+		uint8_t red2 = entry.red;
+		red1 = scale8_LEAVING_R1_DIRTY(red1, f1);
+		red2 = scale8_LEAVING_R1_DIRTY(red2, f2);
+		red1 += red2;
+
+		uint8_t green2 = entry.green;
+		green1 = scale8_LEAVING_R1_DIRTY(green1, f1);
+		green2 = scale8_LEAVING_R1_DIRTY(green2, f2);
+		green1 += green2;
+
+		uint8_t blue2 = entry.blue;
+		blue1 = scale8_LEAVING_R1_DIRTY(blue1, f1);
+		blue2 = scale8_LEAVING_R1_DIRTY(blue2, f2);
+		blue1 += blue2;
+
+		cleanup_R1();
+	}
+
+	if (brightness != 255) {
+		if (brightness) {
+			brightness++; // adjust for rounding
+			// Now, since brightness is nonzero, we don't need the full scale8_video logic;
+			// we can just to scale8 and then add one (unless scale8 fixed) to all nonzero inputs.
+			if (red1) {
+				red1 = scale8_LEAVING_R1_DIRTY(red1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				red1++;
+#endif
+			}
+			if (green1) {
+				green1 = scale8_LEAVING_R1_DIRTY(green1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				green1++;
+#endif
+			}
+			if (blue1) {
+				blue1 = scale8_LEAVING_R1_DIRTY(blue1, brightness);
+#if !(FASTLED_SCALE8_FIXED==1)
+				blue1++;
+#endif
+			}
+			cleanup_R1();
+		}
+		else {
+			red1 = 0;
+			green1 = 0;
+			blue1 = 0;
+		}
+	}
+
+	return CRGB(red1, green1, blue1);
+}
+
+
+
+CRGB ColorFromPalette(const CRGBPalette256& pal, uint8_t index, uint8_t brightness, TBlendType)
+{
+	const CRGB* entry = &(pal[0]) + index;
+
+	uint8_t red = entry->red;
+	uint8_t green = entry->green;
+	uint8_t blue = entry->blue;
+
+	if (brightness != 255) {
+		brightness++; // adjust for rounding
+		red = scale8_video_LEAVING_R1_DIRTY(red, brightness);
+		green = scale8_video_LEAVING_R1_DIRTY(green, brightness);
+		blue = scale8_video_LEAVING_R1_DIRTY(blue, brightness);
+		cleanup_R1();
+	}
+
+	return CRGB(red, green, blue);
+}
+
+
+CHSV ColorFromPalette(const class CHSVPalette16& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	//      hi4 = index >> 4;
+	uint8_t hi4 = lsrX4(index);
+	uint8_t lo4 = index & 0x0F;
+
+	//  CRGB rgb1 = pal[ hi4];
+	const CHSV* entry = &(pal[0]) + hi4;
+
+	uint8_t hue1 = entry->hue;
+	uint8_t sat1 = entry->sat;
+	uint8_t val1 = entry->val;
+
+	uint8_t blend = lo4 && (blendType != NOBLEND);
+
+	if (blend) {
+
+		if (hi4 == 15) {
+			entry = &(pal[0]);
+		}
+		else {
+			entry++;
+		}
+
+		uint8_t f2 = lo4 << 4;
+		uint8_t f1 = 255 - f2;
+
+		uint8_t hue2 = entry->hue;
+		uint8_t sat2 = entry->sat;
+		uint8_t val2 = entry->val;
+
+		// Now some special casing for blending to or from
+		// either black or white.  Black and white don't have
+		// proper 'hue' of their own, so when ramping from
+		// something else to/from black/white, we set the 'hue'
+		// of the black/white color to be the same as the hue
+		// of the other color, so that you get the expected
+		// brightness or saturation ramp, with hue staying
+		// constant:
+
+		// If we are starting from white (sat=0)
+		// or black (val=0), adopt the target hue.
+		if (sat1 == 0 || val1 == 0) {
+			hue1 = hue2;
+		}
+
+		// If we are ending at white (sat=0)
+		// or black (val=0), adopt the starting hue.
+		if (sat2 == 0 || val2 == 0) {
+			hue2 = hue1;
+		}
+
+
+		sat1 = scale8_LEAVING_R1_DIRTY(sat1, f1);
+		val1 = scale8_LEAVING_R1_DIRTY(val1, f1);
+
+		sat2 = scale8_LEAVING_R1_DIRTY(sat2, f2);
+		val2 = scale8_LEAVING_R1_DIRTY(val2, f2);
+
+		//    cleanup_R1();
+
+		// These sums can't overflow, so no qadd8 needed.
+		sat1 += sat2;
+		val1 += val2;
+
+		uint8_t deltaHue = (uint8_t)(hue2 - hue1);
+		if (deltaHue & 0x80) {
+			// go backwards
+			hue1 -= scale8(256 - deltaHue, f2);
+		}
+		else {
+			// go forwards
+			hue1 += scale8(deltaHue, f2);
+		}
+
+		cleanup_R1();
+	}
+
+	if (brightness != 255) {
+		val1 = scale8_video(val1, brightness);
+	}
+
+	return CHSV(hue1, sat1, val1);
+}
+
+
+CHSV ColorFromPalette(const class CHSVPalette32& pal, uint8_t index, uint8_t brightness, TBlendType blendType)
+{
+	uint8_t hi5 = index;
+#if defined(__AVR__)
+	hi5 /= 2;
+	hi5 /= 2;
+	hi5 /= 2;
+#else
+	hi5 >>= 3;
+#endif
+	uint8_t lo3 = index & 0x07;
+
+	uint8_t hi5XsizeofCHSV = hi5 * sizeof(CHSV);
+	const CHSV* entry = (CHSV*)((uint8_t*)(&(pal[0])) + hi5XsizeofCHSV);
+
+	uint8_t hue1 = entry->hue;
+	uint8_t sat1 = entry->sat;
+	uint8_t val1 = entry->val;
+
+	uint8_t blend = lo3 && (blendType != NOBLEND);
+
+	if (blend) {
+
+		if (hi5 == 31) {
+			entry = &(pal[0]);
+		}
+		else {
+			entry++;
+		}
+
+		uint8_t f2 = lo3 << 5;
+		uint8_t f1 = 255 - f2;
+
+		uint8_t hue2 = entry->hue;
+		uint8_t sat2 = entry->sat;
+		uint8_t val2 = entry->val;
+
+		// Now some special casing for blending to or from
+		// either black or white.  Black and white don't have
+		// proper 'hue' of their own, so when ramping from
+		// something else to/from black/white, we set the 'hue'
+		// of the black/white color to be the same as the hue
+		// of the other color, so that you get the expected
+		// brightness or saturation ramp, with hue staying
+		// constant:
+
+		// If we are starting from white (sat=0)
+		// or black (val=0), adopt the target hue.
+		if (sat1 == 0 || val1 == 0) {
+			hue1 = hue2;
+		}
+
+		// If we are ending at white (sat=0)
+		// or black (val=0), adopt the starting hue.
+		if (sat2 == 0 || val2 == 0) {
+			hue2 = hue1;
+		}
+
+
+		sat1 = scale8_LEAVING_R1_DIRTY(sat1, f1);
+		val1 = scale8_LEAVING_R1_DIRTY(val1, f1);
+
+		sat2 = scale8_LEAVING_R1_DIRTY(sat2, f2);
+		val2 = scale8_LEAVING_R1_DIRTY(val2, f2);
+
+		//    cleanup_R1();
+
+		// These sums can't overflow, so no qadd8 needed.
+		sat1 += sat2;
+		val1 += val2;
+
+		uint8_t deltaHue = (uint8_t)(hue2 - hue1);
+		if (deltaHue & 0x80) {
+			// go backwards
+			hue1 -= scale8(256 - deltaHue, f2);
+		}
+		else {
+			// go forwards
+			hue1 += scale8(deltaHue, f2);
+		}
+
+		cleanup_R1();
+	}
+
+	if (brightness != 255) {
+		val1 = scale8_video(val1, brightness);
+	}
+
+	return CHSV(hue1, sat1, val1);
+}
+
+CHSV ColorFromPalette(const class CHSVPalette256& pal, uint8_t index, uint8_t brightness, TBlendType)
+{
+	CHSV hsv = *(&(pal[0]) + index);
+
+	if (brightness != 255) {
+		hsv.value = scale8_video(hsv.value, brightness);
+	}
+
+	return hsv;
+}
+
+
+void UpscalePalette(const class CRGBPalette16& srcpal16, class CRGBPalette256& destpal256)
+{
+	for (int i = 0; i < 256; i++) {
+		destpal256[(uint8_t)(i)] = ColorFromPalette(srcpal16, i);
+	}
+}
+
+void UpscalePalette(const class CHSVPalette16& srcpal16, class CHSVPalette256& destpal256)
+{
+	for (int i = 0; i < 256; i++) {
+		destpal256[(uint8_t)(i)] = ColorFromPalette(srcpal16, i);
+	}
+}
+
+
+void UpscalePalette(const class CRGBPalette16& srcpal16, class CRGBPalette32& destpal32)
+{
+	for (uint8_t i = 0; i < 16; i++) {
+		uint8_t j = i * 2;
+		destpal32[j + 0] = srcpal16[i];
+		destpal32[j + 1] = srcpal16[i];
+	}
+}
+
+void UpscalePalette(const class CHSVPalette16& srcpal16, class CHSVPalette32& destpal32)
+{
+	for (uint8_t i = 0; i < 16; i++) {
+		uint8_t j = i * 2;
+		destpal32[j + 0] = srcpal16[i];
+		destpal32[j + 1] = srcpal16[i];
+	}
+}
+
+void UpscalePalette(const class CRGBPalette32& srcpal32, class CRGBPalette256& destpal256)
+{
+	for (int i = 0; i < 256; i++) {
+		destpal256[(uint8_t)(i)] = ColorFromPalette(srcpal32, i);
+	}
+}
+
+void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& destpal256)
+{
+	for (int i = 0; i < 256; i++) {
+		destpal256[(uint8_t)(i)] = ColorFromPalette(srcpal32, i);
+	}
+}
 
 
 

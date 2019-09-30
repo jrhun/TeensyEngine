@@ -36,6 +36,10 @@ public:
 		ledRef->drawPixel(x, y, h);
 	}
 
+	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+		ledRef->drawBlend(x, y, c, a);
+	}
+
 	// crgb getcolor(unsigned char offset = 0) {
 
 	// }

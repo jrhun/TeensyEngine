@@ -26,6 +26,7 @@ Engine engine(gfx);
 
 #include "../Effects.h"
 #include "../Particle.h"
+#include "../Noise.h"
 
 //#include "../VariableControl.h"
 
@@ -86,4 +87,4 @@ public:
 
 };
 
-bool Pattern::useDefaultEffect = false;
+bool Pattern::useDefaultEffect = true;
