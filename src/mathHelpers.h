@@ -23,6 +23,11 @@ T interpolate(const T& src, const T& dst, float alpha)
 
 #if defined(ARDUINO)
 #define FLT_EPSILON      1.192092896e-07F   
+
+#ifndef CLAMP
+#define CLAMP(val,min,max) ((val) < (min) ? (min) : ((val > max) ? (max) : (val)))
+#endif
+
 float myMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 
 	if (fabs(inputMin - inputMax) < FLT_EPSILON) {
@@ -49,12 +54,14 @@ float myMap(float value, float inputMin, float inputMax, float outputMin, float 
 #include "ofMath.h"
 //#include "math.h"
 
+
+
 inline uint8_t constrain(int x, int min, int max) {
 	return (int)ofClamp(x, min, max);
 }
 
-inline float myMap(float x, float inMin, float inMax, float outMin, float outMax) {
-	return ofMap(x, inMin, inMax, outMin, outMax);
+inline float myMap(float x, float inMin, float inMax, float outMin, float outMax, bool clamp = false) {
+	return ofMap(x, inMin, inMax, outMin, outMax, clamp);
 }
 
 #endif

@@ -7,47 +7,125 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxBaseGui.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxButton.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxColorPicker.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxGuiGroup.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxInputField.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxLabel.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxPanel.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxSlider.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxSliderGroup.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.cpp">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Patterns">
+      <UniqueIdentifier>{5EBBA6F4-1B66-F9CD-15EB-506E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGui">
+      <UniqueIdentifier>{4F2A59AF-5F4E-704B-D067-EC13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGui\src">
+      <UniqueIdentifier>{645E9533-4DCD-6179-1CDF-CB65}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsPC.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mathHelpers.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vec3.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\Color.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Pipeline.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mat.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vec4.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Cube.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data.old.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\Geometry.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsFastLED.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsPC.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ledControl.old.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mat.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mathHelpers.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\FastLED_PC.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\Pattern.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternBeachWaves.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternController.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternCube.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternParametric.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternSpiral.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pipeline.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\ScreenTransform.h">
@@ -55,6 +133,82 @@
     </ClInclude>
     <ClInclude Include="src\Sphere.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vec3.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vec4.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxBaseGui.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxButton.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxColorPicker.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxGui.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxGuiGroup.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxInputField.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxLabel.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxPanel.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSlider.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSliderGroup.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.h">
+      <Filter>addons\ofxGui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternWireFrame.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h" />
+    <ClInclude Include="src\VariableControl.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternWheel.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternFire.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Effects.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Noise.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternSuperShape.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternRaymarcher.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vec2.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternPictures.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternBasic.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\PatternNoise.h">
+      <Filter>src\Patterns</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

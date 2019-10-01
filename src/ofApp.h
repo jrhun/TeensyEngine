@@ -4,6 +4,7 @@
 #else
 
 #include "ofMain.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -24,6 +25,17 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+		ofxPanel gui;
+		ofxFloatSlider floatSlider1;
+		ofxFloatSlider floatSlider2;
+		ofxFloatSlider floatSlider3;
+		ofxFloatSlider floatSlider4;
+		ofxFloatSlider floatSlider5;
+		ofxFloatSlider floatSlider6;
+		ofxIntSlider   intSliderFade;
+		ofxIntSlider   intSliderBlur;
+		ofxIntSlider   intSliderSpiral;
+		ofxIntSlider   intSliderNoiseSmear;
 };
 
 #endif

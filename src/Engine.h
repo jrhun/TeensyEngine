@@ -3,13 +3,15 @@
 //Main file for controlling UI, drawing, etc
 
 // Includes
-#if defined(ESP32) || defined(CORE_TEENSY)
-//  #if defined(__IMXRT1052__) || defined(__IMXRT1062__) TEENSY 4.X
-#include "GraphicsFastLED.h"
-#else // PC includes
-#include "GraphicsPC.h"
-#endif // endif includes
+//#if defined(ESP32) || defined(CORE_TEENSY)
+////  #if defined(__IMXRT1052__) || defined(__IMXRT1062__) TEENSY 4.X
+//#include "GraphicsFastLED.h"
+//#else // PC includes
+//#include "GraphicsPC.h"
+//#endif // endif includes
 
+
+#include "Graphics.h"
 #include "ScreenTransform.h"
 #include "Cube.h"
 #include "Mat.h"
@@ -17,6 +19,7 @@
 #include "Pipeline.h"
 #include "Geometry.h"
 #include "mathHelpers.h"
+#include "Color.h"
 
 
 class Engine {
@@ -43,38 +46,21 @@ public:
 		// 
 	}
 
-	Cube cube;
+	//Cube cube;
 
 	void composeFrame() {
 		// pipeline!
-
-		gfx.resetZ();
+		clear();
+		resetZ();
 		//for each object
 		//generate list of vertex
 		//send to pipeline
 
-
-		//for (int i = 0; i < 16; i++) {
-		//	float r = 2;
-		//	float theta = myMap(i, 0, 16, 0, PI);
-		//	float x = r * cos(theta);
-		//	float z = r * sin(theta);
-		//	for (int j = 0; j < 16; j++) {
-		//		float y = (j ) / 16.0f - 0.5f;
-		//		Mat3 m = Mat3::RotationY(angley);
-		//		Vec3 v(x,y,z);
-		//		v = v * m;
-		//		v.z += 1;
-		//		sst.TransformSphere(v);
-		//		gfx.drawPointDepth(v, (i * 255 / 16) % 128, j * 255 / 16, (i * 255 / 32) % 255);
-		//	}
-		//}
-
-
-		solidCube();
+		//solidCube();
+		
 		//wireFrame();
 		//grid();
-
+		show();
 	}
 
 
@@ -100,47 +86,66 @@ public:
 		}
 	}
 
-	void solidCube() {
-		auto it = cube.getTriangles<Vertex>(2.0f);
-		for (auto &v : it.vertices) {
-			Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
-			v.pos = v.pos * m;
-			float xOff = cameraOffset * cos(anglex);
-			float zOff = cameraOffset * sin(anglex);
-			v.pos.x += xOff;
-			v.pos.z += zOff;
-		}
-		pipeline.Draw(it);
-	}
+	//void solidCube() {
+	//	auto it = cube.getTriangles<Vertex>(2.0f);
+	//	for (auto &v : it.vertices) {
+	//		Mat3 m = Mat3::RotationX(anglex)  * Mat3::RotationY(angley);
+	//		v.pos = v.pos * m;
+	//		float xOff = cameraOffset * cos(anglex);
+	//		float zOff = cameraOffset * sin(anglex);
+	//		v.pos.x += xOff;
+	//		v.pos.z += zOff;
+	//	}
+	//	pipeline.Draw(it);
+	//}
 
-	void wireFrame() {
-		auto lines = cube.getLines(2.0f);
-		for (auto &v : lines.vertices) {
-			Mat3 m = Mat3::RotationY(angley)  * Mat3::RotationX(anglex);
-			v = v * m;
-			//v.z -= cameraOffset;
-			float xOff = cameraOffset * cos(anglex+PI);
-			float zOff = cameraOffset * sin(anglex+PI);
-			v.x += xOff;
-			v.z += zOff;
-			sst.TransformSphere(v);
-		}
-		for (size_t i = 0; i < lines.indices.size() / 2; i++) {
-			gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], 0, 50, 255);
-		}
-	}
+	//void wireFrame() {
+	//	auto lines = cube.getLines(2.0f);
+	//	for (auto &v : lines.vertices) {
+	//		Mat3 m = Mat3::RotationY(angley)  * Mat3::RotationX(anglex);
+	//		v = v * m;
+	//		//v.z -= cameraOffset;
+	//		float xOff = cameraOffset * cos(anglex+PI);
+	//		float zOff = cameraOffset * sin(anglex+PI);
+	//		v.x += xOff;
+	//		v.z += zOff;
+	//		sst.TransformSphere(v);
+	//	}
+	//	//map indicies to hue offset
+	//	// 
+	//	auto getIndicesHue = [this](int i) {
+	//		switch (i) {
+	//		//front face
+	//		case 0: 
+	//		case 1: 
+	//		case 2: 
+	//		case 3:
+	//			return 0;
+	//		case 4:
+	//		case 5:
+	//		case 6:
+	//		case 7:
+	//			return 40;
+	//		}
+	//	};
+	//	for (size_t i = 0; i < lines.indices.size() / 2; i++) {
+	//		uint8_t hue1 = getIndicesHue(lines.indices.at(i * 2));
+	//		uint8_t hue2 = getIndicesHue(lines.indices.at(i * 2 + 1));
+	//		gfx.drawLineDepth(lines.vertices[lines.indices.at(i * 2)], lines.vertices[lines.indices.at(i * 2 + 1)], hue1, hue2);
+	//	}
+	//}
 
-	void drawTest() {
-		gfx.resetZ();
-		for (int i = 0; i < 20; i++) {
-			for (int j = 0; j < 20; j++) {
-				Vec3 a(i, i, 0);
-				Vec3 b(i + 30, i, 255);
-				gfx.drawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
-				//gfx->putPixel(i, i+j, (i / 20.0) * (j / 20.0) * 255);
-			}
-		}
-	}
+	//void drawTest() {
+	//	gfx.resetZ();
+	//	for (int i = 0; i < 20; i++) {
+	//		for (int j = 0; j < 20; j++) {
+	//			Vec3 a(i, i, 0);
+	//			Vec3 b(i + 30, i, 255);
+	//			gfx.drawLineDepth(a, b, (i / 20.0) * 255, 255 - (i / 20.0) * 255, 50);
+	//			//gfx->putPixel(i, i+j, (i / 20.0) * (j / 20.0) * 255);
+	//		}
+	//	}
+	//}
 
 	void init() {
 		gfx.init();
@@ -156,6 +161,10 @@ public:
 
 	void show() {
 		gfx.show();
+	}
+
+	void resetZ() {
+		gfx.resetZ();
 	}
 
 	float anglex = 0;

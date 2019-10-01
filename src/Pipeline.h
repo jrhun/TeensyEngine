@@ -6,9 +6,11 @@
 #include "Geometry.h"
 
 
+#include "Color.h"
+
 template<class Vertex>
 class Pipeline {
-public: 
+public:
 	Pipeline(Graphics &gfx, ScreenTransform &sst) : gfx(gfx), sst(sst) {}
 
 	void Draw(const IndexedTriangleList<Vertex>& it) {
@@ -25,49 +27,39 @@ public:
 			// cull backfacing triangles with cross product (%) shenanigans
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
 			{
-				ProcessTriangle(v0, v1, v2, i);
-				//// process 3 vertices into a triangle
-				//unsigned char hue = ((i / 2) * 40)%255;
-				//Vec3 c;
-				//switch (i / 2) {
-				//case 0:
-				//	c = { 255,0,0 };
-				//	break;
-				//case 1:
-				//	c = { 255,255,0 };
-				//	break;
-				//case 2:
-				//	c = { 0,255,0 };
-				//	break;
-				//case 3:
-				//	c = { 0,255,255 };
-				//	break;
-				//case 4:
-				//	c = { 0,0,255 };
-				//	break;
-				//case 5:
-				//	c = { 255,0,255 };
-				//	break;
-				//};
+				float dot = ((v1.pos - v0.pos) % (v2.pos - v1.pos)).GetNormalized() * v0.pos.GetNormalized();
+				ProcessTriangle(v0, v1, v2, i, -dot);
 
-
-				//GSVertex gs0(v0);
-				////gs0.pos = v0;
-				//GSVertex gs1(v1);
-				//GSVertex gs2(v2);
-
-				//sst.TransformSphere(gs0.pos);
-				//sst.TransformSphere(gs1.pos);
-				//sst.TransformSphere(gs2.pos);
-
-
-				//gfx.drawTriangle(gs0.pos, gs1.pos, gs2.pos, c);
-				//PostProcessTriangleVertices(t);
 			}
 		}
 	}
 
-	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index) {
+	void Draw(const IndexedTriangleList<Vertex>& it, Vec3 light) {
+		//Process vertices
+		//std::vector<Vertex> verticesOut(vertices.size());
+		//std::transform(it.vertices.begin(), it.vertices.end(), 
+		//	verticesOut.begin(), transformFn)
+
+		// assemble triangles
+		for (size_t i = 0, end = it.indices.size() / 3; i < end; i++) {
+			const auto& v0 = it.vertices[it.indices[i * 3]];
+			const auto& v1 = it.vertices[it.indices[i * 3 + 1]];
+			const auto& v2 = it.vertices[it.indices[i * 3 + 2]];
+			// cull backfacing triangles with cross product (%) shenanigans
+			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f)
+			{
+				float dot = ((v1.pos - v0.pos) % (v2.pos - v1.pos)).GetNormalized() * light.GetNormalized();
+				if (end == 12)
+					ProcessTriangle(v0, v1, v2, i, -dot, true);
+				else 
+					ProcessTriangle(v0, v1, v2, i, -dot);
+
+
+			}
+		}
+	}
+
+	void ProcessTriangle(const Vertex &v00, const  Vertex &v10, const Vertex &v20, size_t triangle_index, float dot = 1.0f, bool cube = false) {
 		// GS returns triangle which has copies of vertexs
 		Vec3 v0 = v00.pos;
 		Vec3 v1 = v10.pos;
@@ -81,43 +73,34 @@ public:
 
 		// take into account borders
 		// assumes that we won't be drawing triangles wider than 32 in x axis around borders
-		bool oneGreater = false;
-		const float lower = SCREEN_WIDTH / 4;
-		const float upper = 3 * SCREEN_WIDTH / 4;
-		if (v0.x > upper || v1.x > upper || v2.x > upper)
-			oneGreater = true;
-		if (oneGreater) {
-			if (v0.x < lower)
-				v0.x += SCREEN_WIDTH;
-			if (v1.x < lower)
-				v1.x += SCREEN_WIDTH;
-			if (v2.x < lower)
-				v2.x += SCREEN_WIDTH;
-		}
+		float _max = 0;
+		if (v0.x > v1.x and v0.x > v2.x) 
+			_max = v0.x;
+		else if (v1.x > v0.x and v1.x > v2.x) 
+			_max = v1.x;
+		else 
+			_max = v2.x;
 
-		unsigned char hue = ((triangle_index / 2) * 40) %256;
+		if (_max - v0.x > SCREEN_WIDTH/2)
+			v0.x += SCREEN_WIDTH;
+		if (_max - v1.x > SCREEN_WIDTH / 2)
+			v1.x += SCREEN_WIDTH;
+		if (_max - v2.x > SCREEN_WIDTH / 2)
+			v2.x += SCREEN_WIDTH;
+
+		unsigned char hue;
+		if (cube)
+			hue = ((triangle_index / 2) * 40) % 256;
+		else 
+			hue = ((triangle_index / 16) * 5) % 256;
+
+		CRGB colour;// = CHSV(hue, 255, 255);
+		float al = max(min(int(255.0f * dot), 255), 64);
+		colour.setHSV(hue, 255, al);
 		Vec3 c;
-		switch (triangle_index / 2) {
-		case 0:
-			c = { 255,0,0 };
-			break;
-		case 1:
-			c = { 255,255,0 };
-			break;
-		case 2:
-			c = { 0,255,0 };
-			break;
-		case 3:
-			c = { 0,255,255 };
-			break;
-		case 4:
-			c = { 0,0,255 };
-			break;
-		case 5:
-			c = { 255,0,255 };
-			break;
-		};
-
+		c.x = colour.r;
+		c.y = colour.g;
+		c.z = colour.b;
 
 		gfx.drawTriangle(v0, v1, v2, c);
 

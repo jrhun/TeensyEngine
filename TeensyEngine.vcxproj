@@ -100,11 +100,10 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\Patterns;..\openFrameworks\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <LanguageStandard>
-      </LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -122,7 +121,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\Patterns;..\openFrameworks\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -142,7 +141,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\Patterns;..\openFrameworks\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -165,7 +164,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\Patterns;..\openFrameworks\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -184,22 +183,67 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxBaseGui.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxButton.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxColorPicker.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxGuiGroup.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxInputField.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxLabel.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxPanel.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxSlider.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxSliderGroup.cpp" />
+    <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data.h" />
+    <ClInclude Include="src\Effects.h" />
+    <ClInclude Include="src\Noise.h" />
+    <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\Color.h" />
     <ClInclude Include="src\Cube.h" />
+    <ClInclude Include="src\Data.old.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\Graphics.h" />
+    <ClInclude Include="src\GraphicsFastLED.h" />
     <ClInclude Include="src\GraphicsPC.h" />
+    <ClInclude Include="src\ledControl.old.h" />
     <ClInclude Include="src\Mat.h" />
     <ClInclude Include="src\mathHelpers.h" />
-    <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\Particle.h" />
+    <ClInclude Include="src\Patterns\FastLED_PC.h" />
+    <ClInclude Include="src\Patterns\Pattern.h" />
+    <ClInclude Include="src\Patterns\PatternBasic.h" />
+    <ClInclude Include="src\Patterns\PatternBeachWaves.h" />
+    <ClInclude Include="src\Patterns\PatternController.h" />
+    <ClInclude Include="src\Patterns\PatternCube.h" />
+    <ClInclude Include="src\Patterns\PatternFire.h" />
+    <ClInclude Include="src\Patterns\PatternNoise.h" />
+    <ClInclude Include="src\Patterns\PatternParametric.h" />
+    <ClInclude Include="src\Patterns\PatternPictures.h" />
+    <ClInclude Include="src\Patterns\PatternRaymarcher.h" />
+    <ClInclude Include="src\Patterns\PatternSpiral.h" />
+    <ClInclude Include="src\Patterns\PatternSuperShape.h" />
+    <ClInclude Include="src\Patterns\PatternWheel.h" />
+    <ClInclude Include="src\Patterns\PatternWireFrame.h" />
     <ClInclude Include="src\Pipeline.h" />
     <ClInclude Include="src\ScreenTransform.h" />
     <ClInclude Include="src\Sphere.h" />
+    <ClInclude Include="src\VariableControl.h" />
+    <ClInclude Include="src\Vec2.h" />
     <ClInclude Include="src\Vec3.h" />
     <ClInclude Include="src\Vec4.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxBaseGui.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxButton.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxColorPicker.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxGui.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxGuiGroup.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxInputField.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxLabel.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxPanel.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSlider.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSliderGroup.h" />
+    <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

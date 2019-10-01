@@ -15,6 +15,12 @@ public:
 		y(y),
 		z(z)
 	{}
+	_Vec3(T v)
+		:
+		x(v),
+		y(v),
+		z(v)
+	{}
 	template <typename T2>
 	explicit operator _Vec3<T2>() const
 	{
@@ -35,6 +41,18 @@ public:
 		y /= length;
 		z /= length;
 		return *this;
+	}
+	_Vec3&	Clamp()
+	{
+		x = CLAMP(x, 0.0f, 1.0f);
+		y = CLAMP(y, 0.0f, 1.0f);
+		z = CLAMP(z, 0.0f, 1.0f);
+		return *this;
+	}
+
+	_Vec3	Abs() const
+	{
+		return { abs(x), abs(y), abs(z) };
 	}
 	_Vec3	GetNormalized() const
 	{
@@ -60,11 +78,25 @@ public:
 		z += rhs.z;
 		return *this;
 	}
+	_Vec3&	operator+=(const T &rhs)
+	{
+		x += rhs;
+		y += rhs;
+		z += rhs;
+		return *this;
+	}
 	_Vec3&	operator-=(const _Vec3 &rhs)
 	{
 		x -= rhs.x;
 		y -= rhs.y;
 		z -= rhs.z;
+		return *this;
+	}
+	_Vec3&	operator-=(const T &rhs)
+	{
+		x -= rhs;
+		y -= rhs;
+		z -= rhs;
 		return *this;
 	}
 	T		operator*(const _Vec3 &rhs) const
@@ -74,6 +106,14 @@ public:
 	_Vec3	operator+(const _Vec3 &rhs) const
 	{
 		return _Vec3(*this) += rhs;
+	}
+	_Vec3	operator+(const T &rhs) const
+	{
+		return _Vec3(*this) += rhs;
+	}
+	_Vec3	operator-(const T &rhs) const
+	{
+		return _Vec3(*this) -= rhs;
 	}
 	_Vec3	operator-(const _Vec3 &rhs) const
 	{
@@ -146,6 +186,15 @@ public:
 		temp.Hadamard(rhs);
 		return temp;
 	}
+
+	static _Vec3 getRandom() {
+		// returns random vector between -1 and 1 for each axis
+		_Vec3 v;
+		v.x = (random16() - 32768) / 32768.0f;
+		v.y = (random16() - 32768) / 32768.0f;
+		v.z = (random16() - 32768) / 32768.0f;
+		return v;
+	}
 public:
 	T x;
 	T y;
@@ -155,3 +204,11 @@ public:
 typedef _Vec3<float> Vec3;
 typedef _Vec3<double> Ved3;
 typedef _Vec3<int> Vei3;
+
+Vec3&	cos(Vec3 &v)
+{
+	v.x = cos(v.x);
+	v.y = cos(v.y);
+	v.z = cos(v.z);
+	return v;
+}
