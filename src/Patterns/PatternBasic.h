@@ -127,9 +127,9 @@ public:
 				//      x = COLS-x;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(y);
-                width = myMap(sin8(offset*16), 0, 256, 0, 16);
+                width = myMap(sin8(beat8(40)+y*4), 0, 256, 0, 16);
                 for (int8_t w = width; w >= 0; w--) {
-//                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
+                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
                     gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
                 }
 //                colour.fadeToBlackBy((8-i) * 20 + y * 2);
@@ -139,9 +139,9 @@ public:
 				x = quadwave8((y + SCREEN_HEIGHT / 2) * 2 + 128 - (index / microSteps) % 256) / scale;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(64+y);
-                width = myMap(cos(offset*16), 0, 256, 0, 16);
+                width = myMap(sin8(beat8(40)+y*4), 0, 256, 2, 16);
                 for (int8_t w = width; w >= 0; w--) {
-//                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
+                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
                     gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
                 }
 //                colour.fadeToBlackBy((8 - i) * 20 + y *2);
