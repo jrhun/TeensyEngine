@@ -194,6 +194,7 @@ public:
 		float step = delta / dm;
 		for (;;) { /* loop */
 			c = getColour(hue);
+//            c.nscale8(fade);
 			hue += step;
 			if (hue < 0)
 				hue += 255;

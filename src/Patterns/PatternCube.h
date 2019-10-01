@@ -5,14 +5,14 @@
 #include <math.h>
 
 
-class PatternCube : public Pattern {
+class PatternCube : public _Pattern {
 public:
-	PatternCube() : Pattern("Cube 3d") {
+	PatternCube() : _Pattern("Cube 3d") {
 	}
 
 	uint8_t drawFrame() {
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(128);
 		}
 		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);

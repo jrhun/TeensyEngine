@@ -22,7 +22,7 @@ void ofApp::setup() {
 	//ofSetFrameRate(60);
 
 	//engine.init();
-	//Pattern::setGfx(&gfx_t);
+	//_Pattern::setGfx(&gfx_t);
 
 	// GUI
 	gui.setup();

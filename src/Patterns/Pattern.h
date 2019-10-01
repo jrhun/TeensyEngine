@@ -51,10 +51,10 @@ Engine engine(gfx);
 
 
 
-class Pattern {
+class _Pattern {
 public:
-	Pattern() {}
-	Pattern(const char* name) : name(name) {}
+	_Pattern() {}
+	_Pattern(const char* name) : name(name) {}
 
 	virtual uint8_t drawFrame() {
 		return 0;
@@ -87,4 +87,4 @@ public:
 
 };
 
-bool Pattern::useDefaultEffect = true;
+bool _Pattern::useDefaultEffect = true;

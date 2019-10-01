@@ -10,13 +10,13 @@ extern float GuiVars4;
 extern float GuiVars5;
 extern float GuiVars6;
 
-class PatternParametric : public Pattern {
+class PatternParametric : public _Pattern {
 public:
-	PatternParametric() : Pattern("Parametric Lines") {}
+	PatternParametric() : _Pattern("Parametric Lines") {}
 
 
 	uint8_t drawFrame() {
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}
@@ -81,13 +81,13 @@ public:
 	float angle = 0;
 };
 
-class PatternParametric2 : public Pattern {
+class PatternParametric2 : public _Pattern {
 public:
-	PatternParametric2() : Pattern("Parametric Spiral") {}
+	PatternParametric2() : _Pattern("Parametric Spiral") {}
 
 
 	uint8_t drawFrame() {
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}

@@ -4,9 +4,9 @@
 #include "../../data.h"
 #include "../Particle.h"
 
-class PatternWheelBlur : public Pattern {
+class PatternWheelBlur : public _Pattern {
 public:
-	PatternWheelBlur() : Pattern("Wheel") {
+	PatternWheelBlur() : _Pattern("Wheel") {
 	}
 
 
@@ -26,7 +26,7 @@ public:
 			gfx.putPixel(x + 1, y + 1, c);
 		}
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
 		}
 
@@ -84,9 +84,9 @@ public:
 
 };
 
-class PatternWheelPart : public Pattern {
+class PatternWheelPart : public _Pattern {
 public:
-	PatternWheelPart() : Pattern("Wheel (Particles)") {
+	PatternWheelPart() : _Pattern("Wheel (Particles)") {
 	}
 
 	void start() {
@@ -94,7 +94,7 @@ public:
 	}
 	uint8_t drawFrame() {
 		gfx.resetZ();
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(128);
 		}
 		//ps.applyForce(Vec3(0.0f, 0.005*(GuiVars6-1), 0.0f)); // gravity

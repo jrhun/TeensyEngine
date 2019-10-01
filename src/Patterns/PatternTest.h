@@ -1,9 +1,9 @@
 #pragma once
 
 
-class PatternTest : public Pattern {
+class PatternTest : public _Pattern {
 public:
-	PatternTest() : Pattern("Test") {}
+	PatternTest() : _Pattern("Test") {}
 
 	uint8_t drawFrame() {
 

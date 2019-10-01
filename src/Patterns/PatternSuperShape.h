@@ -5,9 +5,9 @@
 #include "../Geometry.h"
 #include "../Cube.h"
 
-class PatternSuperShape : public Pattern {
+class PatternSuperShape : public _Pattern {
 public:
-	PatternSuperShape() : Pattern("Super Shape") {
+	PatternSuperShape() : _Pattern("Super Shape") {
 		//cube = getVerts<Vertex>(0, 1.1f);
 		//sphere = getVerts<Vertex>(1, 1.1f);
 	}
@@ -26,7 +26,7 @@ public:
 	}
 
 	uint8_t drawFrame() {
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(128);
 		}
 

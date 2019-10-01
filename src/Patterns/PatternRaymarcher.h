@@ -5,13 +5,13 @@
 #include "../Vec3.h"
 #include "../Vec2.h"
 
-class PatternRaymarcher : public Pattern {
+class PatternRaymarcher : public _Pattern {
 public:
-	PatternRaymarcher() : Pattern("Raymarcher") {}
+	PatternRaymarcher() : _Pattern("Raymarcher") {}
 
 	uint8_t drawFrame() {
 		//gfx.clear();
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 
 			gfx.fade(64);
 		}

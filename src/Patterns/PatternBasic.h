@@ -2,12 +2,12 @@
 
 #include "Pattern.h"
 
-class PatternRowThenCol : public Pattern {
+class PatternRowThenCol : public _Pattern {
 public:
-	PatternRowThenCol() : Pattern("Rows then Colums") {}
+	PatternRowThenCol() : _Pattern("Rows then Colums") {}
 
 	uint8_t drawFrame() {
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(40);
 		}
 
@@ -72,13 +72,13 @@ public:
 };
 
 
-class PatternSparks : public Pattern {
+class PatternSparks : public _Pattern {
 public:
-	PatternSparks() : Pattern("Sparks") {}
+	PatternSparks() : _Pattern("Sparks") {}
 
 	uint8_t drawFrame() {
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(10);
 		}
 
@@ -95,13 +95,13 @@ public:
 };
 
 
-class PatternVWaves : public Pattern{
+class PatternVWaves : public _Pattern{
 public:
-	PatternVWaves() : Pattern("Vertical Wave") {}
+	PatternVWaves() : _Pattern("Vertical Wave") {}
 
 	uint8_t drawFrame() {
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 
 			gfx.fade(64);
 			//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 177);
@@ -116,7 +116,8 @@ public:
 
 		uint8_t x = 0;
 		static uint16_t offset = 0;
-		for (uint8_t i = 8; i > 0; i--) {
+        uint8_t width = 0;
+//        for (int8_t i = 8; i > 0; i--) {
 
 			for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 				//    uint8_t x = quadwave8(y * 2 - (Data::index/microSteps)%256) / scale;
@@ -126,20 +127,30 @@ public:
 				//      x = COLS-x;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(y);
-				colour.fadeToBlackBy((8-i) * 20 + y * 2);
-				gfx.blendPixel((x + i+ (offset)) % SCREEN_WIDTH, y, colour);
+                width = myMap(sin8(offset*16), 0, 256, 0, 16);
+                for (int8_t w = width; w >= 0; w--) {
+//                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
+                    gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
+                }
+//                colour.fadeToBlackBy((8-i) * 20 + y * 2);
+//                gfx.blendPixel((x + i+ (offset)) % SCREEN_WIDTH, y, colour);
 			}
 			for (int8_t y = SCREEN_HEIGHT-1; y >= 0; y--) {
 				x = quadwave8((y + SCREEN_HEIGHT / 2) * 2 + 128 - (index / microSteps) % 256) / scale;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(64+y);
-				colour.fadeToBlackBy((8 - i) * 20 + y *2);
-				gfx.blendPixel((x + i + (offset)) % SCREEN_WIDTH, y, colour);
+                width = myMap(cos(offset*16), 0, 256, 0, 16);
+                for (int8_t w = width; w >= 0; w--) {
+//                    colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
+                    gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
+                }
+//                colour.fadeToBlackBy((8 - i) * 20 + y *2);
+//                gfx.blendPixel((x + i + (offset)) % SCREEN_WIDTH, y, colour);
 			}
 			//colour.fadeToBlackBy(60);
 			//colour.fadeToBlackBy(60);
 
-		}
+//        }
 		
 		//offset += 1;
 		offset %= SCREEN_WIDTH;

@@ -59,7 +59,7 @@ public:
 
 	// add pattern members to pattern list
 	static const uint8_t numPatterns = 16;
-	Pattern *patternList[numPatterns] = {
+    _Pattern *patternList[numPatterns] = {
 		&noise1,
 		&parametricSpiral,
 		&verticalWaves,
@@ -110,7 +110,7 @@ public:
 		getCurrentPattern()->start();
 	}
 
-	Pattern* getCurrentPattern() {
+	_Pattern* getCurrentPattern() {
 		return patternList[Data::currentPattern];
 	}
 
@@ -138,7 +138,7 @@ public:
 			//gfx.show();
 #endif
 			gfx.show();
-			if (!Pattern::useDefaultEffect) {
+			if (!_Pattern::useDefaultEffect) {
 				if (FxFade)
 					gfx.fade(FxFade);
 				if (FxBlur)
