@@ -73,9 +73,9 @@ void drawRGBBitmap(int16_t x, int16_t y,
 	}
 }
 
-class PatternWorld: public Pattern {
+class PatternWorld: public _Pattern {
 public: 
-	PatternWorld() : Pattern("World") {}
+	PatternWorld() : _Pattern("World") {}
 
 	
 

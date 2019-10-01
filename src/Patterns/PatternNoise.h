@@ -14,9 +14,9 @@ DEFINE_GRADIENT_PALETTE(Black_White_gp) {
 		255, 255, 255, 255
 };
 
-class PatternNoise1 : public Pattern {
+class PatternNoise1 : public _Pattern {
 public:
-	PatternNoise1() : Pattern("Noise1") {}
+	PatternNoise1() : _Pattern("Noise1") {}
 
 
 

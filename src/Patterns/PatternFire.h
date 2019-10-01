@@ -2,10 +2,10 @@
 
 #include "Pattern.h"
 
-class PatternFire : public Pattern {
+class PatternFire : public _Pattern {
 public:
 	PatternFire()
-		: Pattern("Fire") {}
+		: _Pattern("Fire") {}
 
 	CRGB HeatColor(uint8_t temperature)
 	{

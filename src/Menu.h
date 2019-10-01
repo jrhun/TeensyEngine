@@ -60,10 +60,12 @@ typedef VariableContainer<int8_t>		Int8Container;
 typedef VariableContainer<uint8_t>		uInt8Container;
 
 
+
+
 template<class T>
 class VariableControl {
 public:
-	VariableControl() : {}
+    VariableControl();
 
 	VariableControl(VariableContainer<T> &var) : var(var), min(var.min), max(var.max) {
 		delta = max - min;
@@ -141,7 +143,7 @@ public:
 		interval = period / (delta * 2.0f);  // then interval = 3
 		oscilateOn = true;
 		rampOn = false;
-		trigger = false;
+		triggerOn = false;
 	}
 
 	void ramp(accum88 BPM) {
@@ -154,7 +156,11 @@ public:
 
 	// triggers a sweep from max to current value (or min)
 	// length in ms of sweep
-	void trigger(unsigned long length = 200, T _max = max) {
+	void trigger(unsigned long length = 200, T _max = 0) {
+        if (_max == 0) {
+            _max = max;
+        }
+        
 		interval = round(float(length) / float(delta)); // = 2 if length = 200 and max - min = 100
 
 		triggerEnd = var.d;
@@ -166,6 +172,8 @@ public:
 	}
 };
 
+ 
+ 
 
 class MenuAbstract {
 public:
@@ -200,7 +208,7 @@ public:
 
 };
 
-MenuAbstract default;
+MenuAbstract baseMenu;
 
 class MenuCurrentPattern : public MenuAbstract {
 public: 
@@ -278,7 +286,7 @@ public:
 };
 
 
-
+/*
 template<class ITEM>
 class MenuDisplay {
 public:
@@ -311,6 +319,8 @@ public:
 
 
 };
+ 
+ */
 
 
 class MenuPage {
@@ -522,7 +532,7 @@ public:
 	//menu items
 	static const size_t numItems = 1;
 	MenuAbstract *items[numItems] = {
-		&default
+		&baseMenu
 	};
 
 
@@ -560,7 +570,7 @@ public:
 	//menu items
 	static const size_t numItems = 1;
 	MenuAbstract *items[numItems] = {
-		&default
+		&baseMenu
 	};
 
 
@@ -598,7 +608,7 @@ public:
 	//menu items
 	static const size_t numItems = 1;
 	MenuAbstract *items[numItems] = {
-		&default
+		&baseMenu
 	};
 
 

@@ -3,10 +3,10 @@
 
 #include "Pattern.h"
 
-class PatternBeachWaves : public Pattern {
+class PatternBeachWaves : public _Pattern {
 public:
 	PatternBeachWaves()
-		: Pattern("Beach Waves") {}
+		: _Pattern("Beach Waves") {}
 
 	uint8_t drawFrame() {
 		//      unsigned long now = millis();
@@ -14,7 +14,7 @@ public:
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(2);// ledControl.fade();
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 176);
 		}
@@ -43,10 +43,10 @@ public:
 	}
 };
 
-class PatternBeachWaves2 : public Pattern {
+class PatternBeachWaves2 : public _Pattern {
 public:
 	PatternBeachWaves2()
-		: Pattern("Beach Waves 2") {}
+		: _Pattern("Beach Waves 2") {}
 
 	uint8_t drawFrame() {
 		//      unsigned long now = millis();
@@ -54,7 +54,7 @@ public:
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
 
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			gfx.fade(2);// ledControl.fade();
 			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 176);
 		}

@@ -9,7 +9,7 @@
 #endif
 
 
-class PatternSpiral : public Pattern {
+class PatternSpiral : public _Pattern {
 private:
 	// Timer stuff (Oszillators)
 	struct timer {
@@ -43,7 +43,7 @@ private:
 	}
 
 public:
-	PatternSpiral() : Pattern("Spiral") {}
+	PatternSpiral() : _Pattern("Spiral") {}
 
 	void start() {
 		// set all counting directions positive for the beginning
@@ -137,7 +137,7 @@ public:
 		// --> affects always a square with an odd length
 
 		
-		if (Pattern::useDefaultEffect) {
+		if (_Pattern::useDefaultEffect) {
 			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
 			// increase the contrast
 			gfx.fade(5);
