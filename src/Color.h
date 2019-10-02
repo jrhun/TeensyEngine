@@ -4053,7 +4053,13 @@ void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& d
 }
 
 
+Vec3& toVec(CRGB c) {
+	return Vec3(c.r, c.g, c.b);
+}
 
+CRGB& toCRGB(Vec3 v) {
+	return CRGB(v.x, v.y, v.z);
+}
 
 
 
@@ -4061,7 +4067,59 @@ void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& d
 
 #endif
 
+CRGB& blendrgb(CRGB c1, CRGB c2) {
+	Vec3 v1(c1.r, c1.g, c1.b);
+	Vec3 v2(c2.r, c2.g, c2.b);
 
+	//v1 /= 255;;
+	//v2.Normalize();
+	v1 = v1 * 0.5 + v2 * 0.5;
+
+	//v1 *= 255;
+
+	return CRGB(v1.x, v1.y, v1.z);
+}
+
+CRGB& blendlch(CRGB c1, CRGB c2) {
+	Vec3 lch1 = rgb2lch(Vec3(c1.r, c1.g, c1.b));
+	Vec3 lch2 = rgb2lch(Vec3(c2.r, c2.g, c2.b));
+
+	lch1.x = lch1.x * 0.5f + lch2.x * 0.5f;
+	lch1.y = lch1.y * 0.5f + lch2.y * 0.5f;
+
+	if (lch1.z < lch2.z) {
+		float t = lch1.z;
+		lch1.z = lch2.z;
+		lch2.z = t;
+	}
+
+	if (lch1.z - lch2.z > 180)
+		lch2.z += 360;
+
+	lch1.z = lch1.z * 0.5f + lch2.z * 0.5f;
+
+	if (lch1.z > 360)
+		lch1.z -= 360;
+	if (lch1.z < 0)
+		lch1.z += 360;
+
+	lch1 = lch2rgb(lch1);
+
+	return CRGB(lch1.x, lch1.y, lch1.z);
+}
+
+CRGB& blendlab(CRGB c1, CRGB c2) {
+	Vec3 lch1 = rgb2lab(Vec3(c1.r, c1.g, c1.b));
+	Vec3 lch2 = rgb2lab(Vec3(c2.r, c2.g, c2.b));
+
+	lch1.x = lch1.x * 0.5f + lch2.x * 0.5f;
+	lch1.y = lch1.y * 0.5f + lch2.y * 0.5f;
+	lch1.z = lch1.z * 0.5f + lch2.z * 0.5f;
+
+	lch1 = lab2rgb(lch1);
+
+	return CRGB(lch1.x, lch1.y, lch1.z);
+}
 
 
 //class Colour {

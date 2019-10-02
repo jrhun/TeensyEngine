@@ -12,6 +12,9 @@ int _XY(int x, int y) {
 
 }
 
+
+
+
 void SpiralStream(int x, int y, int r, byte dimm) {
 
 	for (int d = r; d >= 0; d--) { // from the outside to the inside
