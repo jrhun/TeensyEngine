@@ -39,11 +39,15 @@ void ofApp::setup() {
 	gui.add(intSliderNoiseSmear.setup("Noise smear", 0, 0, 255));
 
 	menu.display();
+
+	//patterns.beatControl.ramp(120<<8);
+	//patterns.beatControl.oscilate(120 * 256);
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
+	patterns.beatControl.update();
 }
 
 //--------------------------------------------------------------
@@ -70,7 +74,9 @@ void ofApp::draw() {
 	//engine.show();
 	gui.draw();
 	ofSetColor(ofColor::slateGrey);
-	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 8, 30);
+	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 8+5, 20);
+	String v = "beat: " + to_string(_Pattern::beat);
+	ofDrawBitmapString(v, SCREEN_WIDTH * 8+20, 40);
 
 }
 
@@ -82,6 +88,7 @@ void ofApp::keyPressed(int key) {
 		patterns.inc();
 	if (key == ' ') {
 		//spacebar
+		patterns.beatControl.trigger();
 
 	}
 	if (key == 'a') { //left

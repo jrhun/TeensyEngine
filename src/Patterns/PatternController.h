@@ -37,6 +37,10 @@ class PatternController {
 public:
 	PatternController() {}
 
+	//variables
+	uInt8Container beatRef{ "Beat", _Pattern::beat, 0, 255, true };
+	VariableControl<uint8_t> beatControl{ beatRef };
+
 	//add patterns as members here
 	PatternRowThenCol	rowThenCol;
 	PatternBeachWaves	beachWaves;
@@ -60,9 +64,10 @@ public:
 	// add pattern members to pattern list
 	static const uint8_t numPatterns = 16;
     _Pattern *patternList[numPatterns] = {
+		&verticalWaves,
 		&noise1,
 		&parametricSpiral,
-		&verticalWaves,
+		
 		&sparks,
 		//&superShape,
 		&rowThenCol,
@@ -118,15 +123,19 @@ public:
 	unsigned long nextHueUpdate = 0;
 
 	void run() {
+		
+		
+
 		if (nextUpdate == 0) {
 			getCurrentPattern()->start();// initial
 		}
+
 		unsigned long now = GET_MILLIS();
 		if (now > nextUpdate) {
 			//        audio.readAudio();
+			
 
 			nextUpdate = getCurrentPattern()->drawFrame() + now;
-
 
 			//        memcpy(&scratchArray[0], &leds[0], NUM_LEDS * sizeof(leds[0]));
 			//        leds.displayText();
@@ -159,3 +168,4 @@ public:
 };
 
 PatternController patterns;
+

@@ -28,7 +28,7 @@ Engine engine(gfx);
 #include "../Particle.h"
 #include "../Noise.h"
 
-//#include "../VariableControl.h"
+#include "../VariableControl.h"
 
 
 
@@ -85,6 +85,9 @@ public:
 
 	static bool useDefaultEffect;
 
+	static uint8_t beat;
+
 };
 
 bool _Pattern::useDefaultEffect = true;
+uint8_t _Pattern::beat = 0;

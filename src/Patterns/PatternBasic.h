@@ -77,14 +77,22 @@ public:
 	PatternSparks() : _Pattern("Sparks") {}
 
 	uint8_t drawFrame() {
+		uint8_t chance = beatsin8(90); //128 = 50%
 
 		if (_Pattern::useDefaultEffect) {
-			gfx.fade(10);
+			uint8_t fade = 10;
+			if (chance > GuiVars1*128)
+				fade = myMap(chance, GuiVars1 * 128, 255, 10, GuiVars3*20);
+			gfx.fade(fade);
 		}
 
-
-		for (int i = 0; i < 4; i++) {
-			gfx.putPixel(random8(SCREEN_WIDTH), random8(SCREEN_HEIGHT), gfx.getColour(random8(64)));
+		uint8_t maxI = 1;
+		if (chance > GuiVars2 * 128) {
+			maxI = myMap(chance, GuiVars2 * 128, 255, 0, GuiVars4 * 5);
+		}
+		for (int i = 0; i < maxI; i++) {
+			//if (i == 0 or chance > 200)
+				gfx.putPixel(random8(SCREEN_WIDTH), random8(SCREEN_HEIGHT), gfx.getColour(random8(64)));
 		}
 
 
@@ -116,7 +124,9 @@ public:
 
 		uint8_t x = 0;
 		static uint16_t offset = 0;
-        uint8_t width = 0;
+		uint8_t width = 0;
+		uint8_t maxWidth = myMap(beatsin8(60), 0, 255, 16, 1);
+		
 //        for (int8_t i = 8; i > 0; i--) {
 
 			for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
@@ -127,7 +137,8 @@ public:
 				//      x = COLS-x;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(y);
-                width = myMap(sin8(beat8(40)+y*4), 0, 256, 0, 16);
+                width = myMap(sin8(beat8(30)+y*4), 0, 256, 0, 16);
+				width = min(width, maxWidth);
                 for (int8_t w = width; w >= 0; w--) {
                     colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
                     gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
@@ -139,7 +150,8 @@ public:
 				x = quadwave8((y + SCREEN_HEIGHT / 2) * 2 + 128 - (index / microSteps) % 256) / scale;
 				//    x = (x + ((Data::index / 128) % COLS)) % COLS;
 				colour = gfx.getColour(64+y);
-                width = myMap(sin8(beat8(40)+y*4), 0, 256, 2, 16);
+                width = myMap(sin8(beat8(30) +y*4), 0, 256, 0, 16);
+				width = min(width, maxWidth);
                 for (int8_t w = width; w >= 0; w--) {
                     colour.fadeToBlackBy((width-w) * (160/(width+1)) + y * 2);
                     gfx.blendPixel((x + w + (offset)) % SCREEN_WIDTH, y, colour);
@@ -158,5 +170,7 @@ public:
 
 		return returnVal;
 	}
+	
 
 };
+
