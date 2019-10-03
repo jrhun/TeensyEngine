@@ -47,7 +47,7 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	patterns.beatControl.update();
+	//patterns.beatControl.update();
 }
 
 //--------------------------------------------------------------
@@ -75,8 +75,11 @@ void ofApp::draw() {
 	gui.draw();
 	ofSetColor(ofColor::slateGrey);
 	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 8+5, 20);
+
 	String v = "beat: " + to_string(_Pattern::beat);
-	ofDrawBitmapString(v, SCREEN_WIDTH * 8+20, 40);
+	ofDrawBitmapString(v, SCREEN_WIDTH * 8+10, 40);
+	v = String(patterns.getCurrentPattern()->getVarName(0)) + patterns.getCurrentPattern()->getVarValue(0);
+	ofDrawBitmapString(v, SCREEN_WIDTH * 8 + 90, 40);
 
 }
 
@@ -88,8 +91,7 @@ void ofApp::keyPressed(int key) {
 		patterns.inc();
 	if (key == ' ') {
 		//spacebar
-		patterns.beatControl.trigger();
-
+		patterns.getCurrentPattern()->trigger(0);
 	}
 	if (key == 'a') { //left
 		menu.left();

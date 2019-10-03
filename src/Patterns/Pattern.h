@@ -71,17 +71,48 @@ public:
 
 
 
+	static const uint8_t maxVars = 6;
+	
+	uint8_t numVars = 0;
+	uint8_t getNumVars() {
+		return numVars;
+	}
 
-	//uint8_t numVars = 0;
-	//uint8_t getNumVars() {
-	//	return numVars;
-	//}
+	uInt8Reference *vars[maxVars];
 
-	//char* getVarName(uint8_t i) {
-	//	if (i >= 0 and i < getNumVars()) {
-	//		return 
-	//	}
-	//}
+	void updateVars() {
+		for (uint8_t i = 0; i < getNumVars(); i++) {
+			vars[i]->update();
+		}
+	}
+
+	void trigger(uint8_t i) {
+		uInt8Reference* v = getVar(i);
+		if (v)
+			getVar(i)->trigger();
+	}
+
+
+	uInt8Reference *getVar(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i];
+		}
+		return nullptr;
+	}
+
+	String getVarName(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i]->getName() + ": ";
+		} 
+		return "";
+	}
+
+	String getVarValue(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i]->getValue();
+		}
+		return "";
+	}
 
 	static bool useDefaultEffect;
 

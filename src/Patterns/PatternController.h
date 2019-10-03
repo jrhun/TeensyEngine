@@ -38,8 +38,7 @@ public:
 	PatternController() {}
 
 	//variables
-	uInt8Container beatRef{ "Beat", _Pattern::beat, 0, 255, true };
-	VariableControl<uint8_t> beatControl{ beatRef };
+	uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
 
 	//add patterns as members here
 	PatternRowThenCol	rowThenCol;

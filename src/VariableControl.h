@@ -125,22 +125,63 @@ void VariableControl<bool>::update() {}
 //};
 
 
-
+// use variable reference for UI functions
 template<class TYPE>
-class VariableContainer {
+class VariableReference {
 public:
-	VariableContainer() : min(0), max(0), wrap(true) {}
-	VariableContainer(const char* name, TYPE &t, TYPE min, TYPE max, bool wrap = false) : name(name), d(t), min(min), max(max), wrap(wrap) {}
+	VariableReference() : min(0), max(0), wrap(true) {}
+	VariableReference(const char* name, TYPE &t, TYPE min = 0, TYPE max = 255, bool wrap = false) : name(name), d(t), min(min), max(max), wrap(wrap) {}
 
 	const char* name;
-	const char* getName() {
+	String getName() {
 		return name;
 	}
+
+	String getValue() {
+		return to_string(d);
+	}
+
 
 	TYPE &d;
 	TYPE min;
 	TYPE max;
 	bool wrap;
+
+	uint16_t triggerDuration = 200;
+	unsigned long triggerStart = 0;
+	bool triggerActive = false;
+
+	void trigger() {
+		triggerActive = true;
+		triggerStart = GET_MILLIS();
+		d = max;
+	}
+
+	void update() {
+		unsigned long now = GET_MILLIS();
+
+		uint8_t type = 2;
+		uint8_t bmp = 120;
+		switch (type) {
+		case 0:
+			/* Ramp	/|/|/|			*/
+			d = ((now * (bmp << 8) * 280) >> 16) >> 8;
+			break;
+		case 1:
+			/* Inverse ramp |\|\|\	*/
+			d = 255 - ((now * (bmp << 8) * 280) >> 16) >> 8;
+			break;
+		case 2:
+			// Trigger decay
+			if (triggerActive and d > min) {
+				d = myMap(now - triggerStart, 0, triggerDuration, max, min);
+			}
+			else { triggerActive = false; }
+			break;
+		default: 
+			break;
+		}
+	}
 
 	void inc(TYPE amount = 1) {
 		d += amount;
@@ -158,18 +199,13 @@ public:
 		else			d -= amount;
 	}
 
-	void oscilate();
-	void trigger();
-
-
-
 };
 
-typedef VariableContainer<float>		FloatContainer;
-typedef VariableContainer<int>			IntContainer;
-typedef VariableContainer<unsigned int> uIntContainer;
-typedef VariableContainer<int8_t>		Int8Container;
-typedef VariableContainer<uint8_t>		uInt8Container;
+typedef VariableReference<float>		FloatReference;
+typedef VariableReference<int>			IntReference;
+typedef VariableReference<unsigned int> uIntReference;
+typedef VariableReference<int8_t>		Int8Reference;
+typedef VariableReference<uint8_t>		uInt8Reference;
 
 
 
@@ -179,25 +215,20 @@ typedef VariableContainer<uint8_t>		uInt8Container;
 template<class T>
 class VariableControl {
 public:
-	VariableControl();
+	VariableControl() {}
 
-	VariableControl(VariableContainer<T> &var) : var(var), min(var.min), max(var.max) {
+	VariableControl(T &var) : var(var), min(0), max(255) {
 		delta = max - min;
 		triggerEnd = min;
 	}
 
-	VariableControl(VariableContainer<T> &var, T _min, T _max) : var(var), min(_min), max(_max) {
-		if (_min < var.min)
-			min = var.min;
-		if (_max > var.max)
-			max = var.max;
+	VariableControl(T &var, T _min, T _max) : var(var), min(_min), max(_max) {
 		delta = max - min;
 		triggerEnd = min;
 	}
-
-
 
 	unsigned long lastUpdate;
+
 	void update() {
 		unsigned long now = GET_MILLIS();
 		if ((oscilateOn || rampOn || triggerOn) and (now - lastUpdate > interval)) {
@@ -205,39 +236,39 @@ public:
 			lastUpdate = now;
 
 			if (oscilateOn) {
-				static bool dirUp = true;
-				bool w = var.wrap;
-				var.wrap = false;
-				if (dirUp) {
-					var.inc();
-					if (var.d >= max)
-						dirUp = false;
-				}
-				else {
-					var.dec();
-					if (var.d <= min)
-						dirUp = true;
-				}
+				//static bool dirUp = true;
+				//bool w = var.wrap;
+				//var.wrap = false;
+				//if (dirUp) {
+				//	var.inc();
+				//	if (var.d >= max)
+				//		dirUp = false;
+				//}
+				//else {
+				//	var.dec();
+				//	if (var.d <= min)
+				//		dirUp = true;
+				//}
 
-				var.wrap = w;
+				//var.wrap = w;
 			}
 
 			else if (rampOn) {
-				bool w = var.wrap;
-				var.wrap = true;
-				var.inc();
-				var.wrap = w;
+				//bool w = var.wrap;
+				//var.wrap = true;
+				//var.inc();
+				//var.wrap = w;
 			}
 
 			else if (triggerOn) {
-				bool w = var.wrap;
-				var.wrap = false;
-				var.dec();
-				if (var.d <= triggerEnd) {
-					triggerOn = false;
-					var.d = triggerEnd;
-				}
-				var.wrap = w;
+				//bool w = var.wrap;
+				//var.wrap = false;
+				//var.dec();
+				//if (var.d <= triggerEnd) {
+				//	triggerOn = false;
+				//	var.d = triggerEnd;
+				//}
+				//var.wrap = w;
 			}
 		}
 	}
@@ -278,7 +309,7 @@ public:
 	}
 
 private:
-	VariableContainer<T> &var;
+	VariableReference<T> &var;
 	T min;
 	T max;
 	T delta;
