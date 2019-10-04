@@ -38,7 +38,7 @@ public:
 	PatternController() {}
 
 	//variables
-	uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
+	//uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
 
 	//add patterns as members here
 	PatternRowThenCol	rowThenCol;
@@ -50,6 +50,7 @@ public:
 	PatternParametric	parametric;
 	PatternParametric2	parametricSpiral;
 	PatternRaymarcher	raymarcher;
+	PatternSolid		solid;
 	PatternSparks		sparks;
 	PatternSpiral		spiral;
 	PatternSuperShape	superShape;
@@ -61,8 +62,9 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 16;
+	static const uint8_t numPatterns = 17;
     _Pattern *patternList[numPatterns] = {
+		&solid,
 		&verticalWaves,
 		&noise1,
 		&parametricSpiral,

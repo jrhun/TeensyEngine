@@ -39,6 +39,12 @@ public:
 		}
 	}
 
+	void fill(CRGB c) {
+		for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+			leds[i] = c;
+		}
+	}
+
 	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit

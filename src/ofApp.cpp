@@ -76,9 +76,9 @@ void ofApp::draw() {
 	ofSetColor(ofColor::slateGrey);
 	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 8+5, 20);
 
-	String v = "beat: " + to_string(_Pattern::beat);
-	ofDrawBitmapString(v, SCREEN_WIDTH * 8+10, 40);
-	v = String(patterns.getCurrentPattern()->getVarName(0)) + patterns.getCurrentPattern()->getVarValue(0);
+	//String v = "beat: " + to_string( *_Pattern::beat );
+	//ofDrawBitmapString(v, SCREEN_WIDTH * 8+10, 40);
+	String v = String(patterns.getCurrentPattern()->getVarName(0)) + patterns.getCurrentPattern()->getVarValue(0);
 	ofDrawBitmapString(v, SCREEN_WIDTH * 8 + 90, 40);
 
 }
@@ -91,7 +91,7 @@ void ofApp::keyPressed(int key) {
 		patterns.inc();
 	if (key == ' ') {
 		//spacebar
-		patterns.getCurrentPattern()->trigger(0);
+		patterns.getCurrentPattern()->trigger();
 	}
 	if (key == 'a') { //left
 		menu.left();
@@ -114,6 +114,13 @@ void ofApp::keyPressed(int key) {
 	if (key == 'f') {
 		menu.press();
 	}
+	if (key == '1') _Pattern::beat.setType(0);
+	if (key == '2') _Pattern::beat.setType(1);
+	if (key == '3') _Pattern::beat.setType(2);
+	if (key == '4') _Pattern::beat.setType(3);
+	if (key == '5') _Pattern::beat.setType(4);
+	if (key == '6') _Pattern::beat.setType(5);
+	if (key == '7') _Pattern::beat.setType(6);
 	menu.display();
 }
 

@@ -12,6 +12,11 @@ public:
 	void clear() {
 		ledRef->clear();
 	}
+
+	virtual void fill(CRGB c) {
+		ledRef->fillScreen(c);
+	}
+
 	void fade(unsigned char a = 128) {
 		ledRef->fade(a);
 	}

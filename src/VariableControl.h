@@ -18,7 +18,7 @@ class VariableControl {
 public:
 	VariableControl() {}
 	VariableControl(TYPE &v, char* name, TYPE min, TYPE max, TYPE delta) :
-		var(v), name(name), min(min), max(max), 
+		var(v), name(name), min(min), max(max),
 		delta(delta), diff(max-min) {
 		//variables.push_back(this);
 	}
@@ -126,6 +126,7 @@ void VariableControl<bool>::update() {}
 
 
 // use variable reference for UI functions
+// control a variable between min and max values
 template<class TYPE>
 class VariableReference {
 public:
@@ -146,42 +147,6 @@ public:
 	TYPE min;
 	TYPE max;
 	bool wrap;
-
-	uint16_t triggerDuration = 200;
-	unsigned long triggerStart = 0;
-	bool triggerActive = false;
-
-	void trigger() {
-		triggerActive = true;
-		triggerStart = GET_MILLIS();
-		d = max;
-	}
-
-	void update() {
-		unsigned long now = GET_MILLIS();
-
-		uint8_t type = 2;
-		uint8_t bmp = 120;
-		switch (type) {
-		case 0:
-			/* Ramp	/|/|/|			*/
-			d = ((now * (bmp << 8) * 280) >> 16) >> 8;
-			break;
-		case 1:
-			/* Inverse ramp |\|\|\	*/
-			d = 255 - ((now * (bmp << 8) * 280) >> 16) >> 8;
-			break;
-		case 2:
-			// Trigger decay
-			if (triggerActive and d > min) {
-				d = myMap(now - triggerStart, 0, triggerDuration, max, min);
-			}
-			else { triggerActive = false; }
-			break;
-		default: 
-			break;
-		}
-	}
 
 	void inc(TYPE amount = 1) {
 		d += amount;
@@ -209,7 +174,152 @@ typedef VariableReference<uint8_t>		uInt8Reference;
 
 
 
+class VariableOscilate {
+public:
+	typedef uint8_t type;
+	VariableOscilate() : var(0), min(0), max(255) {}
+	VariableOscilate(type min, type max) : var(0), min(min), max(max) {
 
+	}
+
+	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, OFF };
+
+
+
+
+	void trigger(uint16_t d = 200) {
+		triggerActive = true;
+		triggerStart = GET_MILLIS();
+		triggerDuration = 200;
+		oscType = TRIGGER;
+		var = max;
+	}
+
+	void setType(uint8_t i) {
+		if (i <= OFF) {
+			oscType = i;
+		}
+	}
+
+	void setBPM(accum88 b) {
+		bpm = b;
+	}
+	accum88 getBPM() {
+		return bpm;
+	}
+
+	void update() {
+
+		smoothTimebase = 0.8 * smoothTimebase + 0.2 * timebase;
+
+		unsigned long now = GET_MILLIS() - timebase;
+
+		accum88 b = bpm;
+		if (halfBPM)	b /= 2;
+		if (quaterBPM)	b /= 4;
+
+
+		switch (oscType) {
+		case RAMP:
+			/* Ramp	/|/|/|			*/
+			var = (((now * (b) * 280) >> 16) >> 8);
+			break;
+		case INVERSE_RAMP:
+			/* Inverse ramp |\|\|\	*/
+			var = 255 - (((now * (b) * 280) >> 16) >> 8);
+			break;
+		case TRIANGLE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			if (var > 128)
+				var /= 2;
+			else if (var <= 128)
+				var = 256 - (var * 2);
+			break;
+		case SQUARE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			var += 128;
+			if (var > 128)
+				var = 255;
+			else var = 0;
+			break;
+		case SIN:
+			var = sin8(((now * (b) * 280) >> 16) >> 8);
+			break;
+		case TRIGGER:
+			// Trigger decay
+			if (triggerActive and var > min) {
+				var = myMap(now - triggerStart, 0, triggerDuration, max, min, true);
+			}
+			else { triggerActive = false; var = min; }
+			break;
+		case OFF:
+		default:
+			break;
+		}
+	}
+
+
+	//static std::vector<VariableOscilate*> activeOscilaters;
+
+	type& operator* () {
+		return var;
+	}
+
+	bool halfBPM = false;
+	bool quaterBPM = false;
+
+	void sync() {
+		if (oscType == TRIGGER) {
+			trigger();
+		}
+		else {
+			unsigned long now = GET_MILLIS();
+			
+			timebase = now;
+
+			uint16_t tpt = 0; // average time per tap
+
+			if (prevBeat) {
+				if (now - prevBeat > 4000) {// four second timeout, reset count and sum
+					nBeats = 0;
+					sum = 0;
+				}
+				else {
+					nBeats++;
+					sum += 15360000L / (now - prevBeat); // 60,000 / 500ms = 120 BPM
+					tpt = sum / nBeats; //BPM * 256
+					bpm = tpt;
+				}
+			}
+			prevBeat = now;
+		}
+	}
+
+private:
+	type var;
+	type min;
+	type max;
+
+	uint16_t triggerDuration = 200;
+	unsigned long triggerStart = 0;
+	bool triggerActive = false;
+
+	accum88 bpm = (120 << 8);
+	uint8_t oscType = OFF;
+
+	unsigned long timebase = 0;
+	unsigned long smoothTimebase = 0;
+
+	// from https://learn.adafruit.com/tap-tempo-trinket/code
+	unsigned long
+		prevBeat = 0L, // Time of last button tap
+		sum = 0L; // Cumulative time of all beats
+	uint16_t
+		nBeats = 0;  // Number of beats counted
+
+
+
+};
 
 
 template<class T>

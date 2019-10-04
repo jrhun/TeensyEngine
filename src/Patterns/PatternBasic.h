@@ -2,12 +2,31 @@
 
 #include "Pattern.h"
 
+
+class PatternSolid : public _Pattern {
+public:
+	PatternSolid() : _Pattern("Solid") {}
+
+	uint8_t drawFrame() {
+		_Pattern::drawFrame();
+
+		uint8_t val = myMap(*beat, 0, 255, 128, 255);
+
+		gfx.fill(gfx.getColour().nscale8(val));
+
+
+
+		return returnVal;
+	}
+
+};
+
 class PatternRowThenCol : public _Pattern {
 public:
 	PatternRowThenCol() : _Pattern("Rows then Colums") {}
 
 	uint8_t drawFrame() {
-
+		_Pattern::drawFrame();
 		
 
 		//      unsigned long now = millis();
@@ -16,8 +35,8 @@ public:
 		static uint16_t index = 0;
 		static uint8_t offset = 0;
 
-		static uint16_t nextIndex = 0;
-		nextIndex = myMap(beat8(120/4), 0, 255, 0, 128);
+		uint16_t nextIndex = 0;
+		nextIndex = myMap(beat8(beat.getBPM()>>10), 0, 255, 0, 128);
 		
 
 		uint8_t colourOffset = 64;
@@ -72,14 +91,14 @@ public:
 			else {
 				index = 0;
 				nextIndex = 0;
-				offset = offset + random8(8) - 4;
-				offset %= 64;
+				offset = offset + random8(SCREEN_WIDTH/4) - SCREEN_WIDTH/8;
+				offset %= SCREEN_WIDTH;
 				break;
 			}
 
 			index++;
 		}
-		if (index == 128) index = 0;
+		if (index == SCREEN_WIDTH + SCREEN_HEIGHT*2) index = 0;
 		if (index > nextIndex + 20) index = nextIndex;
 
 
@@ -105,10 +124,11 @@ public:
 	uInt8Reference fadeRef{ "Fade", fade, 5, 20 };
 
 	uint8_t drawFrame() {
-
-		updateVars();
+		_Pattern::drawFrame();
 
 		//uint8_t chance = beatsin8(90); //128 = 50%
+
+		chance = *beat;
 
 		if (_Pattern::useDefaultEffect) {
 			uint8_t fade = 10;
@@ -138,7 +158,15 @@ class PatternVWaves : public _Pattern{
 public:
 	PatternVWaves() : _Pattern("Vertical Wave") {}
 
+	virtual void start() {
+		beat.halfBPM = true;
+	}
+	virtual void stop() {
+		beat.halfBPM = false;
+	}
+
 	uint8_t drawFrame() {
+		_Pattern::drawFrame();
 
 		if (_Pattern::useDefaultEffect) {
 
@@ -156,7 +184,8 @@ public:
 		uint8_t x = 0;
 		static uint16_t offset = 0;
 		uint8_t width = 0;
-		uint8_t maxWidth = myMap(beatsin8(60), 0, 255, 16, 1);
+		//uint8_t maxWidth = myMap(beatsin8(60), 0, 255, 16, 1);
+		uint8_t maxWidth = myMap(*beat, 0, 255, 16, 1);
 		
 //        for (int8_t i = 8; i > 0; i--) {
 

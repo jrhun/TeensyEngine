@@ -57,6 +57,7 @@ public:
 	_Pattern(const char* name) : name(name) {}
 
 	virtual uint8_t drawFrame() {
+		updateVars();
 		return 0;
 	}
 
@@ -81,15 +82,14 @@ public:
 	uInt8Reference *vars[maxVars];
 
 	void updateVars() {
-		for (uint8_t i = 0; i < getNumVars(); i++) {
-			vars[i]->update();
-		}
+		//for (uint8_t i = 0; i < getNumVars(); i++) {
+		//	vars[i]->update();
+		//}
+		beat.update();
 	}
 
-	void trigger(uint8_t i) {
-		uInt8Reference* v = getVar(i);
-		if (v)
-			getVar(i)->trigger();
+	void trigger() {
+		beat.sync();
 	}
 
 
@@ -116,9 +116,9 @@ public:
 
 	static bool useDefaultEffect;
 
-	static uint8_t beat;
+	static VariableOscilate beat;
 
 };
 
+VariableOscilate _Pattern::beat = VariableOscilate();
 bool _Pattern::useDefaultEffect = true;
-uint8_t _Pattern::beat = 0;
