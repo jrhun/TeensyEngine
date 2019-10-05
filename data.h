@@ -39,10 +39,11 @@
 #define AMP_IN_PIN      21  //A7
 #define VOLTS_IN_PIN    20  //A6
 
-#define OLED_DC         32
-#define OLED_RS         31
-#define OLED_CS         30 
-#define OLED_LED_PIN    33
+// Normal Connections
+#define TFT_DC      32
+#define TFT_CS      30
+#define TFT_RST     31
+#define TFT_LED     33
 
 #define LED1            19
 #define LED2            18

@@ -6,7 +6,7 @@
 #include "src\Patterns\PatternController.h"
 
 // Use hardware SPI
-#if 0
+#if defined(ESP32)
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite sText = TFT_eSprite(&tft);
