@@ -1,5 +1,7 @@
 #include "fft.h"
 
+FFT fft1024;
+
 void setup() {
   // put your setup code here, to run once:
 
