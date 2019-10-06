@@ -49,7 +49,6 @@ void setup() {
 
 
 void loop() {
-  Serial.println("pinMode not set");
   Serial.print("Analog read: ");
   Serial.println(analogRead(A13));
   
@@ -60,6 +59,42 @@ void loop() {
   delay(200);
   Serial.print("ADC2 Analog read: ");
   Serial.println(adc->analogRead(A13, 1));
+
+  delay(200);
+  Serial.println("ADC1 interrupt test");
+  adc->enableInterrupts(0);
+  Serial.print("Single read: ");
+  adc->startSingleRead(A13,0);
+  delay(100);
+  Serial.print("Default analogRead: ");
+  analogRead(A13);
+  delay(100);
+  Serial.print("Register edit: ");
+  __disable_irq();
+  ADC1_HC0 = 4;
+  __enable_irq();
+  delay(100);
+  
+  // end ADC1 interrupt tests
+  adc->disableInterrupts(0);
+  
+  delay(200);
+  Serial.println("ADC1 interrupt test");
+  adc->enableInterrupts(1);
+  Serial.print("Single read: ");
+  adc->startSingleRead(A13,1);
+  delay(100);
+  Serial.print("Default analogRead: ");
+  analogRead(A13);
+  delay(100);
+  Serial.print("Register edit: ");
+  __disable_irq();
+  ADC2_HC0 = 4;
+  __enable_irq();
+  delay(100);
+
+  // end ADC2 interrupt tests
+  adc->disableInterrupts(1);
 
   delay(200);
   Serial.println("Set pinmode");
