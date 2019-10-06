@@ -62,6 +62,8 @@ ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST);
 void setup() {
   // Audio requires memory to work.
   AudioMemory(16);
+
+  pinMode(A13, INPUT);
   
   
   
