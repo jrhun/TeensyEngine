@@ -1,210 +1,142 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include <DMAChannel.h>
+#include "ADC.h"
 
 
-#include <ADC.h>
 ADC *adc = new ADC();
-
-const int readPin = A13; // ADC1
-
-// set up continuous reads
-// set up ISR every 25microsec (40khz) to copy value to buffer
-// ISR triggered every 25microsec (40khz)
-// does a single read
-
-struct AudioBuffer {
-  volatile uint16_t data[128];
-  //  volatile uint8_t index = 0;
-  //  volatile uint8_t activeBuffer = 0;
-  //  volatile uint16_t data0[128];
-  //  volatile uint16_t data1[128];
-  //  volatile uint16_t data2[128];
-  //  volatile uint16_t data3[128];
-  //  volatile uint16_t data4[128];
-  //  volatile uint16_t data5[128];
-  //  volatile uint16_t data6[128];
-  //  volatile uint16_t data7[128];
-};
-volatile uint8_t bufferIndex = 0;
-volatile uint8_t activeBuffer = 0;
-const uint8_t  numBuffers = 8;
-volatile AudioBuffer audioBuffer[numBuffers];
-
+DMAChannel dma(false);
+DMAMEM static uint16_t adcBuffer[128];
+IntervalTimer myTimer;
 
 void adc0_isr() {
   __disable_irq();
-  uint16_t v = ADC1_R0;
+  Serial.print("ADC1 ISR. Value: ");
+  Serial.print(adc->readSingle(0));
+  Serial.print("\t(ADC1_R0):");
+  Serial.println(ADC1_R0);
   __enable_irq();
-  Serial.println(v);
-  //  audioBuffer[activeBuffer].data[bufferIndex] = adc->readSingle();
-  //  bufferIndex++;
-  //  if (bufferIndex >= 128) {
-  //    bufferIndex = 0;
-  //    activeBuffer = (activeBuffer + 1) % numBuffers;
-  //  }
-  //  static unsigned long k = 0;
-  //  k++;
-  //  if (k%441000 == 0) {
-  //  Serial.print("Value1adc: ");
-  //  Serial.println(adc->readSingle(1));
-  //  Serial.print("Value1adc: ");
-  //  Serial.println(analogRead(A13));
-  //  }
-
 }
-
 void adc1_isr() {
   __disable_irq();
-  uint16_t v = ADC2_R0;
+  Serial.print("ADC2 ISR. Value: ");
+  Serial.print(adc->readSingle(1));
+  Serial.print("\t(ADC2_R0):");
+  Serial.println(ADC2_R0);
   __enable_irq();
-  Serial.println(v);
-  //  Serial.print("Value1adc: ");
-  //  Serial.println(adc->readSingle(1));
-  //  Serial.print("Value1adc: ");
-  //  Serial.println(analogRead(A13));
-  //    static uint16_t k = 0;
-  //  static unsigned long initial = 0;
-  //  k++;
-  //  if (k % 44100 == 0) {
-  //    unsigned long now = millis();
-  //    Serial.println("ADC2_ISR");
-  //    Serial.print("Time for 44100 samples = ");
-  //    Serial.print(now - initial);
-  //    Serial.println("msec");
-  //    Serial.print("Reading: ");
-  //    Serial.println(ADC2_R0);
-  //    initial = now;
-  //  }
+}
+void readAdc() {
+  static unsigned long k = 0;
+  static unsigned long initial = 0;
+  k++;
+  if (k > 44100) {
+    k = 0;
+    unsigned long now = millis();
+    Serial.println("");
+    Serial.print("Timer 44100 calls = ");
+    Serial.print(now - initial);
+    Serial.println("msec");
+    initial = now;
+//    Serial.print("Last value: ");
+    myTimer.disable();
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);
+
+
 }
 
 
-#include <DMAChannel.h>
+void loop() {
+  Serial.println("pinMode not set");
+  Serial.print("Analog read: ");
+  Serial.println(analogRead(A13));
+  
+  delay(200);
+  Serial.print("ADC1 Analog read: ");
+  Serial.println(adc->analogRead(A13, 0));
 
-//DMAMUX_SOURCE_ADC1 is adc0
-DMAChannel dma(false);
-DMAMEM static uint16_t adcBuffer[128];
+  delay(200);
+  Serial.print("ADC2 Analog read: ");
+  Serial.println(adc->analogRead(A13, 1));
 
+  delay(200);
+  Serial.println("Set pinmode");
+  pinMode(A13, INPUT);
+  Serial.print("Analog read: ");
+  Serial.println(analogRead(A13));
+  
+  delay(200);
+  Serial.print("ADC1 Analog read: ");
+  Serial.println(adc->analogRead(A13, 0));
 
-void DMA_ISR() {
-  dma.clearInterrupt();
+  delay(200);
+  Serial.print("ADC2 Analog read: ");
+  Serial.println(adc->analogRead(A13, 1));
+
+  delay(200);
+  Serial.println("ADC1 interrupt test");
+  adc->enableInterrupts(0);
+  Serial.print("Single read: ");
+  adc->startSingleRead(A13,0);
+  delay(100);
+  Serial.print("Default analogRead: ");
+  analogRead(A13);
+  delay(100);
+  Serial.print("Register edit: ");
   __disable_irq();
-  uint16_t v1 = ADC1_R0;
-  uint16_t v2 = ADC2_R0;
+  ADC1_HC0 = 4;
   __enable_irq();
-  uint32_t t = dma.TCD->DADDR;
-  Serial.println(v1);
-  Serial.println(v2);
-  Serial.println(t);
+  delay(100);
+  
+  // end ADC1 interrupt tests
+  adc->disableInterrupts(0);
+  
+  delay(200);
+  Serial.println("ADC1 interrupt test");
+  adc->enableInterrupts(1);
+  Serial.print("Single read: ");
+  adc->startSingleRead(A13,1);
+  delay(100);
+  Serial.print("Default analogRead: ");
+  analogRead(A13);
+  delay(100);
+  Serial.print("Register edit: ");
+  __disable_irq();
+  ADC2_HC0 = 4;
+  __enable_irq();
+  delay(100);
 
-  //  static unsigned long k = 0;
-  //  static unsigned long initial = 0;
-  //  k++;
-  //
-  //  if (k % (44100/128) == 0) {
-  //     unsigned long now = millis();
-  //     Serial.println("DMA Completed 44100 reads total");
-  //     Serial.print("Time for 44100 samples = ");
-  //     Serial.print(now - initial);
-  //     Serial.println("msec");
-  //     initial = now;
-  //     Serial.print("Reading: ");
-  //     Serial.println(ADC1_R0);
-  //  }
+  // end ADC2 interrupt tests
+  adc->disableInterrupts(1);
+  
+  delay(200);
+  Serial.println("\nTimer test");
+  myTimer.begin(readAdc, 4*1000000.0f/44100.0f);//4*22.675737f);
+
+  delay(5000);
+  Serial.println("DMA ADC1 test");
+  dma.begin(true);
+  dma.TCD->SADDR = &ADC1_R0;
+  dma.TCD->SOFF = 0;
+  dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+  dma.TCD->NBYTES_MLNO = 2;
+  dma.TCD->SLAST = 0;
+  dma.TCD->DADDR = adcBuffer;
+  dma.TCD->DOFF = 2;
+  dma.TCD->CITER_ELINKNO = sizeof(adcBuffer) / 2;
+  dma.TCD->DLASTSGA = -sizeof(adcBuffer);
+  dma.TCD->BITER_ELINKNO = sizeof(adcBuffer) / 2;
+  dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
+  dma.enable();
+  dma.attachInterrupt(DMA_ISR);
+
+  Serial.print("DMA setup\n default read test");
+  for (int i = 0; i < 1024; i++) {
+    
+  }
   
 }
 
-IntervalTimer myTimer;
-
-
-
-void readAdc() {
-  adc->startSingleRead(A13,0);
-//  __disable_irq();
-//  ADC1_HC0 = 4;
-//  __enable_irq();
-  //    ADC1_HC0 = 4; //A13
-  //  Serial.print("Value1adc: ");
-  //  Serial.println(adc->analogRead(A13, 1));
-  //  Serial.print("Value2adc: ");
-  //  Serial.println(analogRead(A13));
-}
-
-
-
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(A13, INPUT);
-
-  Serial.begin(115200);
-  //  delay(10000);
-  while (!Serial);
-
-  Serial.print("ADC Test");
-
-  //  adc->setAveraging(16,0);
-  //  adc->setResolution(12,0);
-  //  adc->analogRead(A13,0);
-    adc->setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED);
-    adc->setSamplingSpeed(ADC_SAMPLING_SPEED::LOW_SPEED);
-
-//  adc->enableInterrupts(0);
-//  adc->enableInterrupts(1);
-
-
-  //  ADC1_CFG |= ADC_CFG_ADTRG;
-
-  //use ADC1
-  //  ADC1_GC |= ADC_GC_DMAEN; //enable DMA trigger on conversion
-//  adc->enableDMA(1);
-
-//  dma.begin(true);
-//  dma.TCD->SADDR = &ADC2_R0;
-//  dma.TCD->SOFF = 0;
-//  dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-//  dma.TCD->NBYTES_MLNO = 2;
-//  dma.TCD->SLAST = 0;
-//  dma.TCD->DADDR = adcBuffer;
-//  dma.TCD->DOFF = 2;
-//  dma.TCD->CITER_ELINKNO = sizeof(adcBuffer) / 2;
-//  dma.TCD->DLASTSGA = -sizeof(adcBuffer);
-//  dma.TCD->BITER_ELINKNO = sizeof(adcBuffer) / 2;
-//  dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-//  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC2);
-//  dma.enable();
-//  dma.attachInterrupt(DMA_ISR);
-
-  //  adc->startContinuous(A13,1);
-
-  //  myTimer.begin(readAdc, 4*1000000.0f/44100.0f);//4*22.675737f);
-  //  startPDB();
-
-
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  delay(1000);
-  Serial.println();
-  //  analogReadRes(10); // max is 1024
-  //  analogReadAveraging(16);
-    Serial.println(analogRead(A13));
-  __disable_irq();
-  uint16_t v = ADC1_R0;
-  __enable_irq();
-  Serial.println(v);
-    Serial.println((int16_t)adc->analogRead(A13));
-//  adc->startSingleRead(A13, 1);
-//     while(adc->isConverting(1));
-  //  int8_t lastBuffer = (activeBuffer + numBuffers - 1) % numBuffers;
-  //  Serial.print("Buffer num: \n");
-  //  Serial.print(lastBuffer);
-  //  Serial.println();
-  //  for (int i = 0; i < 128; i++) {
-  //
-  //    Serial.print(audioBuffer[lastBuffer].data[i]);
-  //    Serial.print("\t");
-  //    if (i % 8 == 0)
-  //      Serial.print("\n");
-  //  }
-//  Serial.print(".");
-}
