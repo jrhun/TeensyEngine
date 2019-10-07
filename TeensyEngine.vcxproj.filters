@@ -210,6 +210,9 @@
     <ClInclude Include="src\Patterns\PatternNoise.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="src\Menu.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

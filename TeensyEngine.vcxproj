@@ -197,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="data.h" />
     <ClInclude Include="src\Effects.h" />
+    <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\Color.h" />

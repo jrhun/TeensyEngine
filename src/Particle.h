@@ -16,7 +16,7 @@ public:
 	//	alpha(0.0f),
 	//	col(0, 0, 0)
 	//{}
-	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col), hue(p.hue), mass(p.mass) {}
+	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha) { hue = p.hue; mass = p.mass; col = p.col; } // col(p.col), hue(p.hue), mass(p.mass)
 
 	void applyForce(Vec3 &force) {
 		acc += force;// (force / mass);

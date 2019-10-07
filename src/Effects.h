@@ -237,7 +237,7 @@ inline void TextureBlock(int xo, int yo)
 	}
 }
 
-
+/*
 void flowMap() {
 
 
@@ -355,7 +355,7 @@ void flowMap() {
 	}
 
 }
-
+*/
 
 void rotateCW(float angle) {
 

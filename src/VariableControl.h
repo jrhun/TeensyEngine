@@ -139,7 +139,11 @@ public:
 	}
 
 	String getValue() {
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(d);
+#else
 		return to_string(d);
+#endif
 	}
 
 
@@ -166,13 +170,11 @@ public:
 
 };
 
-typedef VariableReference<float>		FloatReference;
-typedef VariableReference<int>			IntReference;
-typedef VariableReference<unsigned int> uIntReference;
-typedef VariableReference<int8_t>		Int8Reference;
+//typedef VariableReference<float>		FloatReference;
+//typedef VariableReference<int>			IntReference;
+//typedef VariableReference<unsigned int> uIntReference;
+//typedef VariableReference<int8_t>		Int8Reference;
 typedef VariableReference<uint8_t>		uInt8Reference;
-
-
 
 class VariableOscilate {
 public:
@@ -274,7 +276,7 @@ public:
 		}
 		else {
 			unsigned long now = GET_MILLIS();
-			
+
 			timebase = now;
 
 			uint16_t tpt = 0; // average time per tap
@@ -305,7 +307,7 @@ private:
 	bool triggerActive = false;
 
 	accum88 bpm = (120 << 8);
-	uint8_t oscType = OFF;
+	uint8_t oscType = INVERSE_RAMP;
 
 	unsigned long timebase = 0;
 	unsigned long smoothTimebase = 0;
@@ -321,9 +323,11 @@ private:
 
 };
 
+/*
 
-template<class T>
+//template<class T>
 class VariableControl {
+	typedef uint8_t T;
 public:
 	VariableControl() {}
 
@@ -386,7 +390,7 @@ public:
 
 
 	void oscilate(accum88 BPM) {
-		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600 
+		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600
 		interval = period / (delta * 2.0f);  // then interval = 3
 		oscilateOn = true;
 		rampOn = false;
@@ -394,7 +398,7 @@ public:
 	}
 
 	void ramp(accum88 BPM) {
-		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600 
+		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600
 		interval = period / float(delta);  // then interval = 3
 		rampOn = true;
 		oscilateOn = false;
@@ -419,7 +423,7 @@ public:
 	}
 
 private:
-	VariableReference<T> &var;
+	VariableReference &var;
 	T min;
 	T max;
 	T delta;
@@ -430,3 +434,4 @@ private:
 	bool triggerOn = false;
 	float interval = 10;
 };
+*/

@@ -32,7 +32,7 @@ public:
 			//c2.nscale8_video(min(i * 4, 255));
 			drawLine(t, i / 1, i / 1 + 32, min(i * 12, 255));
 		}
-		offset += 0.05;
+		offset += 0.1;
 
 		centerA.x = 2.5 * cos(angle + PI);
 		centerA.z = 2.5 * sin(angle + PI);
@@ -120,7 +120,7 @@ public:
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {
 		float fa = 2.5;
 		float fb = 1.4;
-		float k = 0.05;
+		//float k = 0.05;
 		float u = 2*t;
 		float v = t*.75;
 		float x1 = (fa + fb * cos(u)) * cos(v);

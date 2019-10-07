@@ -6,8 +6,8 @@
 
 
 // GUItool: begin automatically generated code
-AudioInputAnalog         adc1;           //xy=448,174
 AudioSynthWaveformSine   sine1;          //xy=417,318
+AudioInputAnalog         adc1;           //xy=448,174
 AudioSynthNoisePink      pink1;          //xy=408,369
 AudioMixer4              mixer1;         //xy=592,311
 AudioAnalyzeFFT1024      fft1024;      //xy=626,207
@@ -46,27 +46,13 @@ const uint8_t MIC_PIN = 27;
 const uint8_t BACKLIGHT_PIN = 33;
 
 ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST);
-//
-//#include "ADC.h"
-//ADC *adc = new ADC();
-//
-//IntervalTimer myTimer;
-//
-//void readAdc2() {  
-//  adc->startSingleRead(A13, 1);
-//}
-
-
-
 
 void setup() {
   // Audio requires memory to work.
   AudioMemory(16);
 
   pinMode(A13, INPUT);
-  
-  
-  
+ 
 //  adc->setAveraging(16);
 //  adc->setResolution(12);
 //  adc->setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED);

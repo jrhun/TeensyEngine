@@ -4053,6 +4053,8 @@ void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& d
 }
 
 
+
+
 Vec3 toVec(CRGB c) {
 	return Vec3(c.r, c.g, c.b);
 }
@@ -4065,7 +4067,7 @@ CRGB toCRGB(Vec3 v) {
 
 
 
-#endif
+
 
 CRGB blendrgb(CRGB c1, CRGB c2) {
 	Vec3 v1(c1.r, c1.g, c1.b);
@@ -4121,6 +4123,8 @@ CRGB blendlab(CRGB c1, CRGB c2) {
 	return CRGB(lch1.x, lch1.y, lch1.z);
 }
 
+
+#endif
 
 //class Colour {
 //public:

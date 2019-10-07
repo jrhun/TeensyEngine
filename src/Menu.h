@@ -9,8 +9,10 @@
 
 #if defined(ESP32) || defined(CORE_TEENSY)
 #include "FastLED.h"
+
 #else 
 #include "FastLED_PC.h"
+
 #endif
 // menu
 
@@ -32,7 +34,7 @@ public:
 		return name;
 	}
 
-	virtual const char* getData() {
+	virtual String getData() {
 		return "";
 	}
 
@@ -81,8 +83,8 @@ public:
 		hasSelection = true;
 	}
 
-	const char* getData() {
-		return to_string(Data::currentPattern).c_str();
+	String getData() {
+		return String(Data::currentPattern);// .c_str();
 	}
 
 	String getDataExtended() {
@@ -562,6 +564,7 @@ public:
 		// log current page name
 		r = currentPage()->getPageData(); 
 		//log page data
+		return r;
 	}
 };
 

@@ -23,13 +23,14 @@ public:
 	uint8_t drawFrame() {
 		noise.fillNoise();
 
+
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
 				// We use the value at the (i,j) coordinate in the noise
 				// array for our brightness, and the flipped value from (j,i)
 				// for our pixel's index into the color palette.
 
-				uint8_t index = noise.At(i, j);// noise[j][i];
+				uint8_t index = noise.At(j, i);// noise[j][i];
 				uint8_t bri = noise.At(i, j);// [i][j];
 
 				// if this palette is a 'loop', add a slowly-changing base value

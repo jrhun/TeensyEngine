@@ -39,7 +39,7 @@ CRGBPalette16 targetPalette;
 TBlendType    currentBlending;
 uint8_t blendCounter = 0;
 bool blendActive = false;
-
+/*
 DEFINE_GRADIENT_PALETTE( Black_White_gp) {
   0, 255, 255, 255,
   32, 0, 0, 0,
@@ -87,7 +87,7 @@ const TProgmemRGBGradientPalettePtr gGradientPalettes[] = {
 
 const uint8_t gGradientPaletteCount =
   sizeof( gGradientPalettes) / sizeof( TProgmemRGBGradientPalettePtr );
-
+*/
 const uint8_t PROGMEM gamma8[] = {
   0,   0,   0,   0,   0,   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
   0,   0,   0,   0,   0,   0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,

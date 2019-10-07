@@ -78,8 +78,8 @@ public:
 			y1 = (sin8((1024 - offset % 1024) / 16) - 127) / 4;
 		}
 
-		uint8_t h1 = Data::getHue() + random8(10);
-		uint8_t h2 = Data::getHue() + 64 + random8(15);
+		//uint8_t h1 = Data::getHue() + random8(10);
+		//uint8_t h2 = Data::getHue() + 64 + random8(15);
 		gfx.drawLine(x1, y1, x1 + SCREEN_WIDTH / 2 - 1, SCREEN_HEIGHT - y1 - 1, random8(16), 32 + random8(16));
 		gfx.drawLine(SCREEN_WIDTH - x2, SCREEN_HEIGHT - y1 - 1, SCREEN_WIDTH - x2 + SCREEN_WIDTH / 2 - 1, y1, random8(16) + 32, 64+ random8(16));
 		//gfx.drawLine(SCREEN_WIDTH - x2, y1, x2, SCREEN_HEIGHT - y1, h2, h1);

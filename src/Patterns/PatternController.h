@@ -62,7 +62,7 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 17;
+	static const uint8_t numPatterns = 16;
     _Pattern *patternList[numPatterns] = {
 		&solid,
 		&verticalWaves,
@@ -72,7 +72,7 @@ public:
 		&sparks,
 		//&superShape,
 		&rowThenCol,
-		&raymarcher,
+		//&raymarcher,
 		&world,
 		
 		&wheelParticles,

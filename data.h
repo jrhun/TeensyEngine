@@ -43,7 +43,7 @@
 #define TFT_DC      32
 #define TFT_CS      30
 #define TFT_RST     31
-#define TFT_LED     33
+#define TFT_BACKLIGHT 33
 
 #define LED1            19
 #define LED2            18
@@ -106,6 +106,10 @@ namespace Data {
 
 	// audio vars
 	uint8_t noiseFloor = 65;
+
+
+  // backlight
+  uint16_t backlight_brightness = 1023;
 
 
 } //end nameSpace Data

@@ -54,18 +54,18 @@ public:
 	uint16_t xScale;
 	uint16_t yScale;
 
-	uint16_t speed = 32;
+	uint16_t speed = 64;
 
 	uint8_t noise[SCREEN_WIDTH][SCREEN_WIDTH];
 
-	uint8_t noiseSmoothing = 240;
+	uint8_t noiseSmoothing = 50;
 
 private:
 	void fillNoise8bit() {
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			int ioffset = xScale * i;
+			uint32_t ioffset = xScale * i;
 			for (int j = 0; j < SCREEN_WIDTH; j++) {
-				int joffset = yScale * j;
+				uint32_t joffset = yScale * j;
 
 				uint8_t data = inoise16(xOffset + ioffset, yOffset + joffset, zOffset) >> 8;
 
@@ -169,7 +169,7 @@ private:
 				uint8_t steps = (256 / SCREEN_HEIGHT); // = 8 for 32, or 4 for 64
 				// increase steps slightly for phi so we don't have all leads at the top lighting together
 				// of note maybe we should only do +/-90 deg as with the world map to avoid warping at high lattitudes
-				uint8_t steps2 = 3;
+				//uint8_t steps2 = 3;
 				uint8_t lon = steps * j;
 				uint8_t lat = steps * i / 2;
 

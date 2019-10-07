@@ -158,7 +158,8 @@ public:
 		Vec3 K_d = Vec3(0.7, 0.2, 0.2); //difuse
 		Vec3 K_s = Vec3(1.0, 1.0, 1.0); //specular
 		//Vec3 K_s = Vec3(0.0, 0.0, 0.0); //specular
-		const float shininess = 10.0;
+		//const float shininess = 10.0;
+
 
 		for (int i = 0; i < NUMBER_OF_STEPS; ++i)
 		{
