@@ -54,7 +54,11 @@ Engine engine(gfx);
 class _Pattern {
 public:
 	_Pattern() {}
-	_Pattern(const char* name) : name(name) {}
+	_Pattern(const char* name) : name(name) {
+		Data::triggerType_t.setCallback([] {
+			beat.setType(*Data::triggerType_t);
+		});
+	}
 
 	virtual uint8_t drawFrame() {
 		updateVars();
@@ -79,7 +83,7 @@ public:
 		return numVars;
 	}
 
-	uInt8Reference *vars[maxVars];
+	VariableReference *vars[maxVars];
 
 	void updateVars() {
 		//for (uint8_t i = 0; i < getNumVars(); i++) {
@@ -93,7 +97,7 @@ public:
 	}
 
 
-	uInt8Reference *getVar(uint8_t i) {
+	VariableReference *getVar(uint8_t i) {
 		if (i >= 0 and i < getNumVars()) {
 			return vars[i];
 		}

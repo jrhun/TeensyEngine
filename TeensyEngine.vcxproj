@@ -182,6 +182,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxBaseGui.cpp" />
     <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxButton.cpp" />

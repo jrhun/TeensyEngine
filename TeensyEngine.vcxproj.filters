@@ -43,6 +43,7 @@
     <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.cpp">
       <Filter>addons\ofxGui\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

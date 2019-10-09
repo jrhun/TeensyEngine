@@ -2,10 +2,22 @@
 #include "ADC.h"
 
 
+typedef struct audio_block_struct {
+  uint8_t  ref_count;
+  uint8_t  reserved1;
+  uint16_t memory_pool_index;
+  int16_t  data[AUDIO_BLOCK_SAMPLES];
+} audio_block_t;
+
 ADC *adc = new ADC();
 DMAChannel dma(false);
 DMAMEM static uint16_t adcBuffer[128];
-volatile uint16_t outputBlock[128];
+volatile uint16_t outputBlock1[128];
+volatile uint16_t outputBlock2[128];
+uint16_t* block = NULL;
+audio_block_t * block_left = NULL;
+
+
 IntervalTimer myTimer;
 
 void adc0_isr() {
@@ -55,12 +67,14 @@ void DMA_ISR() {
     offset = 0;
     //if (update_responsibility) AudioStream::update_all();
   }
-
-  dest = (uint16_t *) & (outputBlock[offset]);
-  do {
-    *dest++ = *src++;
-  } while (src < end);
-
+  left = block;
+  if (left != NULL) {
+    
+    dest = (uint16_t *) & (outputBlock[offset]);
+    do {
+      *dest++ = *src++;
+    } while (src < end);
+  }
 
 
 

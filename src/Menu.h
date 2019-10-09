@@ -18,10 +18,13 @@
 
 
 
+#include "VariableControl.h"
 
 
- 
- 
+
+
+
+
 
 class MenuAbstract {
 public:
@@ -59,12 +62,83 @@ public:
 MenuAbstract baseMenu;
 
 class MenuCurrentPattern : public MenuAbstract {
-public: 
+public:
 	MenuCurrentPattern() : MenuAbstract("") {}
 
 	const char* getName() {
-		return patterns.getCurrentPatternName();
+		// String r = "Current pattern:";
+		// r += 
+		return patterns.getCurrentPatternName();//r.c_str();
 	}
+
+	void inc() {
+		patterns.inc();
+	}
+	void dec() {
+		patterns.dec();
+	}
+};
+
+class MenuTrigger : public MenuAbstract {
+public:
+	MenuTrigger() : MenuAbstract("Trigger") {
+		hasSelection = true;
+	}
+
+	String getData() {
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(_Pattern::beat.getType());// .c_str();
+#else
+		return to_string(_Pattern::beat.getType());
+#endif 
+	}
+	String getDataExtended() {
+		String r = "";
+		for (uint8_t i = 0; i < _Pattern::beat.numTypes() + 1; i++) {
+			if (i == _Pattern::beat.getType())
+				r += "x";
+			else if (i == selected)
+				r += ">";
+			else
+				r += " ";
+
+			if (i < _Pattern::beat.numTypes())
+				r += _Pattern::beat.getTriggerName(i);
+			else
+				r += "Back";
+			r += "\n";
+		}
+		return r;
+	}
+	void up() {
+		if (selected <= _Pattern::beat.numTypes())
+			selected++;
+	}
+	void down() {
+		if (selected > 0)
+			selected--;
+	}
+
+	void inc() {
+		const uint8_t currentType = _Pattern::beat.getType();
+		if (currentType < _Pattern::beat.numTypes()+1) {
+			_Pattern::beat.setType(currentType + 1);
+		}
+	}
+	void dec() {
+		const uint8_t currentType = _Pattern::beat.getType();
+		if (currentType > 0) {
+			_Pattern::beat.setType(currentType - 1);
+		}
+	}
+
+	void press() {
+		if (selected < _Pattern::beat.numTypes())
+			_Pattern::beat.setType(selected);
+	}
+
+	uint8_t selected = _Pattern::beat.OFF;
+
 };
 
 class MenuCurrentPalette : public MenuAbstract {
@@ -76,15 +150,106 @@ public:
 	}
 };
 
+//class MenuVariableNamed : public MenuVariable {
+//public:
+//	MenuVariableNamed() {}
+//	MenuVariableNamed(VariableReference *var, const char* names, uint8_t len) : MenuVariable(var) {
+//		hasSelection = true;
+//	}
+//
+//	String getData() {
+//		return var->getValue();
+//	}
+//};
+
+class MenuVariable : public MenuAbstract {
+public:
+	MenuVariable() {}
+	MenuVariable(VariableReference *var) : MenuAbstract(var->name), var(var) {}
+
+	virtual String getData() {
+		return var->getValue();
+	}
+
+	void inc() {
+		increaseRotationSpeed(1);
+		var->inc(incAmount);
+	}
+	void dec() {
+		increaseRotationSpeed(-1);
+		var->dec(incAmount);
+	}
+
+	unsigned long lastUpdate = 0;
+	int8_t lastDirection = 0;
+	uint8_t incAmount = 1;
+	void increaseRotationSpeed(int8_t dir) {
+		unsigned long now = GET_MILLIS();
+		if (now - lastUpdate < 300) { // last update was within a certain time period
+			if (lastDirection == dir) {//moving in same direction
+				incAmount++;
+				if (incAmount > 5)
+					incAmount++;
+			}
+			else {
+				lastDirection = dir;
+			}
+
+		}
+		else { // time out for update
+			lastDirection = 0;
+			incAmount = 1;
+		}
+		lastUpdate = now; // reset time
+	}
+
+private:
+	VariableReference *var;
+
+};
+
+class MenuAction : public MenuAbstract {
+public:
+	MenuAction() {}
+	MenuAction(const char * name) : MenuAbstract(name) {
+		//hasSelection = true;
+		hasAction = true;
+	}
+
+	virtual String getData() {
+		return "";
+	}
+
+	//virtual String getDataExtended() {
+	//	return "$PROMPT";
+	//}
+
+	void press() {
+		if (callback)
+			callback();
+	}
+
+
+	void setCallback(void(*fn)()) { callback = fn; }
+	void(*callback)() = NULL;
+
+
+};
+
 
 class MenuPatternList : public MenuAbstract {
-public: 
-	MenuPatternList() : MenuAbstract("Change pattern") {
+public:
+	MenuPatternList() : MenuAbstract("Pattern list") {
 		hasSelection = true;
 	}
 
 	String getData() {
+		return "";
+#if defined(ESP32) || defined(CORE_TEENSY)
 		return String(Data::currentPattern);// .c_str();
+#else
+		return to_string(Data::currentPattern);
+#endif 
 	}
 
 	String getDataExtended() {
@@ -112,7 +277,7 @@ public:
 	void up() {
 		if (selectedPattern <= patterns.numPatterns)
 			selectedPattern++;
-			//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
+		//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
 	}
 	void down() {
 		if (selectedPattern > 0)
@@ -121,10 +286,12 @@ public:
 	}
 
 	void inc() {
-		patterns.inc();
+		up();
+		//patterns.inc();
 	}
 	void dec() {
-		patterns.dec();
+		down();
+		//patterns.dec();
 	}
 
 	void press() {
@@ -167,7 +334,7 @@ public:
 
 
 };
- 
+
  */
 
 
@@ -188,7 +355,7 @@ public:
 	virtual String getItemData(size_t i) {
 		return "";
 	}
-	
+
 	String getPageData() {
 		String r = "";
 
@@ -207,9 +374,9 @@ public:
 					r += " ";
 				}
 				r += getItemName(i);
-				r += "/t";
+				r += " ";
 				r += getItemData(i);
-				r += "/n";
+				r += "\n";
 			}
 		}
 		return r;
@@ -232,7 +399,7 @@ public:
 	virtual void up() {
 		if (selected)
 			getCurrentItem()->up();
-		else 
+		else
 			currentItem = (currentItem + 1) % getNumItems();
 	}
 	virtual void down() {
@@ -281,7 +448,7 @@ public:
 		if (i < numItems) {
 			if (selected)
 				return (items[i]->getDataExtended());
-			else 
+			else
 				return (items[i]->getData());
 		}
 		return "";
@@ -293,11 +460,16 @@ public:
 
 	MenuCurrentPattern CurrentPattern;
 	MenuPatternList PatternList;
+	MenuVariable Brightness{ &Data::brightness_t };
+	MenuTrigger Trigger;
+	//MenuVariable Trigger{ &Data::triggerType_t };
 
-	static const size_t numItems = 2;
+	static const size_t numItems = 4;
 	MenuAbstract *items[numItems] = {
 		&CurrentPattern,
 		&PatternList,
+		&Brightness,
+		&Trigger
 	};
 
 
@@ -452,11 +624,17 @@ public:
 		return items[currentItem];
 	}
 
+	MenuVariable Backlight{ &Data::backlight_t };
+	MenuAction Save{ "Save Settings" };
+	MenuAction Load{ "Load Settings" };
+
 
 	//menu items
-	static const size_t numItems = 1;
+	static const size_t numItems = 3;
 	MenuAbstract *items[numItems] = {
-		&baseMenu
+		&Backlight,
+		&Save,
+		&Load
 	};
 
 
@@ -501,7 +679,7 @@ public:
 	}
 
 	String getPageData(size_t i) {
-		if (i >= numPages)
+		if (i > numPages)
 			return "";
 		String r;
 		for (size_t j = 0; j < (pages[i]->getNumItems()); j++) {
@@ -512,9 +690,9 @@ public:
 				r += " ";
 			}
 			r += pages[i]->getItemName(j);
-			r += "/t";
+			r += " ";
 			r += pages[i]->getItemData(j);
-			r += "/n";
+			r += "\n";
 
 		}
 		return r;
@@ -537,7 +715,7 @@ public:
 	}
 
 	void left() {
-		previousPage(); 
+		previousPage();
 	}
 	void right() {
 		nextPage();
@@ -559,12 +737,12 @@ public:
 	}
 
 	void display() {
-		
+
 		String r = currentPage()->getName();
 		// log current page name
-		r = currentPage()->getPageData(); 
+		r = currentPage()->getPageData();
 		//log page data
-		return r;
+		// return r;
 	}
 };
 

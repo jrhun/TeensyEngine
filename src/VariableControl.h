@@ -125,56 +125,13 @@ void VariableControl<bool>::update() {}
 //};
 
 
-// use variable reference for UI functions
-// control a variable between min and max values
-template<class TYPE>
-class VariableReference {
-public:
-	VariableReference() : min(0), max(0), wrap(true) {}
-	VariableReference(const char* name, TYPE &t, TYPE min = 0, TYPE max = 255, bool wrap = false) : name(name), d(t), min(min), max(max), wrap(wrap) {}
 
-	const char* name;
-	String getName() {
-		return name;
-	}
-
-	String getValue() {
-#if defined(ESP32) || defined(CORE_TEENSY)
-		return String(d);
-#else
-		return to_string(d);
-#endif
-	}
-
-
-	TYPE &d;
-	TYPE min;
-	TYPE max;
-	bool wrap;
-
-	void inc(TYPE amount = 1) {
-		d += amount;
-		if (d > max) {
-			if (wrap) 	d -= max;
-			else 		d = max;
-		}
-	}
-
-	void dec(TYPE amount = 1) {
-		if (d - amount < min) {
-			if (wrap) 	d = d - amount + max; // works for both signed/unsigned + floats
-			else		d = min;
-		}
-		else			d -= amount;
-	}
-
-};
 
 //typedef VariableReference<float>		FloatReference;
 //typedef VariableReference<int>			IntReference;
 //typedef VariableReference<unsigned int> uIntReference;
 //typedef VariableReference<int8_t>		Int8Reference;
-typedef VariableReference<uint8_t>		uInt8Reference;
+//typedef VariableReference<uint8_t>		uInt8Reference;
 
 class VariableOscilate {
 public:
@@ -186,6 +143,16 @@ public:
 
 	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, OFF };
 
+
+	const char* getTriggerName(uint8_t i) {
+		const char* triggerTypeName[VariableOscilate::OFF + 1]{
+			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Off"
+		};
+		if (i <= OFF) {
+			return triggerTypeName[i];
+		}
+		return "";
+	}
 
 
 
@@ -202,6 +169,13 @@ public:
 			oscType = i;
 		}
 	}
+  
+  uint8_t getType() {
+    return oscType;
+  }
+  uint8_t numTypes() {
+    return OFF +1;
+  }
 
 	void setBPM(accum88 b) {
 		bpm = b;
@@ -313,6 +287,7 @@ private:
 	unsigned long smoothTimebase = 0;
 
 	// from https://learn.adafruit.com/tap-tempo-trinket/code
+  // can update with https://github.com/dxinteractive/ArduinoTapTempo/blob/master/src/ArduinoTapTempo.cpp
 	unsigned long
 		prevBeat = 0L, // Time of last button tap
 		sum = 0L; // Cumulative time of all beats
@@ -322,6 +297,7 @@ private:
 
 
 };
+
 
 /*
 

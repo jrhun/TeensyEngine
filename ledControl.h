@@ -39,6 +39,10 @@ CRGBPalette16 targetPalette;
 TBlendType    currentBlending;
 uint8_t blendCounter = 0;
 bool blendActive = false;
+
+
+//external variables
+
 /*
 DEFINE_GRADIENT_PALETTE( Black_White_gp) {
   0, 255, 255, 255,
@@ -178,7 +182,9 @@ class Leds : public FastLED_GFX {
       FastLED.addLeds<NUM_STRIPS, WS2812B, 19, GRB>(leds, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       #endif 
       
-      FastLED.setBrightness( Data::brightness );
+      FastLED.setBrightness( *Data::brightness_t );
+	    
+
       FastLED.setTemperature( OvercastSky );
       //      FastLED.setMaxPowerInVoltsAndMilliamps(5, 5000);
 

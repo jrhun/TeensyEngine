@@ -27,9 +27,9 @@
 #define EN_A_PIN        1
 #define EN_B_PIN        0
 #define JOY_CENTRE_PIN  5
-#define JOY_UP_PIN      4
+#define JOY_UP_PIN      2
 #define JOY_LEFT_PIN    6
-#define JOY_DOWN_PIN    2
+#define JOY_DOWN_PIN    4
 #define JOY_RIGHT_PIN   3
 
 #define EQ_RESET_PIN    9
@@ -78,6 +78,69 @@ typedef std::string String;
 #define PROGMEM
 #endif
 
+// use variable reference for UI functions
+// control a variable between min and max values
+//template<class TYPE>
+class VariableReference {
+	typedef uint8_t TYPE;
+public:
+	VariableReference() : d(NULL), starting(128), min(0), max(0), wrap(true) {}
+	VariableReference(const char* name, TYPE *t, TYPE starting = 128, TYPE min = 0, TYPE max = 255, bool wrap = false) : name(name), d(t), starting(starting), min(min), max(max), wrap(wrap) {}
+
+	const char* name;
+	String getName() {
+		return name;
+	}
+
+	String getValue() {
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(*d);
+#else
+		return to_string(*d);
+#endif
+	}
+	TYPE *d;
+	TYPE starting;
+	TYPE min;
+	TYPE max;
+	void(*callback)() = NULL;
+	bool wrap;
+
+	void setCallback(void(*fn)()) { callback = fn; }
+
+	void inc(TYPE amount = 1) {
+		if (*d + amount > max) {
+			if (wrap) 	*d = *d - max + amount;
+			else 		*d = max;
+		} else {
+      *d += amount;
+		}
+		if (callback) {
+			callback();
+		}
+	}
+
+	void dec(TYPE amount = 1) {
+		if (*d - amount < min) {
+			if (wrap) 	*d = *d - amount + max; // works for both signed/unsigned + floats
+			else		*d = min;
+		}
+		else			*d -= amount;
+		if (callback) {
+			callback();
+		}
+	}
+
+	TYPE& operator * (void) {
+		return *d;
+	}
+
+// TYPE& operator & (void) {
+//   return *d;
+//  }
+
+};
+
 namespace Data {
 	//  public:
 	// VARS
@@ -86,6 +149,8 @@ namespace Data {
 	uint8_t brightness = 24;
 	uint8_t fadeAmount = 48;
 	bool adjustGamma = false;
+
+	VariableReference brightness_t("Brightness", &brightness, 24);
 
 	uint8_t hueScale = 3;
 	uint8_t hueInc = 1;
@@ -109,7 +174,11 @@ namespace Data {
 
 
   // backlight
-  uint16_t backlight_brightness = 1023;
+  uint8_t backlight_brightness = 63;
+  VariableReference backlight_t{"Backlight", &backlight_brightness, 63, 0, 63};
+  
+  uint8_t triggerType = 0;
+  VariableReference triggerType_t{"Trigger", &triggerType, 0, 0, 6};
 
 
 } //end nameSpace Data
@@ -187,5 +256,8 @@ uint8_t decayExp(uint8_t i) {
 		return decayData[d];// *r + decayData[d - 1] * (3 - r);
 	return (decayData[d] * (3 - r) + decayData[d + 1] * r) / 3;
 }
+
+
+
 
 #endif //DATA_H

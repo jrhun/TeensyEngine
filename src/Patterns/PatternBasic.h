@@ -120,8 +120,8 @@ public:
 	uint8_t chance = 128;
 	uint8_t fade = 10;
 
-	uInt8Reference chanceRef{ "Chance", chance };
-	uInt8Reference fadeRef{ "Fade", fade, 5, 20 };
+	VariableReference chanceRef{ "Chance", &chance };
+	VariableReference fadeRef{ "Fade", &fade, 10, 5, 20 };
 
 	uint8_t drawFrame() {
 		_Pattern::drawFrame();
