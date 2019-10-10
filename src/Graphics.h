@@ -13,6 +13,12 @@
 #include "Color.h"
 #include "Palettes.h"
 
+#if defined(ESP32) || defined(CORE_TEENSY)
+#include "FastLED.h"
+#else
+#include "FastLED_PC.h"
+#endif
+
 class Graphics {
 public:
 	Graphics()  {}
@@ -28,9 +34,12 @@ public:
 		//return CRGB::Black;
 	}
 
+	virtual void setColorTemp(uint32_t i) {}
+
+	uint8_t IncAmount = 24;
+
 	void updatePalette() {
-		const uint8_t incAmount = 24;
-		nblendPaletteTowardPalette(currentPalette, targetPalette, incAmount);
+		nblendPaletteTowardPalette(currentPalette, targetPalette, IncAmount);
 	}
 
 	//void incPalette() {
@@ -403,10 +412,9 @@ public:
 
 
 	float zBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
-
-	CRGBPalette16	currentPalette;
-	CRGBPalette16	targetPalette = RainbowColors_p;
+	
+	CRGBPalette16	currentPalette;// = RainbowColors_gp;
+	CRGBPalette16	targetPalette;// = RainbowColors_p;
 	TBlendType		currentBlending = LINEARBLEND;
-	uint8_t			blendCounter = 0;
 
 };

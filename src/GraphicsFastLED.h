@@ -20,7 +20,9 @@ public:
 	void fade(unsigned char a = 128) {
 		ledRef->fade(a);
 	}
-
+	void setColorTemp(uint32_t i) {
+		FastLED.setTemperature(i);
+	}
 	void show() {
 		FastLED.show();
 	}

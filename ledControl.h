@@ -142,7 +142,7 @@ class Leds : public FastLED_GFX {
       FastLED.setBrightness( *Data::brightness_t );
 	    
 
-      FastLED.setTemperature( OvercastSky );
+      FastLED.setTemperature( DirectSunlight );
       //      FastLED.setMaxPowerInVoltsAndMilliamps(5, 5000);
 
       currentPalette = RainbowColors_p;

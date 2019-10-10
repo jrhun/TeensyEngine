@@ -559,7 +559,7 @@ const TProgmemRGBGradientPalettePtr gGradientPalettes[] = {
 const uint8_t gGradientPaletteCount =
 sizeof(gGradientPalettes) / sizeof(TProgmemRGBGradientPalettePtr) + 1; //one extra for rainbow palette
 
-const PROGMEM String paletteNames[gGradientPaletteCount]  = {
+ const char* paletteNames[gGradientPaletteCount]  = {
   "Rainbow",
   "Sunset_Real",
   "Rivendell",
@@ -598,8 +598,9 @@ const PROGMEM String paletteNames[gGradientPaletteCount]  = {
 
 extern uint8_t Data::paletteIndex;
 
-const char* getPaletteName() {
-	return paletteNames[Data::paletteIndex].c_str();
+VariableReference paletteIndex_t{ "Current Palette", &Data::paletteIndex, 0, 0, gGradientPaletteCount - 1 };
+
+const char* getPaletteName(uint8_t i) {
+	return paletteNames[i];
 }
 
-VariableReference paletteIndex_t{ "Current Palette", &Data::paletteIndex, 0, 0, gGradientPaletteCount};

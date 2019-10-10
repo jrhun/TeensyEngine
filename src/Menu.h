@@ -148,8 +148,9 @@ public:
 	MenuCurrentPalette() : MenuAbstract("") {}
 
 	const char* getName() {
-		return getPaletteName();
+		return paletteNames[(*paletteIndex_t)];
 	}
+
 	void inc() {
 		paletteIndex_t.inc();
 	}
@@ -174,10 +175,33 @@ public:
 class MenuVariable : public MenuAbstract {
 public:
 	MenuVariable() {}
-	MenuVariable(VariableReference *var) : MenuAbstract(var->name), var(var) {}
+	MenuVariable(VariableReference *var) : MenuAbstract(var->name), var(var), names(NULL), len(0) {}
+	MenuVariable(VariableReference *var, const char** names, uint8_t len) : MenuAbstract(var->name), var(var), names(names), len(len) {
+		hasSelection = true;
+	}
 
 	virtual String getData() {
 		return var->getValue();
+	}
+
+	String getDataExtended() {
+		if (len == 0 or names == NULL) return "";
+		String r = "";
+		for (uint8_t i = 0; i < var->max + 1; i++) {
+			if (i == *(*var))
+				r += "x ";
+			else if (i == selected)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < var->max)
+				r += names[i];
+			else
+				r += "Back";
+			r += "\n";
+		}
+		return r;
 	}
 
 	void inc() {
@@ -212,8 +236,11 @@ public:
 		lastUpdate = now; // reset time
 	}
 
-private:
+protected:
 	VariableReference *var;
+	const char **names;
+	uint16_t len;
+	uint8_t selected = 0;
 
 };
 
@@ -248,12 +275,112 @@ public:
 
 //takes const char*[] to array of item Names
 //takes len given array length
+//class MenuVariableNamed : public MenuVariable {
+//public:
+//	MenuVariableNamed() {}
+//	MenuVariableNamed(VariableReference *var, const char** names, uint8_t len) : MenuVariable(var), names(names), len(len) {
+//		hasSelection = true;
+//	}
+//
+//	String getData() {
+//		return var->getValue();
+//	}
+//
+//	String getDataExtended() {
+//		String r = "";
+//		for (uint8_t i = 0; i < var->max + 1; i++) {
+//			if (i == *(*var))
+//				r += "x ";
+//			else if (i == selectedIndex)
+//				r += "> ";
+//			else
+//				r += "  ";
+//
+//			if (i < var->max)
+//				r += names[i];
+//			else
+//				r += "Back";
+//			r += "\n";
+//		}
+//		return r;
+//	}
+//
+//	void up() {
+//		if (selected <= var->max)
+//			selectedPattern++;
+//		//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
+//	}
+//	void down() {
+//		if (selected > 0)
+//			selectedPattern--;
+//		//selectedPattern = (selectedPattern - 1 + (patterns.numPatterns+1)) % (patterns.numPatterns+1);
+//	}
+//
+//	void inc() {
+//		up();
+//	}
+//	void dec() {
+//		down();
+//	}
+//
+//	void press() {
+//		if (selected < var->max)
+//			patterns.set(selected);
+//	}
+//
+//	uint8_t selectedIndex = 0;
+//	const char **names;
+//	uint8_t len;
+//};
 
-class MenuList : public MenuAbstract {
+class MenuPaletteList : public MenuAbstract {
 public:
-	MenuList()  {}
+	MenuPaletteList() : MenuAbstract("Palette List") {
+		hasSelection = true;
+	}
 
+	String getData() {
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(*paletteIndex_t);// .c_str();
+#else
+		return to_string(*paletteIndex_t);
+#endif 
+	}
 
+	String getDataExtended() {
+		String r = "";
+		for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
+			if (i == *paletteIndex_t)
+				r += "x ";
+			else if (i == selected)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < paletteIndex_t.max)
+				r += getPaletteName(i);
+			else
+				r += "Back";
+			r += "\n";
+		}
+		return r;
+	}
+
+	void up() {
+		if (selected <= paletteIndex_t.max) selected++;
+	}
+	void down() {
+		if (selected > 0) selected--;
+	}
+	void inc() { paletteIndex_t.inc(); }
+	void dec() { paletteIndex_t.dec(); }
+
+	void press() {
+		if (selected < paletteIndex_t.max)
+			*paletteIndex_t = selected;
+	}
+
+	uint8_t selected = 0;
 };
 
 
@@ -528,13 +655,18 @@ public:
 		return items[currentItem];
 	}
 
+	VariableReference blendTime_t{ "Blend steps", &gfx.IncAmount, 12, 1, 64 };
 
 	//menu items
-	MenuCurrentPalette CurrentPalette;
+	MenuCurrentPalette	CurrentPalette;
+	MenuPaletteList		PaletteList;
+	MenuVariable		BlendTime{ &blendTime_t };
 
-	static const size_t numItems = 1;
+	static const size_t numItems = 3;
 	MenuAbstract *items[numItems] = {
-		&CurrentPalette
+		&CurrentPalette,
+		&PaletteList,
+		&BlendTime
 	};
 
 
@@ -619,7 +751,9 @@ public:
 
 class PageSettings : public MenuPage {
 public:
-	PageSettings() : MenuPage("Settings") {}
+	PageSettings() : MenuPage("Settings") {
+		temperature_t.setCallback(&PageSettings::setColorTemp);
+	}
 
 	size_t getNumItems() {
 		return PageSettings::numItems;
@@ -645,20 +779,59 @@ public:
 		return items[currentItem];
 	}
 
+
+	static void setColorTemp() {
+		gfx.setColorTemp(colourTempValues[colorTemp]);
+	}
+
+	static uint8_t colorTemp;
+	static const uint32_t colourTempValues[20];
+
+
+	VariableReference temperature_t{ "Color Temp", &colorTemp, 0 ,0, 19 };
+
+
+	MenuVariable Temperature{ &temperature_t};
 	MenuVariable Backlight{ &Data::backlight_t };
 	MenuAction Save{ "Save Settings" };
 	MenuAction Load{ "Load Settings" };
 
 
 	//menu items
-	static const size_t numItems = 3;
+	static const size_t numItems = 4;
 	MenuAbstract *items[numItems] = {
+		&Temperature,
 		&Backlight,
 		&Save,
 		&Load
 	};
 
 
+};
+
+uint8_t PageSettings::colorTemp = 6;
+
+const uint32_t PageSettings::colourTempValues[20] = {
+		Candle, //0
+		Tungsten40W,
+		Tungsten100W,
+		Halogen,
+		CarbonArc,
+		HighNoonSun, //5
+		DirectSunlight,
+		OvercastSky,
+		ClearBlueSky,
+		WarmFluorescent,
+		StandardFluorescent, //10
+		CoolWhiteFluorescent,
+		FullSpectrumFluorescent,
+		GrowLightFluorescent,
+		BlackLightFluorescent,
+		MercuryVapor, //15
+		SodiumVapor,
+		MetalHalide,
+		HighPressureSodium,
+		UncorrectedTemperature //
 };
 
 

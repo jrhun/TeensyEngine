@@ -277,15 +277,22 @@ void uiSetup() {
   analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4 );
 
   // setup callbacks
+  currentPattern_t.setCallback([]() {
+    patterns.set(*currentPattern_t);
+  });
+
+  paletteIndex_t.setCallback([]() {
+    gfx.setPalette(*paletteIndex_t);
+  });
+  
+  gfx.currentPalette = RainbowColors_p;
+  gfx.targetPalette = RainbowColors_p;
+
   Data::brightness_t.setCallback([]() {
     FastLED.setBrightness(*Data::brightness_t);
   });
   Data::backlight_t.setCallback([]()  {
     analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4);
-  });
-
-  paletteIndex_t.setCallback([]() {
-    gfx.setPalette(*paletteIndex_t);
   });
 
   menu.Settings.Save.setCallback([]() {

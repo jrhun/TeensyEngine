@@ -35,7 +35,7 @@
 
 class PatternController {
 public:
-	PatternController() {}
+	PatternController() { gfx.setPalette(0); }
 
 	//variables
 	//uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
@@ -70,11 +70,8 @@ public:
 		&parametricSpiral,
 		
 		&sparks,
-		//&superShape,
 		&rowThenCol,
-		//&raymarcher,
 		&world,
-		
 		&wheelParticles,
 		&fire, 
 		&beachWaves2,
@@ -86,7 +83,8 @@ public:
 		&cube3d,
 		&beachWaves
 		
-		
+		//&raymarcher,
+		//&superShape,
 	};
 
 	const char* getCurrentPatternName() {
@@ -170,4 +168,7 @@ public:
 };
 
 PatternController patterns;
+
+VariableReference currentPattern_t{	"Current pattern", &Data::currentPattern, 0, 0, patterns.numPatterns };
+
 
