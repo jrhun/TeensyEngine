@@ -38,6 +38,10 @@ void ofApp::setup() {
 	gui.add(intSliderSpiral.setup("Spiral", 0, 0, 255));
 	gui.add(intSliderNoiseSmear.setup("Noise smear", 0, 0, 255));
 
+	paletteIndex_t.setCallback([]() {
+		gfx.setPalette(*paletteIndex_t);
+	});
+
 	menu.display();
 
 	//patterns.beatControl.ramp(120<<8);

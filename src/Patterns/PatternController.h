@@ -11,7 +11,9 @@
 #include "PatternFire.h"
 #include "PatternNoise.h"
 #include "PatternParametric.h"
+#include "PatternParticleSysOld.h"
 #include "PatternPictures.h"
+#include "PatternPurpleRain.h"
 #include "PatternRaymarcher.h"
 #include "PatternSpiral.h"
 #include "PatternSuperShape.h"
@@ -46,9 +48,11 @@ public:
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
 	PatternFire			fire;
+	PatternFountain		particleFountain;
 	PatternNoise1		noise1;
 	PatternParametric	parametric;
 	PatternParametric2	parametricSpiral;
+	PatternPurpleRain	PurpleRain;
 	PatternRaymarcher	raymarcher;
 	PatternSolid		solid;
 	PatternSparks		sparks;
@@ -57,30 +61,33 @@ public:
 	PatternVWaves		verticalWaves;
 	PatternWireFrame	wireFrame;
 	PatternWheelBlur	wheelBlur;
-	PatternWheelPart	wheelParticles;
+	PatternWheelPart	wheelParticle;
 	PatternWorld		world;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 16;
+	static const uint8_t numPatterns = 18;
     _Pattern *patternList[numPatterns] = {
-		&solid,
-		&verticalWaves,
+		&PurpleRain,
+		&wheelParticle,
 		&noise1,
+		&verticalWaves,
+		&solid,
 		&parametricSpiral,
-		
 		&sparks,
+
 		&rowThenCol,
 		&world,
-		&wheelParticles,
+		&particleFountain,
 		&fire, 
 		&beachWaves2,
-		
+
 		&wheelBlur,
 		&parametric,
 		&spiral,
 		&wireFrame,
 		&cube3d,
+
 		&beachWaves
 		
 		//&raymarcher,

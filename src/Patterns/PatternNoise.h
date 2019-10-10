@@ -30,7 +30,7 @@ public:
 				// array for our brightness, and the flipped value from (j,i)
 				// for our pixel's index into the color palette.
 
-				uint8_t index = noise.At(j, i);// noise[j][i];
+				uint8_t index = noise.At(i, j);// noise[j][i];
 				uint8_t bri = noise.At(i, j);// [i][j];
 
 				// if this palette is a 'loop', add a slowly-changing base value
@@ -48,7 +48,8 @@ public:
 				}
 
 				//CRGB color = ColorFromPalette(Black_White_gp, index, bri);
-				CRGB color = CHSV(index, 255, bri);
+				CRGB color = gfx.getColour(index + Data::getHue(), bri);
+				//CRGB color = CHSV(index, 255, bri);
 
 
 				gfx.putPixel(i,j, color);

@@ -28,9 +28,9 @@ public:
 	virtual void clear() {}
 	virtual void fill(CRGB c) {}
 	virtual void fade(uint8_t a = 128) {}
-	virtual CRGB getColour(uint8_t offset = 0) {
+	virtual CRGB getColour(uint8_t offset = 0, uint8_t bri = 255) {
 		uint8_t h = (Data::getHue() + offset) % 256;
-		return ColorFromPalette(currentPalette, h,255, currentBlending);
+		return ColorFromPalette(currentPalette, h, bri, currentBlending);
 		//return CRGB::Black;
 	}
 
@@ -177,7 +177,8 @@ public:
 			//c = getColour(hue);
 			//c.nscale8_video(fade);
 			uint8_t h = Data::getHue() + hue;
-			c = CHSV(h, myMap(z0, 0, 255, 128, 255), fade);
+			c = getColour(h, fade);
+			//c = CHSV(h, myMap(z0, 0, 255, 128, 255), fade);
 			hue += step;
 			if (hue < 0)
 				hue += 255;
@@ -259,7 +260,38 @@ public:
 		y1 = dm / 2;
 
 		for (;;) { /* loop */
+			
 			putPixel(x0, y0, c);
+			if (i-- == 0) break;
+			x1 -= dx;
+			if (x1 < 0) {
+				x1 += dm;
+				x0 += sx;
+			}
+			y1 -= dy;
+			if (y1 < 0) {
+				y1 += dm;
+				y0 += sy;
+			}
+		}
+	}
+
+	void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB c1, CRGB c2) {
+		int16_t dx = abs(x1 - x0);
+		int16_t sx = x0 < x1 ? 1 : -1;
+		int16_t dy = abs(y1 - y0);
+		int16_t sy = y0 < y1 ? 1 : -1;
+		int16_t dm = max(dx, dy);
+		int16_t i = dm; /* maximum difference */
+		x1 = dm / 2;
+		y1 = dm / 2;
+		const float interpolateSteps = 1.0f / dm;
+		Vec3 v1 = toVec(c1); 
+		Vec3 v2 = toVec(c2);
+
+		for (;;) { /* loop */
+			
+			putPixel(x0, y0, toCRGB(interpolate(v1, v2, i * interpolateSteps)) );
 			if (i-- == 0) break;
 			x1 -= dx;
 			if (x1 < 0) {

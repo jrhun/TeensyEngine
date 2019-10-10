@@ -265,11 +265,14 @@ public:
 					sum += 15360000L / (now - prevBeat); // 60,000 / 500ms = 120 BPM
 					tpt = sum / nBeats; //BPM * 256
 					bpm = tpt;
+					bpmVal = bpm >> 8;
 				}
 			}
 			prevBeat = now;
 		}
 	}
+
+	uint8_t bpmVal = 120;
 
 private:
 	type var;

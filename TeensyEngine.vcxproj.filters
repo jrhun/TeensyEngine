@@ -214,6 +214,9 @@
     <ClInclude Include="src\Menu.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Patterns\PatternPurpleRain.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

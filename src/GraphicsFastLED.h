@@ -40,7 +40,8 @@ public:
 	}
 
 	void putPixel(int x, int y, unsigned char h) {
-		ledRef->drawPixel(x, y, h);
+		CRGB c = getColour(h);
+		ledRef->drawPixel(x, y, c);
 	}
 
 	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {

@@ -27,7 +27,8 @@ public:
 
 	void putPixel(int x, int y, unsigned char h) {
 		CRGB col;
-		col.setHSV(h, 255, 255);
+		//col.setHSV(h, 255, 255);
+		col = getColour(h, 255);
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			leds[x + y * SCREEN_WIDTH] = col;
 		}
@@ -48,8 +49,8 @@ public:
 	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
-				//leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
-				leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
+				leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
+				//leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
 			}
 			else
 				putPixel(x, y, c);

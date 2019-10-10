@@ -185,7 +185,7 @@ namespace Data {
   VariableReference backlight_t{"Backlight", &backlight_brightness, 63, 0, 63};
   
   uint8_t triggerType = 0;
-  VariableReference triggerType_t{"Trigger", &triggerType, 0, 0, 6};
+  VariableReference triggerType_t{"Trigger", &triggerType, 4, 0, 6};
 
 
 } //end nameSpace Data

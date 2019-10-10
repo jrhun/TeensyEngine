@@ -81,7 +81,7 @@ public:
 
 class MenuTrigger : public MenuAbstract {
 public:
-	MenuTrigger() : MenuAbstract("Trigger") {
+	MenuTrigger() : MenuAbstract("Osc Type") {
 		hasSelection = true;
 	}
 
@@ -578,9 +578,15 @@ public:
 
 class PagePattern : public MenuPage {
 public:
-	PagePattern() : MenuPage("Patterns") {}
-
-
+	PagePattern() : MenuPage("Patterns") {
+		TapTempo.setCallback([]() {
+			_Pattern::beat.sync();
+		});
+		tempo_t.setCallback([]() {
+			_Pattern::beat.setBPM(_Pattern::beat.bpmVal << 8);
+		});
+	}
+	
 	size_t getNumItems() {
 		return PagePattern::numItems;
 	}
@@ -609,15 +615,20 @@ public:
 	MenuCurrentPattern CurrentPattern;
 	MenuPatternList PatternList;
 	MenuVariable Brightness{ &Data::brightness_t };
-	MenuTrigger Trigger;
-	//MenuVariable Trigger{ &Data::triggerType_t };
+	
+	VariableReference tempo_t{ "Tempo", &_Pattern::beat.bpmVal, 120, 30,240 };
+	MenuVariable Tempo{ &tempo_t };
+	MenuAction TapTempo{ "Tap tempo" };
+	MenuTrigger OscType;
 
-	static const size_t numItems = 4;
+	static const size_t numItems = 6;
 	MenuAbstract *items[numItems] = {
 		&CurrentPattern,
 		&PatternList,
 		&Brightness,
-		&Trigger
+		&Tempo,
+		&TapTempo,
+		&OscType
 	};
 
 

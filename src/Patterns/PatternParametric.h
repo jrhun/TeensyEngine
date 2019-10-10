@@ -118,6 +118,7 @@ public:
 	}
 
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {
+		//https://math.stackexchange.com/questions/324527/do-these-equations-create-a-helix-wrapped-into-a-torus
 		float fa = 2.5;
 		float fb = 1.4;
 		//float k = 0.05;
