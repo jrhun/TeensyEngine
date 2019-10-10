@@ -167,7 +167,10 @@ namespace Data {
 
 	// UI variables
 	uint8_t currentPattern = 0;
-	uint8_t currentPalette = 0;
+
+ 
+	uint8_t paletteIndex = 0;
+  
 
 	// audio vars
 	uint8_t noiseFloor = 65;

@@ -24,6 +24,7 @@ GraphicsPC gfx;
 Engine engine(gfx);
 
 
+#include "../Palettes.h"
 #include "../Effects.h"
 #include "../Particle.h"
 #include "../Noise.h"

@@ -44,50 +44,7 @@ bool blendActive = false;
 //external variables
 
 /*
-DEFINE_GRADIENT_PALETTE( Black_White_gp) {
-  0, 255, 255, 255,
-  32, 0, 0, 0,
-  64, 0, 0, 0,
-  96, 0, 0, 0,
-  128, 255, 255, 255,
-  160, 0, 0, 0,
-  192, 0, 0, 0,
-  224, 0, 0, 0,
-  255, 255, 255, 255
-};
 
-DEFINE_GRADIENT_PALETTE( BlacK_Red_Magenta_Yellow_gp ) {
-  0,   0,  0,  0,
-  42,  42,  0,  0,
-  84, 255,  0,  0,
-  127, 255,  0, 45,
-  170, 255,  0, 255,
-  212, 255, 55, 45,
-  255, 255, 255,  0
-};
-
-DEFINE_GRADIENT_PALETTE( BlacK_Magenta_Red_gp ) {
-  0,   0,  0,  0,
-  63,  42,  0, 45,
-  127, 255,  0, 255,
-  191, 255,  0, 45,
-  255, 255,  0,  0
-};
-
-DEFINE_GRADIENT_PALETTE( Blue_Cyan_Yellow_gp ) {
-  0,   0,  0, 255,
-  63,   0, 55, 255,
-  127,   0, 255, 255,
-  191,  42, 255, 45,
-  255, 255, 255,  0
-};
-
-const TProgmemRGBGradientPalettePtr gGradientPalettes[] = {
-  Black_White_gp,
-  BlacK_Red_Magenta_Yellow_gp,
-  BlacK_Magenta_Red_gp,
-  Blue_Cyan_Yellow_gp
-};
 
 const uint8_t gGradientPaletteCount =
   sizeof( gGradientPalettes) / sizeof( TProgmemRGBGradientPalettePtr );

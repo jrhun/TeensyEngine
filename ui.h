@@ -284,6 +284,10 @@ void uiSetup() {
     analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4);
   });
 
+  paletteIndex_t.setCallback([]() {
+    gfx.setPalette(*paletteIndex_t);
+  });
+
   menu.Settings.Save.setCallback([]() {
     Serial.print("Saved settings. Brightness: ");
     Serial.println(*Data::brightness_t);

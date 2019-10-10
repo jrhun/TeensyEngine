@@ -11,6 +11,7 @@
 #include "Geometry.h"
 #include <limits>
 #include "Color.h"
+#include "Palettes.h"
 
 class Graphics {
 public:
@@ -22,7 +23,30 @@ public:
 	virtual void fill(CRGB c) {}
 	virtual void fade(uint8_t a = 128) {}
 	virtual CRGB getColour(uint8_t offset = 0) {
-		return CRGB::Black;
+		uint8_t h = (Data::getHue() + offset) % 256;
+		return ColorFromPalette(currentPalette, h,255, currentBlending);
+		//return CRGB::Black;
+	}
+
+	void updatePalette() {
+		const uint8_t incAmount = 24;
+		nblendPaletteTowardPalette(currentPalette, targetPalette, incAmount);
+	}
+
+	//void incPalette() {
+	//	*paletteIndex_t = (*paletteIndex_t + 1) % gGradientPaletteCount;
+	//	setPalette(*paletteIndex_t);
+	//}
+
+	//void decPalette() {
+	//	*paletteIndex_t = (*paletteIndex_t - 1 + gGradientPaletteCount) % gGradientPaletteCount;
+	//	setPalette(*paletteIndex_t);
+	//}
+	void setPalette(uint8_t i) {
+		if (i < gGradientPaletteCount) {
+			if (i == 0)		targetPalette = RainbowColors_p;
+			else			targetPalette = gGradientPalettes[*paletteIndex_t+1];
+		}
 	}
 
 	virtual void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {};
@@ -379,5 +403,10 @@ public:
 
 
 	float zBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+
+	CRGBPalette16	currentPalette;
+	CRGBPalette16	targetPalette = RainbowColors_p;
+	TBlendType		currentBlending = LINEARBLEND;
+	uint8_t			blendCounter = 0;
 
 };

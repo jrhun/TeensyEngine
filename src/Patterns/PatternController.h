@@ -135,6 +135,7 @@ public:
 		if (now > nextUpdate) {
 			//        audio.readAudio();
 			
+			gfx.updatePalette();
 
 			nextUpdate = getCurrentPattern()->drawFrame() + now;
 

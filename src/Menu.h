@@ -121,7 +121,7 @@ public:
 
 	void inc() {
 		const uint8_t currentType = _Pattern::beat.getType();
-		if (currentType < _Pattern::beat.numTypes()+1) {
+		if (currentType < _Pattern::beat.numTypes() + 1) {
 			_Pattern::beat.setType(currentType + 1);
 		}
 	}
@@ -141,12 +141,21 @@ public:
 
 };
 
+
+
 class MenuCurrentPalette : public MenuAbstract {
 public:
 	MenuCurrentPalette() : MenuAbstract("") {}
 
 	const char* getName() {
-		return "palette temp";
+		return getPaletteName();
+	}
+	void inc() {
+		paletteIndex_t.inc();
+	}
+
+	void dec() {
+		paletteIndex_t.dec();
 	}
 };
 
@@ -235,6 +244,18 @@ public:
 
 
 };
+
+
+//takes const char*[] to array of item Names
+//takes len given array length
+
+class MenuList : public MenuAbstract {
+public:
+	MenuList()  {}
+
+
+};
+
 
 
 class MenuPatternList : public MenuAbstract {

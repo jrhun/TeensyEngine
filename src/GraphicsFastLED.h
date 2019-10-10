@@ -25,9 +25,9 @@ public:
 		FastLED.show();
 	}
 
-	CRGB getColour(uint8_t offset = 0) {
-		return ledRef->getColour(offset);
-	}
+	//CRGB getColour(uint8_t offset = 0) {
+	//	return ledRef->getColour(offset);
+	//}
 
 	void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {
 		ledRef->drawPixel(x, y, CRGB(r, g, b));
