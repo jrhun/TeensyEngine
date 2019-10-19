@@ -9,7 +9,7 @@ public:
 	Drop() { 
 		init();
 		y = random8(SCREEN_WIDTH*2) - SCREEN_WIDTH*2;
-		ySpeed += myMap(y, -SCREEN_WIDTH*2, 0, 0, 4.0);
+		ySpeed += myMap(y, -SCREEN_WIDTH*2, 0, 0, 4.0) / 6.0f;
 		//ySpeed = 0.05;
 	}
 
@@ -18,7 +18,7 @@ public:
 		y = random8(SCREEN_WIDTH) - SCREEN_WIDTH*2;
 		z = random8(0, 20);
 		len = myMap(z, 0, 20, 10, 20);
-		ySpeed = myMap(z, 0, 20, 4 / (2*10.0f), 10 / (2*10.0f));
+		ySpeed = myMap(z, 0, 20, 4 / (2*10.0f), 10 / (2*10.0f)) / 4.0f;
 	}
 
 	float x;
@@ -29,7 +29,7 @@ public:
 
 	void fall() {
 		this->y = this->y + this->ySpeed;
-		ySpeed += 0.05;
+		ySpeed += 0.005;
 		if (y > SCREEN_HEIGHT) {
 			init();
 		}
@@ -46,7 +46,7 @@ public:
 	}
 };
 
-CRGB Drop::background = CRGB(230, 230, 250).nscale8(64);// GuiVars1 * 128);
+CRGB Drop::background = CRGB::Black;// CRGB(230, 230, 250).nscale8(16);// GuiVars1 * 128);
 
 Drop drops[200];
 

@@ -216,22 +216,31 @@ public:
 	unsigned long lastUpdate = 0;
 	int8_t lastDirection = 0;
 	uint8_t incAmount = 1;
+	uint8_t incCounter = 0;
 	void increaseRotationSpeed(int8_t dir) {
 		unsigned long now = GET_MILLIS();
-		if (now - lastUpdate < 300) { // last update was within a certain time period
+		if (now - lastUpdate < 200) { // last update was within a certain time period
 			if (lastDirection == dir) {//moving in same direction
-				incAmount++;
-				if (incAmount > 5)
-					incAmount++;
+				incCounter++;
+				if (incCounter > 5)
+				{
+					//incAmount++;
+					//incCounter = 0;
+					if (incAmount < 5)
+						incAmount++;
+				}
 			}
 			else {
 				lastDirection = dir;
+				incAmount = 1;
+				incCounter = 0;
 			}
 
 		}
 		else { // time out for update
 			lastDirection = 0;
 			incAmount = 1;
+			incCounter = 0;
 		}
 		lastUpdate = now; // reset time
 	}

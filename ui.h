@@ -22,11 +22,28 @@ TFT_eSprite sText = TFT_eSprite(&tft);
 #else //teensy 
 
 #include "SPI.h"
-#include "ILI9341_t3.h"
-#include "font_Arial.h"
+//#include "ILI9341_t3.h"
+//#include "font_Arial.h"
+
+//#include "SPI.h"
+#include "ILI9341_t3n.h"
+#include "ili9341_t3n_font_Arial.h"
+#include "ili9341_t3n_font_ArialBold.h"
+ILI9341_t3n tft = ILI9341_t3n(TFT_CS, TFT_DC, TFT_RST);
+
+#define TFT_MOSI    11
+#define TFT_SCLK    13
+#define TFT_MISO    12
+
+
 #define TFT_BACKGROUND  0x2967
 #define TFT_TEXT        0xE719
-ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST);
+//ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST);
+
+
+
+
+
 #endif
 
 
@@ -89,19 +106,24 @@ void uiLoop() {
 
   //encoder handle
   int8_t newPos = encoder.read();
-  if (newPos >= + 4) {
+  cli();
+  if (newPos > 0) {
+    
     while (newPos >= 4) {
       inc();
       newPos -= 4;
     }
+//    newPos = 0;
     encoder.write(newPos);
-  } else if (newPos <= -4) {
+  } else if (newPos < 0) {
     while (newPos <= -4) {
       dec();
       newPos += 4;
     }
+//    newPos = 0;
     encoder.write(newPos);
   }
+  sei();
 
   // button press
 
@@ -117,8 +139,8 @@ void uiLoop() {
         if (reading == LOW) {// input pull up
           buttonActions[i](false);//shortPress();
           updateDisplay = true;
-          Serial.print("Press: ");
-          Serial.println(i);
+//          Serial.print("Press: ");
+//          Serial.println(i);
         }
       }
       if ( (reading == LOW) and (now - lastDebounceTime[i]) > holdDelay) {
@@ -132,73 +154,74 @@ void uiLoop() {
 
   // display handle
   static unsigned long lastTFTUpdate = 0;
-  if (now - lastTFTUpdate > (1000 / 60)) {
-    lastTFTUpdate = now;
-    // fast text updates only!
-    //FPS
-    if (displayFPS) {
-      tftDisplayFPS();
-    }
-  }
+  if (now - lastTFTUpdate > (1000 / 20)) {
+	  lastTFTUpdate = now;
+	  // fast text updates only!
+	  //FPS
+	  if (displayFPS) {
+		  tftDisplayFPS();
+	  }
 
-  if (updateDisplay) {
-    updateDisplay = false;
+#if 1
+	  if (updateDisplay) {
+		  updateDisplay = false;
+      
+		  //    tft.fillScreen(ILI9341_BLACK);
+      tft.useFrameBuffer(true);
+			  // print title
+		  const uint8_t headingOffset = 2;
+		  tft.setCursor(0, headingOffset);
+		  tft.setTextSize(3);
+		  tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
+		  tft.println("Radience");
+		  const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
+		  tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
 
-//    tft.fillScreen(ILI9341_BLACK);
-    // print title
-    const uint8_t headingOffset = 2;
-    tft.setCursor(0, headingOffset);
-    tft.setTextSize(3);
-    tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
-    tft.println("Radience");
-    const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
-    tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
-
-    //print page name
-    tft.setCursor(2, headingBottom + 6);
-    tft.setTextSize(2);
-    tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight()+2, ILI9341_BLACK);
-    //    tft.print("Current pattern\n> ");
-    tft.println(menu.currentPage()->getName());    
-    for (uint8_t i = 0; i < menu.numPages; i++) {
-      const uint8_t xPos = tft.width() - 52;
-      const uint8_t yPos = headingBottom + 2 + 2 + 2;
-      if (i == menu.currentPageIndex) {
-        tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
-      }
-      else {
-        tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
-      }
-    }
-    tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
-    
-
-    //Print body
-    const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
-    tft.setCursor(0, bodyY);
-    
-    tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
-    tft.println(menu.currentPage()->getPageData());
-    //    String body = menu.currentPage()->getPageData();
-    //    uint8_t index = 0;
-    //    String temp = "";
-    //    for (int i = 0; i < body.length(); i++) {
-    //      char c = body.charAt(i);
-    //      if (c == '\n') {
-    //        tft.println(temp);
-    //        temp = "";
-    //      } else {
-    //        if (c == '\t'){
-    //          temp += " ";
-    //          }
-    //        else {
-    //          temp += c;
-    //        }
-    //      }
-    //    }
+		  //print page name
+		  tft.setCursor(2, headingBottom + 6);
+		  tft.setTextSize(2);
+		  tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
+		  //    tft.print("Current pattern\n> ");
+		  tft.println(menu.currentPage()->getName());
+		  for (uint8_t i = 0; i < menu.numPages; i++) {
+			  const uint8_t xPos = tft.width() - 52;
+			  const uint8_t yPos = headingBottom + 2 + 2 + 2;
+			  if (i == menu.currentPageIndex) {
+				  tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
+			  }
+			  else {
+				  tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
+			  }
+		  }
+		  tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
 
 
+		  //Print body
+		  const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
+		  tft.setCursor(0, bodyY);
 
+		  tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
+		  tft.println(menu.currentPage()->getPageData());
+		  //    String body = menu.currentPage()->getPageData();
+		  //    uint8_t index = 0;
+		  //    String temp = "";
+		  //    for (int i = 0; i < body.length(); i++) {
+		  //      char c = body.charAt(i);
+		  //      if (c == '\n') {
+		  //        tft.println(temp);
+		  //        temp = "";
+		  //      } else {
+		  //        if (c == '\t'){
+		  //          temp += " ";
+		  //          }
+		  //        else {
+		  //          temp += c;
+		  //        }
+		  //      }
+		  //    }
+      tft.updateScreenAsync(false);
+	  }
+#endif
   }
 }
 
@@ -265,6 +288,7 @@ void updateSettings() {
 void uiSetup() {
 
   tft.begin();
+//  tft.setFont(Arial_24_Bold);
   tft.setRotation(2);
   tft.fillScreen(ILI9341_BLACK);// grey fill
 
@@ -272,6 +296,8 @@ void uiSetup() {
   for (uint8_t i = 0; i < numButtons; i++) {
     pinMode(buttonPins[i], INPUT_PULLUP);
   }
+
+  encoder.write(0);
 
   pinMode(TFT_BACKLIGHT, OUTPUT);
   analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4 );

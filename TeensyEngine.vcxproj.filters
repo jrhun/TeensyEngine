@@ -217,6 +217,7 @@
     <ClInclude Include="src\Patterns\PatternPurpleRain.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

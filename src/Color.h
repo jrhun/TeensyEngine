@@ -4137,13 +4137,7 @@ typedef enum {
 } ColorTemperature;
 
 
-Vec3 toVec(CRGB c) {
-	return Vec3(c.r, c.g, c.b);
-}
 
-CRGB toCRGB(Vec3 v) {
-	return CRGB(v.x, v.y, v.z);
-}
 
 
 
@@ -4207,6 +4201,14 @@ CRGB blendlab(CRGB c1, CRGB c2) {
 
 
 #endif
+
+Vec3 toVec(CRGB c) {
+	return Vec3(c.r, c.g, c.b);
+}
+
+CRGB toCRGB(Vec3 v) {
+	return CRGB(v.x, v.y, v.z);
+}
 
 //class Colour {
 //public:

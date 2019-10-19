@@ -247,6 +247,7 @@
     <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
