@@ -18,7 +18,7 @@ public:
 	uint8_t drawFrame() {
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}
 		gfx.resetZ();
 		const int maxI = 100;
@@ -89,7 +89,7 @@ public:
 	uint8_t drawFrame() {
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
 		}
 
 		gfx.resetZ();

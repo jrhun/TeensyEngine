@@ -15,7 +15,7 @@ public:
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(128);
 		}
-		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);
+		//blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);
 
 		engine.resetZ();
 

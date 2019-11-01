@@ -1,22 +1,35 @@
 #include "data.h"
 #include "ledControl.h"
+#include "audio.h"
 
 #include "src\Patterns\PatternController.h"
 #include "ui.h"
 
+#include "headbands.h"
+
+
 
 void setup() {
-  // put your setup code here, to run once:
-  ledControl.init();
   Serial.begin(115200);
+  delay(200);
+  Serial.println("Started");
+  
+//  audioSetup();
+  ledControl.init();
+  
 
   uiSetup();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+//  audioLoop();
   patterns.run();
   uiLoop();
+
+  if (Data::sendUpdate) {
+    hbUpdate(Data::sendUpdate);
+    Data::sendUpdate = 0;
+  }
   
   EVERY_N_MILLISECONDS(1000) {
     Serial.print("FPS: ");

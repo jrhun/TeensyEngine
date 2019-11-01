@@ -27,7 +27,7 @@ public:
 		}
 
 		if (_Pattern::useDefaultEffect) {
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
+			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
 		}
 
 		offset += 0.25;
@@ -112,7 +112,7 @@ public:
 //		}
 //
 //		if (_Pattern::useDefaultEffect) {
-//			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
+//			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 75); // 75 works well for blur
 //		}
 //
 //		offset += 0.25;

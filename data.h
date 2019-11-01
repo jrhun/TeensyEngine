@@ -55,6 +55,8 @@
 #define LED8            23
 
 
+// MPU9250 on SCL2/ SDA2
+
 #endif // teensy 4.x
 
 #define NUM_VARS    6
@@ -178,6 +180,8 @@ namespace Data {
 
 	// audio vars
 	uint8_t noiseFloor = 65;
+  uint8_t threshold = 200;
+  float beat = 0;
 
 
   // backlight
@@ -186,6 +190,15 @@ namespace Data {
   
   uint8_t triggerType = 0;
   VariableReference triggerType_t{"Trigger", &triggerType, 4, 0, 6};
+
+
+  //accelerometer
+  float ax = 0.0f, ay = 0.0f, az = 0.0f;
+  float dx = 0.0f, dy = 0.0f, dz = 0.0f;
+
+  //headbands
+  enum {hbPaletteUpdate = 1, hbBrightnessUpdate, hbPatternUpdate}; // update type
+  uint8_t sendUpdate = 0;
 
 
 } //end nameSpace Data

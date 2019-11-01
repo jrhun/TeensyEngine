@@ -158,7 +158,7 @@ public:
 				if (FxFade)
 					gfx.fade(FxFade);
 				if (FxBlur)
-					blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
+					blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
 				if (FxSpiral)
 					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
 				if (FxNoiseSmear)

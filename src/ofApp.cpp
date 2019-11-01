@@ -104,10 +104,10 @@ void ofApp::keyPressed(int key) {
 		menu.right();
 	}
 	if (key == 'w') { //up
-		menu.up();
+		menu.down();
 	}
 	if (key == 's') {
-		menu.down();
+		menu.up();
 	}
 	if (key == 'q') {
 		menu.dec();

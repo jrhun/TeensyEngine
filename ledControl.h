@@ -31,7 +31,7 @@
 #define pgm_read_pointer(addr) ((void *)pgm_read_word(addr))
 #endif
 */
-CRGBArray < NUM_LEDS > leds;
+CRGBArray < NUM_LEDS > ledsRaw;
 //uint8_t zBuffer[ROWS * COLS];
 //CRGB scratchArray[NUM_LEDS]; // have global as ESP doesn't like variables on the stack
 CRGBPalette16 currentPalette;
@@ -126,17 +126,17 @@ class Leds : public FastLED_GFX {
 
     void init() {
       #if defined(ESP32)
-      FastLED.addLeds<WS2812B, 13, GRB>(leds, 0 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 12, GRB>(leds, 1 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 14, GRB>(leds, 2 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 27, GRB>(leds, 3 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 26, GRB>(leds, 4 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 25, GRB>(leds, 5 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 33, GRB>(leds, 6 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
-      FastLED.addLeds<WS2812B, 32, GRB>(leds, 7 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 13, GRB>(ledsRaw, 0 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 12, GRB>(ledsRaw, 1 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 14, GRB>(ledsRaw, 2 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 27, GRB>(ledsRaw, 3 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 26, GRB>(ledsRaw, 4 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 25, GRB>(ledsRaw, 5 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 33, GRB>(ledsRaw, 6 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<WS2812B, 32, GRB>(ledsRaw, 7 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       // teensy 4.x
       #elif defined(__IMXRT1052__) || defined(__IMXRT1062__) 
-      FastLED.addLeds<NUM_STRIPS, WS2812B, 19, GRB>(leds, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
+      FastLED.addLeds<NUM_STRIPS, WS2812B, 19, GRB>(ledsRaw, NUM_LEDS_PER_STRIP).setCorrection( TypicalSMD5050 );
       #endif 
       
       FastLED.setBrightness( *Data::brightness_t );
@@ -161,8 +161,8 @@ class Leds : public FastLED_GFX {
       j += 5;
       for (int i = 0; i < 8; i++) {
         
-//        leds(i*NUM_LEDS_PER_STRIP + 10, i*NUM_LEDS_PER_STRIP + 15).fill_solid(CHSV(i * 26, 255, 255));
-        leds(i*NUM_LEDS_PER_STRIP + 17, i*NUM_LEDS_PER_STRIP + 17 + i).fill_solid(CRGB::Red);
+//        ledsRaw(i*NUM_LEDS_PER_STRIP + 10, i*NUM_LEDS_PER_STRIP + 15).fill_solid(CHSV(i * 26, 255, 255));
+        ledsRaw(i*NUM_LEDS_PER_STRIP + 17, i*NUM_LEDS_PER_STRIP + 17 + i).fill_solid(CRGB::Red);
         setTextColor(CHSV(j, 255, 255));
         setCursor(1+ i * COLS / 8, 10);
         print(i);
@@ -180,22 +180,22 @@ class Leds : public FastLED_GFX {
     }
 
     void drawPixel(int16_t x, int16_t y, CRGB color) {
-      leds[XY(x, y)] = color;
+      ledsRaw[XY(x, y)] = color;
     }
     void drawPixel(int16_t x, int16_t y, uint8_t hue) {
-      leds[XY(x, y)] = getColour(hue);
+      ledsRaw[XY(x, y)] = getColour(hue);
     }
 
     void drawPixel(int16_t x, int16_t y, CRGB color, uint8_t amount) {
-      if (leds[XY(x, y)])
-        leds[XY(x, y)] = blend(leds[XY(x, y)], color, amount);
+      if (ledsRaw[XY(x, y)])
+        ledsRaw[XY(x, y)] = blend(ledsRaw[XY(x, y)], color, amount);
       else
-        leds[XY(x, y)] = color.nscale8(amount);
+        ledsRaw[XY(x, y)] = color.nscale8(amount);
     }
 
     void setRow(uint8_t row, CRGB colour) {
       for (uint8_t x = 0; x < COLS; x++) {
-        leds[XY(x, row)] = colour;
+        ledsRaw[XY(x, row)] = colour;
       }
     }
 
@@ -203,21 +203,21 @@ class Leds : public FastLED_GFX {
       CRGB *rowReference[COLS];
 
       for (uint8_t x = 0; x < COLS; x++) {
-        rowReference[x] = &leds[XY(x, row)];
+        rowReference[x] = &ledsRaw[XY(x, row)];
       }
       fill_rainbow(rowReference[0], COLS, hue);
     }
 
     void setCol(uint8_t col, CRGB colour) {
       for (uint8_t y = 0; y < ROWS; y++) {
-        leds[XY(col, y)] = colour;
+        ledsRaw[XY(col, y)] = colour;
       }
     }
 
     void setColRainbow(uint8_t col, uint8_t hue) {
       CRGB *colReference[ROWS];
       for (uint8_t y = 0; y < ROWS; y++) {
-        colReference[y] = &leds[XY(col, y)];
+        colReference[y] = &ledsRaw[XY(col, y)];
       }
       fill_rainbow(colReference[0], ROWS, hue);
     }
@@ -230,14 +230,14 @@ class Leds : public FastLED_GFX {
     }
 
     void drawBlend(uint8_t row, uint8_t col, CRGB colour, uint8_t blendAmount) {
-      if (leds[XY(row, col)]) // only blend if pixel is already lit
-        nblend(leds[XY(row, col)], colour, blendAmount);
+      if (ledsRaw[XY(row, col)]) // only blend if pixel is already lit
+        nblend(ledsRaw[XY(row, col)], colour, blendAmount);
       else
         drawPixel(row, col, colour);
     }
 
     void fade(uint8_t amount = Data::fadeAmount) {
-      leds.fadeToBlackBy(amount);
+      ledsRaw.fadeToBlackBy(amount);
     }
 
     void clear() {
@@ -245,7 +245,7 @@ class Leds : public FastLED_GFX {
     }
 
     void fillScreen(CRGB color) {
-      leds.fill_solid(color);
+      ledsRaw.fill_solid(color);
     }
 
     bool blendOnDrawPixel = false;

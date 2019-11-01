@@ -171,7 +171,7 @@ public:
 		if (_Pattern::useDefaultEffect) {
 
 			gfx.fade(64);
-			//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 177);
+			//blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 177);
 		}
 
 		uint8_t scale = 256 / SCREEN_WIDTH;

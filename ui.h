@@ -225,6 +225,16 @@ void uiLoop() {
   }
 }
 
+//battery voltage
+float getBatteryVolts() {
+  uint16_t v = analogRead(VOLTS_IN_PIN);
+  
+}
+
+float getAmps() {
+  uint16_t a = analogRead(AMP_IN_PIN);
+}
+
 
 // Display functions
 void drawBattery() {

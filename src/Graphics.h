@@ -448,5 +448,7 @@ public:
 	CRGBPalette16	currentPalette;// = RainbowColors_gp;
 	CRGBPalette16	targetPalette;// = RainbowColors_p;
 	TBlendType		currentBlending = LINEARBLEND;
+	
+	CRGBArray < SCREEN_WIDTH * SCREEN_HEIGHT > leds;
 
 };

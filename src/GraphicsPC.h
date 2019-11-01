@@ -6,7 +6,7 @@
 #include "Color.h"
 
 #include "../data.h"
-CRGB leds[SCREEN_HEIGHT * SCREEN_WIDTH];
+//CRGB leds[SCREEN_HEIGHT * SCREEN_WIDTH];
 
 float rgb2luma(Vec3 rgb) {
 	return sqrt(rgb * Vec3(0.299, 0.587, 0.114)); // dot

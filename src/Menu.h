@@ -22,7 +22,7 @@
 
 
 
-
+#define MAX_LINES	8
 
 
 
@@ -56,6 +56,8 @@ public:
 	virtual void press() {}
 	virtual void inc() {}
 	virtual void dec() {}
+
+	enum { maxLines = 9 };
 
 };
 
@@ -180,6 +182,7 @@ public:
 		hasSelection = true;
 	}
 
+
 	virtual String getData() {
 		return var->getValue();
 	}
@@ -250,6 +253,8 @@ protected:
 	const char **names;
 	uint16_t len;
 	uint8_t selected = 0;
+
+
 
 };
 
@@ -349,6 +354,7 @@ public:
 	}
 
 	String getData() {
+		return getPaletteName(*paletteIndex_t);
 #if defined(ESP32) || defined(CORE_TEENSY)
 		return String(*paletteIndex_t);// .c_str();
 #else
@@ -358,7 +364,9 @@ public:
 
 	String getDataExtended() {
 		String r = "";
-		for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
+		//for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
+		for (uint8_t i = frame; i < frame + maxLines; i++) {
+
 			if (i == *paletteIndex_t)
 				r += "x ";
 			else if (i == selected)
@@ -368,18 +376,25 @@ public:
 
 			if (i < paletteIndex_t.max)
 				r += getPaletteName(i);
-			else
+			else if (i == paletteIndex_t.max)
 				r += "Back";
+
 			r += "\n";
+		}
+		if (frame + maxLines <= paletteIndex_t.max) {
+			if (*paletteIndex_t > frame + maxLines) r += "x ...";
+			else r += "  ...";
 		}
 		return r;
 	}
 
 	void up() {
-		if (selected <= paletteIndex_t.max) selected++;
+		if (selected < paletteIndex_t.max) selected++;
+		if (selected > maxLines + frame) frame++; 
 	}
 	void down() {
 		if (selected > 0) selected--;
+		if (selected < frame) frame--;
 	}
 	void inc() { paletteIndex_t.inc(); }
 	void dec() { paletteIndex_t.dec(); }
@@ -390,28 +405,40 @@ public:
 	}
 
 	uint8_t selected = 0;
+	uint8_t frame = 0;
+
 };
 
 
 
 class MenuPatternList : public MenuAbstract {
 public:
-	MenuPatternList() : MenuAbstract("Pattern list") {
+	MenuPatternList() : MenuAbstract("Pattern list ") {
 		hasSelection = true;
 	}
 
+	//const char* getName() {
+	//	return patterns.getCurrentPatternName();//r.c_str();
+	//}
+
 	String getData() {
-		return "";
-#if defined(ESP32) || defined(CORE_TEENSY)
-		return String(Data::currentPattern);// .c_str();
-#else
-		return to_string(Data::currentPattern);
-#endif 
+		return patterns.getCurrentPatternName();
+		//return "";
+//#if defined(ESP32) || defined(CORE_TEENSY)
+//		return String(Data::currentPattern);// .c_str();
+//#else
+//		return to_string(Data::currentPattern);
+//#endif 
 	}
 
 	String getDataExtended() {
 		String r = "";
-		for (uint8_t i = 0; i < patterns.numPatterns + 1; i++) {
+		//for (uint8_t i = 0; i < patterns.numPatterns + 1; i++) {
+		for (uint8_t i = frame; i < frame + maxLines; i++) {
+			//if (i == frame + maxLines - 1 and patterns.numPatterns >= i) {
+			//	r += "...";
+			//}
+
 			if (i == Data::currentPattern)
 				r += "x ";
 			else if (i == selectedPattern)
@@ -419,36 +446,59 @@ public:
 			else
 				r += "  ";
 
+			//if (i < frame + maxLines) {
+			//	if (i < patterns.numPatterns)
+			//		r += patterns.getPatternName(i);
+			//	else if (i == patterns.numPatterns)
+			//		r += "Back";
+			//}
+			//else {
+			//	// last item 
+			//	//if (i <= patterns.numPatterns) {
+			//	//	r += "...";
+			//	//}
+			//}
+
 			if (i < patterns.numPatterns)
 				r += patterns.getPatternName(i);
-			else
+			else if ( i == patterns.numPatterns)
 				r += "Back";
+			
 			r += "\n";
+		}
+
+		if (frame + maxLines <= patterns.numPatterns) {
+			if (Data::currentPattern > frame+maxLines) r += "x ...";
+			else r += "  ...";
 		}
 		return r;
 	}
 
 	uint8_t selectedPattern = Data::currentPattern;
+	uint8_t frame = 0;
 
 
+	
 	void up() {
-		if (selectedPattern <= patterns.numPatterns)
+		if (selectedPattern < patterns.numPatterns)
 			selectedPattern++;
+		if (selectedPattern > maxLines + frame) frame++;
 		//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
 	}
 	void down() {
 		if (selectedPattern > 0)
 			selectedPattern--;
+		if (selectedPattern < frame) frame--;
 		//selectedPattern = (selectedPattern - 1 + (patterns.numPatterns+1)) % (patterns.numPatterns+1);
 	}
 
 	void inc() {
-		up();
-		//patterns.inc();
+		//up();
+		patterns.inc();
 	}
 	void dec() {
-		down();
-		//patterns.dec();
+		//down();
+		patterns.dec();
 	}
 
 	void press() {
@@ -621,7 +671,7 @@ public:
 		return items[currentItem];
 	}
 
-	MenuCurrentPattern CurrentPattern;
+	//MenuCurrentPattern CurrentPattern;
 	MenuPatternList PatternList;
 	MenuVariable Brightness{ &Data::brightness_t };
 	
@@ -630,9 +680,9 @@ public:
 	MenuAction TapTempo{ "Tap tempo" };
 	MenuTrigger OscType;
 
-	static const size_t numItems = 6;
+	static const size_t numItems = 5;
 	MenuAbstract *items[numItems] = {
-		&CurrentPattern,
+		//&CurrentPattern,
 		&PatternList,
 		&Brightness,
 		&Tempo,
