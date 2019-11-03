@@ -1,6 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+
 // PIN DEFINITIONS
 #if defined(ESP32)
 #define EN_A_PIN        34
@@ -38,6 +39,11 @@
 #define MIC_IN_PIN      27  //A13
 #define AMP_IN_PIN      21  //A7
 #define VOLTS_IN_PIN    20  //A6
+
+#define NRF_CE_PIN      29
+#define NRF_CSN_PIN     28
+#define ESP_RX          28 //RX7
+#define ESP_TX          29 //TX7
 
 // Normal Connections
 #define TFT_DC      32
@@ -172,6 +178,7 @@ namespace Data {
 
  
 	uint8_t paletteIndex = 0;
+  uint8_t hbPaletteIndex = 0;
 
   uint32_t colorTemp = 0;
 
@@ -191,6 +198,8 @@ namespace Data {
   uint8_t triggerType = 0;
   VariableReference triggerType_t{"Trigger", &triggerType, 4, 0, 6};
 
+  
+
 
   //accelerometer
   float ax = 0.0f, ay = 0.0f, az = 0.0f;
@@ -199,6 +208,39 @@ namespace Data {
   //headbands
   enum {hbPaletteUpdate = 1, hbBrightnessUpdate, hbPatternUpdate}; // update type
   uint8_t sendUpdate = 0;
+
+  bool hbOn = true;
+  bool hbManual = false;
+  bool hbFade = false;
+  bool hbSendUpdate = true;
+  bool syncHue = true;//not used
+  uint16_t hbSendMillisDelay = 100;
+  uint8_t indexSkip = 1;
+  uint8_t hbHueOffset = 50;
+  uint8_t hbHueDelay = 16;
+  uint8_t hbIndex = 0;
+  uint8_t hbSpeed = 50;
+  uint8_t hbBrightness = 128;
+  uint8_t hbFadeAmount = 32;
+  uint8_t hbCurrentPattern = 2;
+  const uint8_t hbMaxPatterns = 6;
+  const String hbPatternNames[hbMaxPatterns] = { 
+    "Wipe Colours", 
+    "Rotate Colours", 
+    "Rotate Colours2", 
+    "Sparkles", 
+    "Commets", 
+    "Solid colour",
+  };
+
+  VariableReference brightnessHb_t("Brightness", &hbBrightness, hbBrightness, 0, 255);
+  VariableReference fadeHb_t("Fade", &hbFadeAmount, hbFadeAmount, 0, 128);
+  VariableReference speedHb_t("Speed", &hbSpeed, hbSpeed, 0, 255);
+  VariableReference hueDelayHb_t("Hue delay", &hbHueDelay, hbHueDelay, 1, 64);
+
+//  VariableReference hbPattern_t{"HB Pattern", &hbCurrentPattern, 2, 0, hbMaxPatterns};
+
+  bool syncPalettes = false;
 
 
 } //end nameSpace Data

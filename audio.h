@@ -1,7 +1,8 @@
+#pragma once 
 
 #include "data.h"
 
-#include "ADC.h"
+//#include "ADC.h"
 //ADC *adc = new ADC();
 
 IntervalTimer myTimer;

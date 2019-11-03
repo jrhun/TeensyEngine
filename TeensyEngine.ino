@@ -5,7 +5,7 @@
 #include "src\Patterns\PatternController.h"
 #include "ui.h"
 
-#include "headbands.h"
+//#include "headbands.h"
 
 
 
@@ -26,14 +26,14 @@ void loop() {
   patterns.run();
   uiLoop();
 
-  if (Data::sendUpdate) {
-    hbUpdate(Data::sendUpdate);
-    Data::sendUpdate = 0;
-  }
-  
-  EVERY_N_MILLISECONDS(1000) {
-    Serial.print("FPS: ");
-    Serial.println(FastLED.getFPS());
-//    tftDisplayFPS();
-  }
+//  if (Data::sendUpdate) {
+//    hbUpdate(Data::sendUpdate);
+//    Data::sendUpdate = 0;
+//  }
+//  
+//  EVERY_N_MILLISECONDS(1000) {
+//    Serial.print("FPS: ");
+//    Serial.println(FastLED.getFPS());
+////    tftDisplayFPS();
+//  }
 }

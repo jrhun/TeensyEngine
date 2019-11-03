@@ -57,7 +57,7 @@ public:
 	virtual void inc() {}
 	virtual void dec() {}
 
-	enum { maxLines = 9 };
+	enum { maxLines = 14 };
 
 };
 
@@ -354,7 +354,7 @@ public:
 	}
 
 	String getData() {
-		return getPaletteName(*paletteIndex_t);
+		//return getPaletteName(*paletteIndex_t);
 #if defined(ESP32) || defined(CORE_TEENSY)
 		return String(*paletteIndex_t);// .c_str();
 #else
@@ -390,7 +390,7 @@ public:
 
 	void up() {
 		if (selected < paletteIndex_t.max) selected++;
-		if (selected > maxLines + frame) frame++; 
+		if (selected >= maxLines + frame) frame++; 
 	}
 	void down() {
 		if (selected > 0) selected--;
@@ -404,16 +404,84 @@ public:
 			*paletteIndex_t = selected;
 	}
 
+
+	uint8_t selected = 0;
+	uint8_t frame = 0;
+
+};
+
+class MenuPaletteListHb : public MenuAbstract {
+public:
+	MenuPaletteListHb() : MenuAbstract("Palette List") {
+		hasSelection = true;
+	}
+
+	String getData() {
+		//return getPaletteName(*paletteIndexHb_t);
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(*paletteIndexHb_t);// .c_str();
+#else
+		return to_string(*paletteIndexHb_t);
+#endif 
+	}
+
+	String getDataExtended() {
+		String r = "";
+		//for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
+		for (uint8_t i = frame; i < frame + maxLines; i++) {
+
+			if (i == *paletteIndexHb_t)
+				r += "x ";
+			else if (i == selected)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < paletteIndexHb_t.max)
+				r += getPaletteName(i);
+			else if (i == paletteIndexHb_t.max)
+				r += "Back";
+
+			r += "\n";
+		}
+		if (frame + maxLines <= paletteIndexHb_t.max) {
+			if (*paletteIndexHb_t > frame + maxLines) r += "x ...";
+			else r += "  ...";
+		}
+		return r;
+	}
+
+	void up() {
+		if (selected < paletteIndexHb_t.max) selected++;
+		if (selected >= maxLines + frame) frame++;
+	}
+	void down() {
+		if (selected > 0) selected--;
+		if (selected < frame) frame--;
+	}
+	void inc() { paletteIndexHb_t.inc(); if (callback)	callback(); }
+	void dec() { paletteIndexHb_t.dec(); if (callback)	callback();	}
+
+	void press() {
+		if (selected < paletteIndexHb_t.max)
+			*paletteIndexHb_t = selected;
+		if (callback)
+			callback();
+	}
+
+	void setCallback(void(*fn)()) { callback = fn; }
+	void(*callback)() = NULL;
+
+
 	uint8_t selected = 0;
 	uint8_t frame = 0;
 
 };
 
 
-
 class MenuPatternList : public MenuAbstract {
 public:
-	MenuPatternList() : MenuAbstract("Pattern list ") {
+	MenuPatternList() : MenuAbstract("Pattern ") {
 		hasSelection = true;
 	}
 
@@ -422,13 +490,13 @@ public:
 	//}
 
 	String getData() {
-		return patterns.getCurrentPatternName();
+		//return patterns.getCurrentPatternName();
 		//return "";
-//#if defined(ESP32) || defined(CORE_TEENSY)
-//		return String(Data::currentPattern);// .c_str();
-//#else
-//		return to_string(Data::currentPattern);
-//#endif 
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(Data::currentPattern);// .c_str();
+#else
+		return to_string(Data::currentPattern);
+#endif 
 	}
 
 	String getDataExtended() {
@@ -482,7 +550,7 @@ public:
 	void up() {
 		if (selectedPattern < patterns.numPatterns)
 			selectedPattern++;
-		if (selectedPattern > maxLines + frame) frame++;
+		if (selectedPattern >= maxLines + frame) frame++;
 		//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
 	}
 	void down() {
@@ -505,7 +573,100 @@ public:
 		if (selectedPattern < patterns.numPatterns)
 			patterns.set(selectedPattern);
 	}
+
+
 };
+
+class MenuPatternListHb : public MenuAbstract {
+public:
+	MenuPatternListHb() : MenuAbstract("Pattern ") {
+		hasSelection = true;
+		maxI = frame + maxLines;
+		if (maxI > Data::hbMaxPatterns) maxI = Data::hbMaxPatterns;
+	}
+
+	//const char* getName() {
+	//	return patterns.getCurrentPatternName();//r.c_str();
+	//}
+
+	String getData() {
+		//return patterns.getCurrentPatternName();
+		return "";
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return String(Data::currentPattern);// .c_str();
+#else
+		return to_string(Data::currentPattern);
+#endif 
+	}
+
+	String getDataExtended() {
+		String r = "";
+		for (uint8_t i = frame; i < maxI; i++) {
+			if (i == Data::hbCurrentPattern)
+				r += "x ";
+			else if (i == selectedPattern)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < Data::hbMaxPatterns)
+				r += Data::hbPatternNames[i];
+			else if (i == Data::hbMaxPatterns)
+				r += "Back";
+
+			r += "\n";
+		}
+
+		if (frame + maxLines <= Data::hbMaxPatterns) {
+			if (Data::hbCurrentPattern > maxI) r += "x ...";
+			else r += "  ...";
+		}
+		return r;
+	}
+
+	uint8_t selectedPattern = Data::hbCurrentPattern;
+	uint8_t frame = 0;
+	uint8_t maxI = 0;
+
+
+	void up() {
+		if (selectedPattern < Data::hbMaxPatterns)
+			selectedPattern++;
+		if (selectedPattern >= maxI) frame++;
+		//selectedPattern = (selectedPattern + 1) % (patterns.numPatterns + 1); //plus one for back button
+	}
+	void down() {
+		if (selectedPattern > 0)
+			selectedPattern--;
+		if (selectedPattern < frame) frame--;
+		//selectedPattern = (selectedPattern - 1 + (patterns.numPatterns+1)) % (patterns.numPatterns+1);
+	}
+
+	void inc() {
+		if (Data::hbCurrentPattern < Data::hbMaxPatterns -1)
+			Data::hbCurrentPattern++;
+		if (callback)
+			callback();
+	}
+	void dec() {
+		if (Data::hbCurrentPattern > 0)
+			Data::hbCurrentPattern--;
+		if (callback)
+			callback();
+	}
+
+	void press() {
+		if (selectedPattern < Data::hbMaxPatterns) {
+			Data::hbCurrentPattern = selectedPattern;
+			if (callback)
+				callback();
+		}
+	}
+
+	void setCallback(void(*fn)()) { callback = fn; }
+	void(*callback)() = NULL;
+};
+
 
 
 /*
@@ -671,7 +832,7 @@ public:
 		return items[currentItem];
 	}
 
-	//MenuCurrentPattern CurrentPattern;
+	MenuCurrentPattern CurrentPattern;
 	MenuPatternList PatternList;
 	MenuVariable Brightness{ &Data::brightness_t };
 	
@@ -680,10 +841,10 @@ public:
 	MenuAction TapTempo{ "Tap tempo" };
 	MenuTrigger OscType;
 
-	static const size_t numItems = 5;
+	static const size_t numItems = 6;
 	MenuAbstract *items[numItems] = {
-		//&CurrentPattern,
 		&PatternList,
+		&CurrentPattern,
 		&Brightness,
 		&Tempo,
 		&TapTempo,
@@ -734,8 +895,9 @@ public:
 
 	static const size_t numItems = 3;
 	MenuAbstract *items[numItems] = {
-		&CurrentPalette,
 		&PaletteList,
+		&CurrentPalette,
+
 		&BlendTime
 	};
 
@@ -809,11 +971,30 @@ public:
 		return items[currentItem];
 	}
 
+	MenuPatternListHb Pattern;
+	MenuPaletteListHb Palette;
+	MenuVariable Brightness{ &Data::brightnessHb_t };
+	MenuVariable Fade{ &Data::fadeHb_t };
+	MenuVariable Speed{ &Data::speedHb_t };
+	MenuVariable HueDelay{ &Data::hueDelayHb_t };
+	MenuAction Sync{ "Sync" };
+	MenuAction Settings{ "Push Settings" };
+
+	MenuAction Trigger{ "Trigger" };
+
 
 	//menu items
-	static const size_t numItems = 1;
+	static const size_t numItems = 9;
 	MenuAbstract *items[numItems] = {
-		&baseMenu
+		&Pattern,
+		&Palette,
+		&Brightness,
+		&Fade, 
+		&Speed,
+		&HueDelay,
+		&Sync,
+		&Settings,
+		&Trigger
 	};
 
 

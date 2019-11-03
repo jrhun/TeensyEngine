@@ -1,6 +1,8 @@
 #include <SPI.h>
 #include <Encoder.h> // paul strofen library
 
+#include "headbands.h"
+
 #include "data.h"
 #include "ledControl.h"
 #include "src\Patterns\PatternController.h"
@@ -343,6 +345,39 @@ void uiSetup() {
     Serial.print("Loaded settings. Brightness: ");
     Serial.print(*Data::brightness_t);
     updateSettings();
+  });
+
+  setupRadio();
+  menu.Headbands.Palette.setCallback([]() {
+    sendClientUpdate(PALETTE);
+  });
+
+  menu.Headbands.Pattern.setCallback([]() {
+    sendClientUpdate(SETTINGS);
+  });
+
+//  Data::brightnessHb_t.setCallback([]() {
+//    sendClientUpdate(SETTINGS);
+//  });
+//
+//  Data::fadeHb_t.setCallback([]() {
+//    sendClientUpdate(SETTINGS);
+//  });
+//
+//  Data::speedHb_t.setCallback([]() {
+//    sendClientUpdate(SETTINGS);
+//  });
+//
+//  Data::hueDelayHb_t.setCallback([]() {
+//    sendClientUpdate(SETTINGS);
+//  });
+
+  menu.Headbands.Sync.setCallback([]() {
+    sendClientUpdate(UPDATE);
+  });
+
+  menu.Headbands.Settings.setCallback([]() {
+    sendClientUpdate(SETTINGS);
   });
 
   //  xTaskCreatePinnedToCore(uiTask, "UITask", 4096, NULL, 2, &uiTaskHandle, 1);
