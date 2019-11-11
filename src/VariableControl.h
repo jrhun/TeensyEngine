@@ -5,12 +5,6 @@
 // Takes a reference to a value and implements an interface for changing it within defined min and max + deltas
 // Also provides a way to oscilate and change that value
 
-class Oscilate {
-public:
-	Oscilate() {}
-
-
-};
 
 /*
 template<class TYPE>
@@ -132,6 +126,9 @@ void VariableControl<bool>::update() {}
 //typedef VariableReference<unsigned int> uIntReference;
 //typedef VariableReference<int8_t>		Int8Reference;
 //typedef VariableReference<uint8_t>		uInt8Reference;
+
+//https://github.com/dxinteractive/ArduinoTapTempo/blob/master/src/ArduinoTapTempo.h
+// BPM control
 
 class VariableOscilate {
 public:

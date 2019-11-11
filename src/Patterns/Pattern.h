@@ -32,6 +32,8 @@ Engine engine(gfx);
 #include "../VariableControl.h"
 
 
+//https://github.com/pixelmatix/aurora/blob/master/Effects.h
+
 
 
 // thoughts

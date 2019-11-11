@@ -196,7 +196,9 @@
     <ClCompile Include="..\openFrameworks\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audio.h" />
     <ClInclude Include="data.h" />
+    <ClInclude Include="PatternFluidSim.h" />
     <ClInclude Include="src\Effects.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\Noise.h" />

@@ -218,6 +218,12 @@
       <Filter>src\Patterns</Filter>
     </ClInclude>
     <ClInclude Include="ui.h" />
+    <ClInclude Include="audio.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternFluidSim.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

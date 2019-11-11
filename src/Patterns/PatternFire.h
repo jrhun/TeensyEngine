@@ -2,6 +2,9 @@
 
 #include "Pattern.h"
 
+//alternative fire https://web.archive.org/web/20160418004150/http://freespace.virgin.net/hugo.elias/models/m_fire.htm
+// warp map https://web.archive.org/web/20160418004149/http://freespace.virgin.net/hugo.elias/graphics/x_warp.htm
+
 class PatternFire : public _Pattern {
 public:
 	PatternFire()

@@ -5,6 +5,8 @@
 #include "Color.h"
 #include <vector>
 
+//https://www.bfilipek.com/2014/04/flexible-particle-system-container-2.html
+
 class Particle {
 public:
 	Particle() {}

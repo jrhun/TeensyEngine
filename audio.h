@@ -5,6 +5,12 @@
 //#include "ADC.h"
 //ADC *adc = new ADC();
 
+// references
+//noise processing code https://github.com/atuline/FastLED-Demos/blob/master/soundmems_noise/soundmems_noise.ino
+//example algorithim https://www.parallelcube.com/2018/03/30/beat-detection-algorithm/
+//article on the principles of beat detection https://www.badlogicgames.com/wordpress/?p=99
+// ended up just doing a VU like meter rather than beat detection 
+
 IntervalTimer myTimer;
 
 #define SAMPLEPERIODUS 200

@@ -5,6 +5,9 @@
 #include "../Geometry.h"
 #include "../Cube.h"
 
+//http://www.syedrezaali.com/3d-supershapes/
+//http://paulbourke.net/geometry/supershape/
+
 class PatternSuperShape : public _Pattern {
 public:
 	PatternSuperShape() : _Pattern("Super Shape") {
