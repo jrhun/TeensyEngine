@@ -70,28 +70,29 @@ public:
     _Pattern *patternList[numPatterns] = {
 		&PurpleRain,
 		&wheelParticle,
+		&wheelBlur,
+		
 		&noise1,
 		&verticalWaves,
-		&solid,
-		&parametricSpiral,
-		&sparks,
-
-		&rowThenCol,
-		&world,
-		&particleFountain,
-		&fire, 
 		&beachWaves2,
-
-		&wheelBlur,
+		&beachWaves,
+		&rowThenCol,
+		&solid,
+		&sparks,
+		
+		&parametricSpiral,
 		&parametric,
 		&spiral,
+
+		&particleFountain,
+		&fire, 
+		&world,
+		
 		&wireFrame,
 		&cube3d,
-
-		&beachWaves
 		
 		//&raymarcher,
-		//&superShape,
+		//&superShape
 	};
 
 	const char* getCurrentPatternName() {
@@ -158,7 +159,7 @@ public:
 				if (FxFade)
 					gfx.fade(FxFade);
 				if (FxBlur)
-					blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
+					gfx.blur(FxBlur);
 				if (FxSpiral)
 					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
 				if (FxNoiseSmear)

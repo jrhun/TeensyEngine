@@ -42,6 +42,37 @@ public:
 		nblendPaletteTowardPalette(currentPalette, targetPalette, IncAmount);
 	}
 
+	void blur(uint8_t amount) {
+		blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, amount);
+	}
+
+	uint16_t myXY(int16_t x, int16_t y) {
+		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT)
+			return x + y * SCREEN_WIDTH;
+		return 0;
+	}
+
+	void spiral(int x, int y, int r, byte dimm) {
+		for (int d = r; d >= 0; d--) { // from the outside to the inside
+			for (int i = x - d; i <= x + d; i++) {
+				leds[myXY(i, y - d)] += leds[myXY(i + 1, y - d)]; // lowest row to the right
+				leds[myXY(i, y - d)].nscale8(dimm);
+			}
+			for (int i = y - d; i <= y + d; i++) {
+				leds[myXY(x + d, i)] += leds[myXY(x + d, i + 1)]; // right colum up
+				leds[myXY(x + d, i)].nscale8(dimm);
+			}
+			for (int i = x + d; i >= x - d; i--) {
+				leds[myXY(i, y + d)] += leds[myXY(i - 1, y + d)]; // upper row to the left
+				leds[myXY(i, y + d)].nscale8(dimm);
+			}
+			for (int i = y + d; i >= y - d; i--) {
+				leds[myXY(x - d, i)] += leds[myXY(x - d, i - 1)]; // left colum down
+				leds[myXY(x - d, i)].nscale8(dimm);
+			}
+		}
+	}
+
 	//void incPalette() {
 	//	*paletteIndex_t = (*paletteIndex_t + 1) % gGradientPaletteCount;
 	//	setPalette(*paletteIndex_t);

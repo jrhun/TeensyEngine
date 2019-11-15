@@ -100,8 +100,84 @@ buttonFn buttonActions[numButtons] = {
 };
 
 
+
 // Main UI Functions
-void tftDisplayFPS();
+// Display functions
+void drawBattery() {
+
+}
+
+void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
+  //draws a rectangle filled with current palette with arrow highlighting current hue
+  // TL = top left
+  // BR = bottom right
+  // 0,0 is top left
+  //  const uint8_t h = 30;
+  const uint8_t w = 220; // 240 - w / 2
+  const uint8_t xStart = (240 - w) / 2;
+  for (uint8_t i = xStart; i < xStart + w; i++) {
+    //center current hue in middle
+    CRGB c = ColorFromPalette(palette, i + 100);
+    //    tft.drawFastVLine(i, y, h, tft.color565(c.r, c.g, c.b));
+  }
+  //  tft.drawRoundRect(x - 10, y, 20, h, 5, TFT_WHITE);
+}
+
+void tftDisplayFPS() {
+  tft.setCursor(180, 310);
+  tft.setTextSize(1);
+  tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
+  char p[10];
+  sprintf(p, "FPS:%3d", FastLED.getFPS());
+  tft.print(p);
+}
+
+void tftDisplayVoltsAmps() {
+  static uint8_t lastValue = 0;
+  const uint8_t numVals = 10;
+  float volts[numVals] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
+  float voltsSum = 0;
+  float amps[numVals] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
+  float ampsSum = 0;
+
+    
+  
+  float v = analogRead(VOLTS_IN_PIN);
+  const float VREF = 3.292f;
+  const uint16_t VMAX = 4095;
+  v = (v * VREF) / VMAX;
+  // I think R1 is 508k, R2 96k...
+  v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
+
+  int16_t ampsRaw = analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
+//  amps = (ampsRaw * VREF) / VMAX; // amps measured in volts where 100mv = 1a
+  float a = map(ampsRaw, 3169, 3347, 580, 2050);
+  a /= 1000.0f;
+
+  voltsSum -= volts[lastValue];
+  voltsSum += v;
+  volts[lastValue] = v;
+
+  ampsSum -= amps[lastValue];
+  ampsSum += a;
+  amps[lastValue] = a;
+
+  lastValue = (lastValue + 1) % numVals;
+
+  float voltsAvg = voltsSum / numVals;
+  float ampsAvg = ampsSum / numVals;
+  
+  tft.setTextSize(1);
+  tft.setCursor(180, 8);
+  tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
+  char t[12];
+  sprintf(t, "V: %.2f", voltsAvg);
+  tft.print(t);
+
+  tft.setCursor(180, 16);
+  sprintf(t, "A: %.2fA", ampsAvg);
+  tft.print(t);
+}
 
 void uiLoop() {
   unsigned long now = millis();
@@ -156,12 +232,16 @@ void uiLoop() {
 
   // display handle
   static unsigned long lastTFTUpdate = 0;
-  if (now - lastTFTUpdate > (1000 / 20)) {
+  if (now - lastTFTUpdate > (1000 / 10)) {
 	  lastTFTUpdate = now;
 	  // fast text updates only!
+    tft.useFrameBuffer(false);
+    tftDisplayVoltsAmps();
 	  //FPS
+    
 	  if (displayFPS) {
 		  tftDisplayFPS();
+      
 	  }
 
 #if 1
@@ -221,52 +301,15 @@ void uiLoop() {
 		  //        }
 		  //      }
 		  //    }
+      tftDisplayVoltsAmps();
+      if (displayFPS) tftDisplayFPS();
       tft.updateScreenAsync(false);
 	  }
 #endif
   }
 }
 
-//battery voltage
-float getBatteryVolts() {
-  uint16_t v = analogRead(VOLTS_IN_PIN);
-  
-}
 
-float getAmps() {
-  uint16_t a = analogRead(AMP_IN_PIN);
-}
-
-
-// Display functions
-void drawBattery() {
-
-}
-
-void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
-  //draws a rectangle filled with current palette with arrow highlighting current hue
-  // TL = top left
-  // BR = bottom right
-  // 0,0 is top left
-  //  const uint8_t h = 30;
-  const uint8_t w = 220; // 240 - w / 2
-  const uint8_t xStart = (240 - w) / 2;
-  for (uint8_t i = xStart; i < xStart + w; i++) {
-    //center current hue in middle
-    CRGB c = ColorFromPalette(palette, i + 100);
-    //    tft.drawFastVLine(i, y, h, tft.color565(c.r, c.g, c.b));
-  }
-  //  tft.drawRoundRect(x - 10, y, 20, h, 5, TFT_WHITE);
-}
-
-void tftDisplayFPS() {
-  tft.setCursor(180, 10);
-  tft.setTextSize(1);
-  tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
-  char p[10];
-  sprintf(p, "FPS: %3d", FastLED.getFPS());
-  tft.print(p);
-}
 
 
 // SAVING AND STORING SETTINGS
@@ -298,11 +341,23 @@ void updateSettings() {
 }
 
 void uiSetup() {
-
+  
+  pinMode(TFT_BACKLIGHT, OUTPUT);
+  digitalWrite(TFT_BACKLIGHT, LOW);
+  
   tft.begin();
 //  tft.setFont(Arial_24_Bold);
   tft.setRotation(2);
   tft.fillScreen(ILI9341_BLACK);// grey fill
+
+  // turn up screen brightness
+  uint16_t i = 0;
+  while (i <= *Data::backlight_t) {
+    analogWrite( TFT_BACKLIGHT, gamma6[i] * 4 );
+    i += 4;
+    delay(5);
+  }
+  analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4 );
 
   //buttons
   for (uint8_t i = 0; i < numButtons; i++) {
@@ -311,8 +366,8 @@ void uiSetup() {
 
   encoder.write(0);
 
-  pinMode(TFT_BACKLIGHT, OUTPUT);
-  analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4 );
+  
+  
 
   // setup callbacks
   currentPattern_t.setCallback([]() {

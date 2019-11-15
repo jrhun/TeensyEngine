@@ -221,7 +221,7 @@
     <ClInclude Include="audio.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="PatternFluidSim.h">
+    <ClInclude Include="src\Patterns\PatternFluidSim.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
   </ItemGroup>

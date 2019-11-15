@@ -18,7 +18,7 @@ public:
 	uint8_t drawFrame() {
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
-			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			gfx.blur(90);
 		}
 		gfx.resetZ();
 		const int maxI = 100;
@@ -43,7 +43,11 @@ public:
 		angle += 0.005;
 		if (angle >= TWO_PI)
 			angle -= TWO_PI;
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return (1000/60);
+#else 
 		return returnVal;
+#endif
 	}
 
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {
@@ -89,7 +93,7 @@ public:
 	uint8_t drawFrame() {
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(30);
-			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			gfx.blur(90);
 		}
 
 		gfx.resetZ();

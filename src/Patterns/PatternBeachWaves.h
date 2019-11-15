@@ -16,7 +16,7 @@ public:
 
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(2);// ledControl.fade();
-			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 176);
+			gfx.blur(176);
 		}
 		//
 		static uint16_t offset = 0;
@@ -35,7 +35,7 @@ public:
 			gfx.putPixel(x1, y, c1);
 			gfx.putPixel(x2, y, c2);
 		}
-		//blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 120);
+		//gfx.blur(120);
 
 
 		//      uint16_t offset = millis() - now;
@@ -56,7 +56,7 @@ public:
 
 		if (_Pattern::useDefaultEffect) {
 			gfx.fade(2);// ledControl.fade();
-			blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 176);
+			gfx.blur(176);
 		}
 		//
 		static uint16_t offset = 0;
@@ -94,7 +94,7 @@ public:
 		//gfx.putPixel(x1, y, c1);
 		//gfx.putPixel(x2, y, c2);
 
-	//blur2d(gfx.leds, SCREEN_WIDTH, SCREEN_HEIGHT, 120);
+	//gfx.blur(120);
 
 
 	//      uint16_t offset = millis() - now;
