@@ -128,4 +128,4 @@ public:
 };
 
 VariableOscilate _Pattern::beat = VariableOscilate();
-bool _Pattern::useDefaultEffect = true;
+bool _Pattern::useDefaultEffect = false;

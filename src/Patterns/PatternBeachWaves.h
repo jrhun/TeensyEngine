@@ -15,7 +15,7 @@ public:
 		//      CRGB colour2 = ledControl.getColour(64);
 
 		if (_Pattern::useDefaultEffect) {
-			gfx.fade(2);// ledControl.fade();
+			gfx.fade(5);// ledControl.fade();
 			gfx.blur(176);
 		}
 		//
@@ -55,7 +55,7 @@ public:
 		//      CRGB colour2 = ledControl.getColour(64);
 
 		if (_Pattern::useDefaultEffect) {
-			gfx.fade(2);// ledControl.fade();
+			gfx.fade(5);// ledControl.fade();
 			gfx.blur(176);
 		}
 		//
@@ -99,5 +99,38 @@ public:
 
 	//      uint16_t offset = millis() - now;
 		return (1000 / Data::FPS);
+	}
+};
+
+
+class PatternDualWaves : public _Pattern {
+public:
+	PatternDualWaves()
+		: _Pattern("Dual Waves") {}
+
+	uint8_t drawFrame() {
+
+		if (_Pattern::useDefaultEffect) {
+			gfx.fade(10);// ledControl.fade();
+			gfx.blur(175);
+		}
+		//
+		uint8_t amplitude = 8;
+		amplitude = GuiVars1 * 12;
+		//amplitude = myMap(beatsin8(80, ), 0, 255, 0, 12);
+		amplitude = beatsin8(80, 1, 12);
+		for (uint8_t x = 0; x < SCREEN_WIDTH; x++) {
+			uint8_t y = beatsin8(70, SCREEN_HEIGHT/2 - amplitude, SCREEN_HEIGHT / 2 + amplitude, 0, 4 * x);
+			gfx.putPixel(x, y, gfx.getColour());
+			y = beatsin8(70, SCREEN_HEIGHT / 2 - amplitude, SCREEN_HEIGHT / 2 + amplitude, 0, 64 + 4 * x);
+			gfx.putPixel(x, y, gfx.getColour(50));
+		}
+
+
+		//gfx.drawLine(x1, y1, x1 + SCREEN_WIDTH / 2 - 1, SCREEN_HEIGHT - y1 - 1, random8(16), 32 + random8(16));
+		//gfx.putPixel(x1, y, c1);
+		//gfx.putPixel(x2, y, c2);
+
+		return returnVal;
 	}
 };

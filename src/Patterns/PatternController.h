@@ -47,12 +47,13 @@ public:
 	PatternBeachWaves	beachWaves;
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
+	PatternDualWaves	dualWaves;
 	PatternFire			fire;
 	PatternFountain		particleFountain;
 	PatternNoise1		noise1;
 	PatternParametric	parametric;
 	PatternParametric2	parametricSpiral;
-	PatternPurpleRain	PurpleRain;
+	PatternPurpleRain	purpleRain;
 	PatternRaymarcher	raymarcher;
 	PatternSolid		solid;
 	PatternSparks		sparks;
@@ -63,12 +64,14 @@ public:
 	PatternWheelBlur	wheelBlur;
 	PatternWheelPart	wheelParticle;
 	PatternWorld		world;
+	
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 18;
+	static const uint8_t numPatterns = 19;
     _Pattern *patternList[numPatterns] = {
-		&PurpleRain,
+		&dualWaves,
+		&purpleRain,
 		&wheelParticle,
 		&wheelBlur,
 		

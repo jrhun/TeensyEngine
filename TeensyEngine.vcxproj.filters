@@ -224,6 +224,9 @@
     <ClInclude Include="src\Patterns\PatternFluidSim.h">
       <Filter>src\Patterns</Filter>
     </ClInclude>
+    <ClInclude Include="src\Patterns\PatternDots.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

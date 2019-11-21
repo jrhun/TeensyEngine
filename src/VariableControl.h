@@ -138,12 +138,12 @@ public:
 
 	}
 
-	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, OFF };
+	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, OFF };
 
 
 	const char* getTriggerName(uint8_t i) {
 		const char* triggerTypeName[VariableOscilate::OFF + 1]{
-			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Off"
+			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Gate", "Off"
 		};
 		if (i <= OFF) {
 			return triggerTypeName[i];
@@ -157,7 +157,7 @@ public:
 		triggerActive = true;
 		triggerStart = GET_MILLIS();
 		triggerDuration = 200;
-		oscType = TRIGGER;
+		//oscType = TRIGGER;
 		var = max;
 	}
 
@@ -191,6 +191,11 @@ public:
 		if (halfBPM)	b /= 2;
 		if (quaterBPM)	b /= 4;
 
+		if (triggerActive and var > min) {
+			var = myMap(now - triggerStart, 0, triggerDuration, max, min, true);
+		}
+		else { triggerActive = false; var = min; }
+
 
 		switch (oscType) {
 		case RAMP:
@@ -219,11 +224,13 @@ public:
 			var = sin8(((now * (b) * 280) >> 16) >> 8);
 			break;
 		case TRIGGER:
-			// Trigger decay
-			if (triggerActive and var > min) {
-				var = myMap(now - triggerStart, 0, triggerDuration, max, min, true);
-			}
-			else { triggerActive = false; var = min; }
+			// Trigger decay handled above
+			break;
+		case GATE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			var += 128;
+			if (var > 128)
+				trigger();
 			break;
 		case OFF:
 		default:
@@ -281,7 +288,7 @@ private:
 	bool triggerActive = false;
 
 	accum88 bpm = (120 << 8);
-	uint8_t oscType = OFF;
+	uint8_t oscType = GATE;
 
 	unsigned long timebase = 0;
 	unsigned long smoothTimebase = 0;
