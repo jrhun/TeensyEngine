@@ -163,6 +163,7 @@ namespace Data {
 	uint8_t hueScale = 3;
 	uint8_t hueInc = 1;
 	uint16_t hue = 0;
+	bool hueChange = true;
 	uint8_t getHue() {
 		return hue / hueScale;
 	}
@@ -186,6 +187,7 @@ namespace Data {
 
 
 	// audio vars
+  bool audioOn = false;
 	uint8_t noiseFloor = 65;
   uint8_t threshold = 200;
   float beat = 0;
@@ -199,11 +201,36 @@ namespace Data {
   VariableReference triggerType_t{"Trigger", &triggerType, 4, 0, 6};
 
   
-
+  //text
+  bool textOn = false;
+  uint8_t scrollSpeed = 1;
+  uint8_t textIndex = 0;
+  const uint8_t textOptionsCount = 17; // custom options at index 15 and 16
+  VariableReference textIndex_t{"Text", &textIndex, 0, 0, textOptionsCount};
+  const String textOptions[textOptionsCount] = {
+    "Dance!",
+    "Good job",
+    "Well done",
+    "Good tune", 
+    "Tune!",
+    "Nice one", 
+    "Thanks!",
+    "Yew!",
+    "Wow!", 
+    "Boot!",
+    "Pham!",
+    "Love it",
+    "Kick it", 
+    "Hi Mum",
+    "Nailed it",
+    "Custom 1",
+    "Custom 2"
+  };
 
   //accelerometer
+  bool MPUOn = false;
   float ax = 0.0f, ay = 0.0f, az = 0.0f;
-  float dx = 0.0f, dy = 0.0f, dz = 0.0f;
+  float gx = 0.0f, gy = 0.0f, gz = 0.0f;
 
   //headbands
   enum {hbPaletteUpdate = 1, hbBrightnessUpdate, hbPatternUpdate}; // update type

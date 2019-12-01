@@ -63,6 +63,110 @@ public:
 
 MenuAbstract baseMenu;
 
+class MenuBool : public MenuAbstract {
+public:
+	MenuBool(const char * name, bool *v) : MenuAbstract(name), val(v) {
+		hasAction = true;
+	}
+
+	const char* getName() {
+		//String r = name;
+		//r += getData();
+		//return r.c_str();
+		return name;
+	}
+
+	void press() {
+		*val = !*val;
+	}
+
+	String getData() {
+		if (*val)
+			return "On";
+		else return "Off";
+	}
+
+	void inc() {
+		press();
+	}
+
+	void dec() {
+		press();
+	}
+
+	bool *val;
+};
+
+
+
+class MenuTextSelection : public MenuAbstract {
+public:
+	MenuTextSelection() : MenuAbstract("Custom text") {
+		hasSelection = true;
+	}
+
+	String getDataExtended() {
+		return msg;
+	}
+
+	void inc() {
+		if (msg[sel] >= 'A' and msg[sel] < 'Z') {
+			// upper case
+			msg[sel]++;
+		}
+		else if (msg[sel] >= 'a' and msg[sel] < 'z') {
+			//lower case
+			msg[sel]++;
+		}
+		else if (msg[sel] == 'Z') {
+			msg[sel] = 'a';
+		}
+		else {
+			msg[sel] = 'A';
+		}
+	}
+
+	void dec() {
+		if (msg[sel] > 'A' and msg[sel] <= 'Z') {
+			// upper case
+			msg[sel]--;
+		}
+		else if (msg[sel] > 'a' and msg[sel] <= 'z') {
+			//lower case
+			msg[sel]--;
+		}
+		else if (msg[sel] == 'A') {
+			msg[sel] = ' ';
+		}
+	}
+
+	void up() {
+		if (msg[sel] >= 'a') msg[sel] -= 32;
+	}
+
+	void down() {
+		if (msg[sel] <= 'Z') msg[sel] += 32;
+	}
+
+	void left() {
+		if (sel > 0) sel--;
+	}
+
+	void right() {
+		if (sel < maxChar) sel++;
+	}
+
+	static const uint8_t maxChar = 16;
+	char msg[maxChar+1] = "                ";
+	uint8_t sel = 0;
+	
+	const uint8_t charUpperMin = 'A';
+	const uint8_t charUpperMax = 'Z';
+	const uint8_t charLowerMin = 'a';
+	const uint8_t charLowerMax = 'z';
+
+};
+
 class MenuCurrentPattern : public MenuAbstract {
 public:
 	MenuCurrentPattern() : MenuAbstract("") {}
@@ -347,6 +451,62 @@ public:
 //	uint8_t len;
 //};
 
+class MenuTextList : public MenuAbstract {
+public: 
+	MenuTextList() :MenuAbstract("Text list") {
+		hasSelection = true;
+	}
+	String getDataExtended() {
+		String r = "";
+		//for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
+		for (uint8_t i = frame; i < frame + maxLines; i++) {
+
+			if (i == *Data::textIndex_t)
+				r += "x ";
+			else if (i == selected)
+				r += "> ";
+			else
+				r += "  ";
+
+			if (i < Data::textIndex_t.max)
+				r += Data::textOptions[i];
+			else if (i == Data::textIndex_t.max)
+				r += "Back";
+
+			r += "\n";
+		}
+		if (frame + maxLines <= Data::textIndex_t.max) {
+			if (*Data::textIndex_t > frame + maxLines) r += "x ...";
+			else r += "  ...";
+		}
+
+		return r;
+	}
+
+	void up() {
+		if (selected < Data::textIndex_t.max) selected++;
+		if (selected >= maxLines + frame) frame++;
+
+	}
+	void down() {
+		if (selected > 0) selected--;
+		if (selected < frame) frame--;
+
+	}
+	void inc() { Data::textIndex_t.inc(); }
+	void dec() { Data::textIndex_t.dec(); }
+
+	void press() {
+		if (selected < Data::textIndex_t.max)
+			*Data::textIndex_t = selected;
+	}
+
+
+	uint8_t selected = 0;
+	uint8_t frame = 0;
+
+};
+
 class MenuPaletteList : public MenuAbstract {
 public:
 	MenuPaletteList() : MenuAbstract("Palette List") {
@@ -385,16 +545,19 @@ public:
 			if (*paletteIndex_t > frame + maxLines) r += "x ...";
 			else r += "  ...";
 		}
+		callback(selected);
 		return r;
 	}
 
 	void up() {
 		if (selected < paletteIndex_t.max) selected++;
 		if (selected >= maxLines + frame) frame++; 
+		
 	}
 	void down() {
 		if (selected > 0) selected--;
 		if (selected < frame) frame--;
+
 	}
 	void inc() { paletteIndex_t.inc(); }
 	void dec() { paletteIndex_t.dec(); }
@@ -404,6 +567,9 @@ public:
 			*paletteIndex_t = selected;
 	}
 
+
+	void setCallback(void(*fn)(uint8_t)) { callback = fn; }
+	void(*callback)(uint8_t) = NULL;
 
 	uint8_t selected = 0;
 	uint8_t frame = 0;
@@ -762,8 +928,8 @@ public:
 	// if an item is selected, can display a seperate page with details for it
 	bool selected = false;
 
-	virtual void left() {}
-	virtual void right() {}
+	virtual void left() { getCurrentItem()->left(); }
+	virtual void right() { getCurrentItem()->right(); }
 	virtual void up() {
 		if (selected)
 			getCurrentItem()->up();
@@ -787,10 +953,14 @@ public:
 			getCurrentItem()->press();
 	}
 	void inc() {
-		getCurrentItem()->inc();
+		if (selected and getCurrentItem()->getName() != "Custom text")
+			up();
+		else getCurrentItem()->inc();
 	}
 	void dec() {
-		getCurrentItem()->dec();
+		if (selected and getCurrentItem()->getName() != "Custom text")
+			down();
+		else getCurrentItem()->dec();
 	}
 };
 
@@ -891,13 +1061,14 @@ public:
 	//menu items
 	MenuCurrentPalette	CurrentPalette;
 	MenuPaletteList		PaletteList;
+	MenuBool			HueChange{ "Hue change", &Data::hueChange };
 	MenuVariable		BlendTime{ &blendTime_t };
 
-	static const size_t numItems = 3;
+	static const size_t numItems = 4;
 	MenuAbstract *items[numItems] = {
 		&PaletteList,
 		&CurrentPalette,
-
+		&HueChange,
 		&BlendTime
 	};
 
@@ -933,11 +1104,18 @@ public:
 		return items[currentItem];
 	}
 
+	MenuBool TextOn{ "Text: ", &Data::textOn };
+	MenuTextList TextList;
+	MenuTextSelection TextSelection1;
+	MenuTextSelection TextSelection2;
 
 	//menu items
-	static const size_t numItems = 1;
+	static const size_t numItems = 4;
 	MenuAbstract *items[numItems] = {
-		&baseMenu
+		&TextOn,
+		&TextList,
+		&TextSelection1,
+		&TextSelection2
 	};
 
 
@@ -1160,10 +1338,21 @@ public:
 	}
 
 	void left() {
-		previousPage();
+		//if (currentPage()->getCurrentItem() == Effects.TextSelection)
+		if (currentPage()->getCurrentItem()->getName() == "Custom text" and currentPage()->selected) {
+			currentPage()->left();
+		}
+		else {
+			previousPage();
+		}
 	}
 	void right() {
-		nextPage();
+		if (currentPage()->getCurrentItem()->getName() == "Custom text" and currentPage()->selected) {
+			currentPage()->right();
+		}
+		else {
+			nextPage();
+		}
 	}
 	void up() {
 		currentPage()->up();

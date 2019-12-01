@@ -2,7 +2,7 @@
 
 
 #include "data.h"
-#include "src\Patterns\PatternController.h"
+#include "src/Patterns/PatternController.h"
 
 #include <SPI.h>
 #include <RF24.h>

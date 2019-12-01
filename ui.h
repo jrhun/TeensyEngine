@@ -107,18 +107,27 @@ void drawBattery() {
 
 }
 
-void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
+//#include "src\palettes.h"
+
+//void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
+void drawPalette(uint8_t paletteIndex) {
   //draws a rectangle filled with current palette with arrow highlighting current hue
   // TL = top left
   // BR = bottom right
   // 0,0 is top left
-  //  const uint8_t h = 30;
-  const uint8_t w = 220; // 240 - w / 2
-  const uint8_t xStart = (240 - w) / 2;
-  for (uint8_t i = xStart; i < xStart + w; i++) {
+  const uint8_t h = 16;
+  const uint8_t w = 255; // 240 - w / 2
+//  const uint8_t xStart = (240 - w) / 2;
+
+//  uint8_t currentHue = (Data::getHue() + 128) % 255; // current hue centered in middle
+  uint8_t currentHue = 0;
+  CRGBPalette16 p = gGradientPalettes[paletteIndex];
+  for (uint8_t i = 0; i < w; i++) {
     //center current hue in middle
-    CRGB c = ColorFromPalette(palette, i + 100);
-    //    tft.drawFastVLine(i, y, h, tft.color565(c.r, c.g, c.b));
+    
+    CRGB c = ColorFromPalette(p, currentHue);
+    currentHue++;
+    tft.drawFastHLine(224, 60+i, 16, tft.color565(c.r, c.g, c.b));
   }
   //  tft.drawRoundRect(x - 10, y, 20, h, 5, TFT_WHITE);
 }
@@ -135,13 +144,13 @@ void tftDisplayFPS() {
 void tftDisplayVoltsAmps() {
   static uint8_t lastValue = 0;
   const uint8_t numVals = 10;
-  float volts[numVals] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
+  float volts[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
   float voltsSum = 0;
-  float amps[numVals] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
+  float amps[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
   float ampsSum = 0;
 
-    
-  
+
+
   float v = analogRead(VOLTS_IN_PIN);
   const float VREF = 3.292f;
   const uint16_t VMAX = 4095;
@@ -150,7 +159,7 @@ void tftDisplayVoltsAmps() {
   v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
 
   int16_t ampsRaw = analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
-//  amps = (ampsRaw * VREF) / VMAX; // amps measured in volts where 100mv = 1a
+  //  amps = (ampsRaw * VREF) / VMAX; // amps measured in volts where 100mv = 1a
   float a = map(ampsRaw, 3169, 3347, 580, 2050);
   a /= 1000.0f;
 
@@ -166,7 +175,7 @@ void tftDisplayVoltsAmps() {
 
   float voltsAvg = voltsSum / numVals;
   float ampsAvg = ampsSum / numVals;
-  
+
   tft.setTextSize(1);
   tft.setCursor(180, 8);
   tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
@@ -186,19 +195,19 @@ void uiLoop() {
   int8_t newPos = encoder.read();
   cli();
   if (newPos > 0) {
-    
+
     while (newPos >= 4) {
       inc();
       newPos -= 4;
     }
-//    newPos = 0;
+    //    newPos = 0;
     encoder.write(newPos);
   } else if (newPos < 0) {
     while (newPos <= -4) {
       dec();
       newPos += 4;
     }
-//    newPos = 0;
+    //    newPos = 0;
     encoder.write(newPos);
   }
   sei();
@@ -217,8 +226,8 @@ void uiLoop() {
         if (reading == LOW) {// input pull up
           buttonActions[i](false);//shortPress();
           updateDisplay = true;
-//          Serial.print("Press: ");
-//          Serial.println(i);
+          //          Serial.print("Press: ");
+          //          Serial.println(i);
         }
       }
       if ( (reading == LOW) and (now - lastDebounceTime[i]) > holdDelay) {
@@ -233,78 +242,85 @@ void uiLoop() {
   // display handle
   static unsigned long lastTFTUpdate = 0;
   if (now - lastTFTUpdate > (1000 / 10)) {
-	  lastTFTUpdate = now;
-	  // fast text updates only!
+    lastTFTUpdate = now;
+    // fast text updates only!
     tft.useFrameBuffer(false);
     tftDisplayVoltsAmps();
-	  //FPS
-    
-	  if (displayFPS) {
-		  tftDisplayFPS();
-      
-	  }
+    //FPS
+
+    if (displayFPS) {
+      tftDisplayFPS();
+
+    }
 
 #if 1
-	  if (updateDisplay) {
-		  updateDisplay = false;
-      
-		  //    tft.fillScreen(ILI9341_BLACK);
+    if (updateDisplay) {
+      updateDisplay = false;
+
+      //    tft.fillScreen(ILI9341_BLACK);
       tft.useFrameBuffer(true);
-			  // print title
-		  const uint8_t headingOffset = 2;
-		  tft.setCursor(0, headingOffset);
-		  tft.setTextSize(3);
-		  tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
-		  tft.println("Radience");
-		  const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
-		  tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
+      // print title
+      const uint8_t headingOffset = 2;
+      tft.setCursor(0, headingOffset);
+      tft.setTextSize(3);
+      tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
+      tft.println("Radience");
+      const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
+      tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
 
-		  //print page name
-		  tft.setCursor(2, headingBottom + 6);
-		  tft.setTextSize(2);
-		  tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
-		  //    tft.print("Current pattern\n> ");
-		  tft.println(menu.currentPage()->getName());
-		  for (uint8_t i = 0; i < menu.numPages; i++) {
-			  const uint8_t xPos = tft.width() - 52;
-			  const uint8_t yPos = headingBottom + 2 + 2 + 2;
-			  if (i == menu.currentPageIndex) {
-				  tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
-			  }
-			  else {
-				  tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
-			  }
-		  }
-		  tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
+      //print page name
+      tft.setCursor(2, headingBottom + 6);
+      tft.setTextSize(2);
+      tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
+      //    tft.print("Current pattern\n> ");
+      tft.println(menu.currentPage()->getName());
+      for (uint8_t i = 0; i < menu.numPages; i++) {
+        const uint8_t xPos = tft.width() - 52;
+        const uint8_t yPos = headingBottom + 2 + 2 + 2;
+        if (i == menu.currentPageIndex) {
+          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
+        }
+        else {
+          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
+        }
+      }
+      tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
 
 
-		  //Print body
-		  const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
-		  tft.setCursor(0, bodyY);
+      //Print body
+      const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
+      tft.setCursor(0, bodyY);
 
-		  tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
-		  tft.println(menu.currentPage()->getPageData());
-		  //    String body = menu.currentPage()->getPageData();
-		  //    uint8_t index = 0;
-		  //    String temp = "";
-		  //    for (int i = 0; i < body.length(); i++) {
-		  //      char c = body.charAt(i);
-		  //      if (c == '\n') {
-		  //        tft.println(temp);
-		  //        temp = "";
-		  //      } else {
-		  //        if (c == '\t'){
-		  //          temp += " ";
-		  //          }
-		  //        else {
-		  //          temp += c;
-		  //        }
-		  //      }
-		  //    }
+      tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
+      tft.println(menu.currentPage()->getPageData());
+      //    String body = menu.currentPage()->getPageData();
+      //    uint8_t index = 0;
+      //    String temp = "";
+      //    for (int i = 0; i < body.length(); i++) {
+      //      char c = body.charAt(i);
+      //      if (c == '\n') {
+      //        tft.println(temp);
+      //        temp = "";
+      //      } else {
+      //        if (c == '\t'){
+      //          temp += " ";
+      //          }
+      //        else {
+      //          temp += c;
+      //        }
+      //      }
+      //    }
+
+      
+//      if (menu.currentPageIndex == 1) {
+        //colour, display palette
+//        drawPalette(0, 300, gfx.currentPalette);
+//      }
+
       tftDisplayVoltsAmps();
       if (displayFPS) tftDisplayFPS();
       tft.updateScreenAsync(false);
-	  }
+    }
 #endif
   }
 }
@@ -313,7 +329,7 @@ void uiLoop() {
 
 
 // SAVING AND STORING SETTINGS
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__) 
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include <EEPROM.h>
 
 void saveSettings() {
@@ -326,11 +342,11 @@ void saveSettings() {
 void loadSettings() {
   uint8_t address = 0;
   *Data::brightness_t = EEPROM.read(address++);
-  *Data::triggerType_t = EEPROM.read(address++); 
+  *Data::triggerType_t = EEPROM.read(address++);
   *Data::backlight_t = EEPROM.read(address++);
 }
 
-#else 
+#else
 void saveSettings();
 void loadSettings();
 #endif
@@ -341,12 +357,12 @@ void updateSettings() {
 }
 
 void uiSetup() {
-  
+
   pinMode(TFT_BACKLIGHT, OUTPUT);
   digitalWrite(TFT_BACKLIGHT, LOW);
-  
+
   tft.begin();
-//  tft.setFont(Arial_24_Bold);
+  //  tft.setFont(Arial_24_Bold);
   tft.setRotation(2);
   tft.fillScreen(ILI9341_BLACK);// grey fill
 
@@ -366,8 +382,8 @@ void uiSetup() {
 
   encoder.write(0);
 
-  
-  
+
+
 
   // setup callbacks
   currentPattern_t.setCallback([]() {
@@ -377,7 +393,9 @@ void uiSetup() {
   paletteIndex_t.setCallback([]() {
     gfx.setPalette(*paletteIndex_t);
   });
+
   
+
   gfx.currentPalette = RainbowColors_p;
   gfx.targetPalette = RainbowColors_p;
 
@@ -388,15 +406,19 @@ void uiSetup() {
     analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4);
   });
 
+  menu.Colour.PaletteList.setCallback([](uint8_t i) {
+    drawPalette(i);
+  });
+
   menu.Settings.Save.setCallback([]() {
     Serial.print("Saved settings. Brightness: ");
     Serial.println(*Data::brightness_t);
-    saveSettings();  
+    saveSettings();
     updateSettings();
   });
 
   menu.Settings.Load.setCallback([]() {
-    loadSettings();  
+    loadSettings();
     Serial.print("Loaded settings. Brightness: ");
     Serial.print(*Data::brightness_t);
     updateSettings();
@@ -411,21 +433,21 @@ void uiSetup() {
     sendClientUpdate(SETTINGS);
   });
 
-//  Data::brightnessHb_t.setCallback([]() {
-//    sendClientUpdate(SETTINGS);
-//  });
-//
-//  Data::fadeHb_t.setCallback([]() {
-//    sendClientUpdate(SETTINGS);
-//  });
-//
-//  Data::speedHb_t.setCallback([]() {
-//    sendClientUpdate(SETTINGS);
-//  });
-//
-//  Data::hueDelayHb_t.setCallback([]() {
-//    sendClientUpdate(SETTINGS);
-//  });
+  //  Data::brightnessHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::fadeHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::speedHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::hueDelayHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
 
   menu.Headbands.Sync.setCallback([]() {
     sendClientUpdate(UPDATE);

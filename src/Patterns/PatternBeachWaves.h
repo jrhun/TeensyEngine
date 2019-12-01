@@ -115,14 +115,16 @@ public:
 			gfx.blur(175);
 		}
 		//
-		uint8_t amplitude = 8;
-		amplitude = GuiVars1 * 12;
+		uint8_t amplitude1 = 8;
+		uint8_t amplitude2 = 8;
+		amplitude1 = GuiVars1 * 12;
 		//amplitude = myMap(beatsin8(80, ), 0, 255, 0, 12);
-		amplitude = beatsin8(80, 1, 12);
+		amplitude1 = beatsin8(120, 2, 12);
+		amplitude2 = beatsin8(130, 2, 12);
 		for (uint8_t x = 0; x < SCREEN_WIDTH; x++) {
-			uint8_t y = beatsin8(70, SCREEN_HEIGHT/2 - amplitude, SCREEN_HEIGHT / 2 + amplitude, 0, 4 * x);
+			uint8_t y = beatsin8(70, SCREEN_HEIGHT/2 - amplitude1, SCREEN_HEIGHT / 2 + amplitude1, 0, 4 * x);
 			gfx.putPixel(x, y, gfx.getColour());
-			y = beatsin8(70, SCREEN_HEIGHT / 2 - amplitude, SCREEN_HEIGHT / 2 + amplitude, 0, 64 + 4 * x);
+			y = beatsin8(70, SCREEN_HEIGHT / 2 - amplitude2, SCREEN_HEIGHT / 2 + amplitude2, 0, 64 + 4 * x);
 			gfx.putPixel(x, y, gfx.getColour(50));
 		}
 

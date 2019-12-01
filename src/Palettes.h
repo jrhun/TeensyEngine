@@ -590,9 +590,9 @@ sizeof(gGradientPalettes) / sizeof(TProgmemRGBGradientPalettePtr) + 1; //one ext
   "Magenta Evening",
   "Pink Purple",
   "Autumn",
-  "Black Blue Magenta White",
-  "Black Magenta Red",
-  "Black Red Magenta Yellow",
+  "Blue Magenta White",
+  "Magenta Red",
+  "Red Magenta Yellow",
   "Blue Cyan Yellow"
 };
 

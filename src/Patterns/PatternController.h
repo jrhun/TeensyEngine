@@ -170,7 +170,7 @@ public:
 			}
 
 		}
-		if (now - nextHueUpdate > 1000 / 60) {
+		if (Data::hueChange and now - nextHueUpdate > 1000 / 60) {
 			nextHueUpdate = now;
 			Data::incHue();
 		}
