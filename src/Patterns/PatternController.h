@@ -131,11 +131,10 @@ public:
 
 	unsigned long nextUpdate = 0;
 	unsigned long nextHueUpdate = 0;
+	unsigned long nextCursorUpdate = 0;
+	uint8_t cursorPos = 0;
 
 	void run() {
-		
-		
-
 		if (nextUpdate == 0) {
 			getCurrentPattern()->start();// initial
 		}
@@ -146,28 +145,41 @@ public:
 			
 			gfx.updatePalette();
 
-			nextUpdate = getCurrentPattern()->drawFrame() + now;
+			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
 
-			//        memcpy(&scratchArray[0], &leds[0], NUM_LEDS * sizeof(leds[0]));
-			//        leds.displayText();
-			//        memcpy(&leds[0], &scratchArray[0], NUM_LEDS * sizeof(leds[0]));
-#if defined(ARDUINO)
-			FastLED.setBrightness(Data::brightness);
-			//FastLED.show();
-#else 
-			//gfx.show();
-#endif
-			gfx.show();
+			//add effects
 			if (!_Pattern::useDefaultEffect) {
-				if (FxFade)
-					gfx.fade(FxFade);
-				if (FxBlur)
-					gfx.blur(FxBlur);
-				if (FxSpiral)
-					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
-				if (FxNoiseSmear)
-					standardNoiseSmearing();
+				if (_Pattern::fadeFx)
+					gfx.fade(_Pattern::fadeFx);
+				if (_Pattern::blurFx)
+					gfx.blur(_Pattern::blurFx);
+				//if (FxSpiral)
+				//	SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
+				//if (FxNoiseSmear)
+				//	standardNoiseSmearing();
 			}
+
+			gfx.update(); ////copys from gfx led buffer to FastLED/screen buffer
+
+			//text
+			//gfx.setFont(&Org_01);
+			
+			//gfx.print("Meredith!");
+			if (Data::textOn) {
+				gfx.setCursor(cursorPos, 12);
+				
+				String text;
+				if (Data::textIndex == Data::customIndex1) {
+					text = Data::custom1;
+				}
+				else if (Data::textIndex == Data::customIndex2) {
+					text = Data::custom2;
+				}
+				else {text = Data::textOptions[Data::textIndex];}
+				gfx.print(text);
+			}
+
+			gfx.show();
 
 		}
 		if (Data::hueChange and now - nextHueUpdate > 1000 / 60) {
@@ -175,8 +187,15 @@ public:
 			Data::incHue();
 		}
 
+		if (now - nextCursorUpdate > 1000 / 40) {
+			nextCursorUpdate = now;
+			cursorPos = (cursorPos - 1 + SCREEN_WIDTH) % SCREEN_WIDTH;
+		}
+
 	}
 };
+
+
 
 PatternController patterns;
 

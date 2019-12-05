@@ -206,26 +206,31 @@ namespace Data {
   uint8_t scrollSpeed = 1;
   uint8_t textIndex = 0;
   const uint8_t textOptionsCount = 17; // custom options at index 15 and 16
+  const uint8_t customIndex1 = 15;
+  const uint8_t customIndex2 = 16;
   VariableReference textIndex_t{"Text", &textIndex, 0, 0, textOptionsCount};
   const String textOptions[textOptionsCount] = {
     "Dance!",
-    "Good job",
-    "Well done",
-    "Good tune", 
+    "Good job!",
+    "Well done!",
+    "Good tune!", 
     "Tune!",
-    "Nice one", 
+    "Nice one!", 
     "Thanks!",
     "Yew!",
     "Wow!", 
     "Boot!",
     "Pham!",
-    "Love it",
-    "Kick it", 
-    "Hi Mum",
-    "Nailed it",
+    "Love it!",
+    "Kick it!", 
+    "Hi Mum!",
+    "Nailed it!",
     "Custom 1",
     "Custom 2"
   };
+
+  char custom1[12] = "           ";
+  char custom2[12] = "           ";
 
   //accelerometer
   bool MPUOn = false;

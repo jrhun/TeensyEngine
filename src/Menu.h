@@ -103,7 +103,11 @@ class MenuTextSelection : public MenuAbstract {
 public:
 	MenuTextSelection() : MenuAbstract("Custom text") {
 		hasSelection = true;
+		index = counter++;
 	}
+
+	static uint8_t counter;
+	uint8_t index;
 
 	String getDataExtended() {
 		return msg;
@@ -121,6 +125,12 @@ public:
 		else if (msg[sel] == 'Z') {
 			msg[sel] = 'a';
 		}
+		else if (msg[sel] == 'z') {
+			msg[sel] = '!';
+		}
+		else if (msg[sel] == '!') {
+			msg[sel] = '?';
+		}
 		else {
 			msg[sel] = 'A';
 		}
@@ -137,6 +147,12 @@ public:
 		}
 		else if (msg[sel] == 'A') {
 			msg[sel] = ' ';
+		}
+		else if (msg[sel] == '?') {
+			msg[sel] = '!';
+		}
+		else if (msg[sel] == '!') {
+			msg[sel] = 'z';
 		}
 	}
 
@@ -156,8 +172,19 @@ public:
 		if (sel < maxChar) sel++;
 	}
 
-	static const uint8_t maxChar = 16;
-	char msg[maxChar+1] = "                ";
+	void press() {
+		char *toAddress;
+		if (index == 0)
+			toAddress = Data::custom1;
+		if (index == 1)
+			toAddress = Data::custom2;
+		for (uint8_t i = 0; i < 15; i++) {
+			toAddress[i] = msg[i];
+		}
+	}
+
+	static const uint8_t maxChar = 11;
+	char msg[maxChar+1] = "           ";
 	uint8_t sel = 0;
 	
 	const uint8_t charUpperMin = 'A';
@@ -166,6 +193,8 @@ public:
 	const uint8_t charLowerMax = 'z';
 
 };
+
+uint8_t MenuTextSelection::counter = 0;
 
 class MenuCurrentPattern : public MenuAbstract {
 public:
@@ -1108,14 +1137,29 @@ public:
 	MenuTextList TextList;
 	MenuTextSelection TextSelection1;
 	MenuTextSelection TextSelection2;
+	MenuBool CustomOn{ "Custom fx", &_Pattern::useDefaultEffect };
+
+	VariableReference blurFx{ "Blur", &_Pattern::blurFx };
+	VariableReference fadeFx{ "Fade", &_Pattern::fadeFx };
+	VariableReference textFx{ "Text opacity", &_Pattern::textFx };
+	VariableReference textOpacity{ "Text opacity", &gfx.textOpacity };
+
+	MenuVariable BlurFx{ &blurFx };
+	MenuVariable FadeFx{ &fadeFx };
+	MenuVariable TextFx{ &textOpacity };
 
 	//menu items
-	static const size_t numItems = 4;
+	static const size_t numItems = 8;
 	MenuAbstract *items[numItems] = {
 		&TextOn,
+		&TextFx,
 		&TextList,
 		&TextSelection1,
-		&TextSelection2
+		&TextSelection2,
+		&CustomOn,
+		&BlurFx, 
+		&FadeFx
+		
 	};
 
 

@@ -19,15 +19,38 @@
 #include "FastLED_PC.h"
 #endif
 
+#include "Font.h"
+
+
+
+
+
 class Graphics {
 public:
 	Graphics()  {}
 
 	virtual void init() {}
+	virtual void update() {}
 	virtual void show() {}
-	virtual void clear() {}
-	virtual void fill(CRGB c) {}
-	virtual void fade(uint8_t a = 128) {}
+	virtual void clear() {
+		for (int i = 0; i < SCREEN_WIDTH; i++) {
+			for (int j = 0; j < SCREEN_HEIGHT; j++) {
+				leds[i + j * SCREEN_WIDTH] = CRGB::Black;
+			}
+		}
+	}
+	virtual void fill(CRGB c) {
+		for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+			leds[i] = c;
+		}
+	}
+	void fade(uint8_t a = 128) {
+		for (int i = 0; i < SCREEN_WIDTH; i++) {
+			for (int j = 0; j < SCREEN_HEIGHT; j++) {
+				leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
+			}
+		}
+	}
 	virtual CRGB getColour(uint8_t offset = 0, uint8_t bri = 255) {
 		uint8_t h = (Data::getHue() + offset) % 256;
 		return ColorFromPalette(currentPalette, h, bri, currentBlending);
@@ -92,8 +115,21 @@ public:
 	virtual void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {};
 	virtual void putPixel(int x, int y, CRGB c) {};
 	virtual void putPixel(int x, int y, unsigned char h) {};
-	virtual void blendPixel(int x, int y, CRGB c, uint8_t a=128) {};
-
+	virtual void putPixelDirect(int x, int y, CRGB c) {};
+	
+	
+	//virtual void blendPixel(int x, int y, CRGB c, uint8_t a=128) {};
+	void blendPixel(int x, int y, CRGB c, uint8_t a = 128) {
+		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
+			if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
+				leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
+				//leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
+			}
+			else
+				putPixel(x, y, c);
+		}
+	}
+	
 
 	void drawPointDepth(int16_t x, int16_t y, int16_t z, unsigned char r, unsigned char g, unsigned char b) {
 		drawPointDepth(x, y, z, CRGB(r, g, b));
@@ -472,14 +508,212 @@ public:
 		return false;
 	}
 
+	void setTextColour(CRGB c) {
+		textcolor = c;
+	}
+
+	void setCursor(uint8_t x, uint8_t y) {
+		cursor_x = x;
+		cursor_y = y;
+	}
+
+	void setFont(const FXfont *f) {
+		if (f) {          // Font struct pointer passed in?
+			if (!gfxFont) { // And no current font struct?
+			  // Switching from classic to new font behavior.
+			  // Move cursor pos down 6 pixels so it's on baseline.
+				cursor_y += 6;
+			}
+		}
+		else if (gfxFont) { // NULL passed.  Current font struct defined?
+	   // Switching from new to classic font behavior.
+	   // Move cursor pos up 6 pixels so it's at top-left of char.
+			cursor_y -= 6;
+		}
+		gfxFont = (FXfont *)f;
+	}
+
+	size_t write(const char c) {
+		if (!gfxFont) { // 'Classic' built-in font
+
+			if (c == '\n') {
+				cursor_y += textsize * 8;
+				cursor_x = 0;
+			}
+			else if (c == '\r') {
+				// skip em
+			}
+			else {
+				if (wrap && ((cursor_x + textsize * 6) >= SCREEN_WIDTH * 2)) { // Heading off edge?
+					cursor_x = 0;            // Reset x to zero
+					cursor_y += textsize * 8; // Advance y one line
+				}
+				cursor_x %= SCREEN_WIDTH; //wrap around
+				drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+				cursor_x += textsize * 6;
+			}
+
+		}
+		else {
+			if (c == '\n') {
+				cursor_x = 0;
+				cursor_y += (int16_t)textsize *
+					(uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+			}
+			else if (c != '\r') {
+				uint8_t first = pgm_read_byte(&gfxFont->first);
+				if ((c >= first) && (c <= (uint8_t)pgm_read_byte(&gfxFont->last))) {
+					uint8_t   c2 = c - pgm_read_byte(&gfxFont->first);
+					FXglyph *glyph = &(((FXglyph *)pgm_read_pointer(&gfxFont->glyph))[c2]);
+					uint8_t   w = pgm_read_byte(&glyph->width),
+						h = pgm_read_byte(&glyph->height);
+					if ((w > 0) && (h > 0)) { // Is there an associated bitmap?
+						int16_t xo = (int8_t)pgm_read_byte(&glyph->xOffset); // sic
+						if (wrap && ((cursor_x + textsize * (xo + w)) >= SCREEN_WIDTH * 2)) {
+							// Drawing character would go off right edge; wrap to new line
+							cursor_x = 0;
+							cursor_y += (int16_t)textsize *
+								(uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+						}
+						cursor_x %= SCREEN_WIDTH; //wrap around
+						drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+					}
+					cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+				}
+			}
+		}
+		return 1;
+	}
+
+	size_t write(const char *buffer, size_t size) {
+		size_t n = 0;
+		while (size--) {
+			size_t ret = write(pgm_read_byte(buffer++));
+			if (ret == 0) {
+				// Write of last byte didn't complete, abort additional processing
+				break;
+			}
+			n += ret;
+		}
+		return n;
+	}
+
+	void fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, CRGB c) {
+		for (uint8_t i = 0; i < w; i++) {
+			for (uint8_t j = 0; j < h; j++) {
+				putPixel(x + i, y + j, c);
+			}
+		}
+	}
+
+	void fillRectDirect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, CRGB c) {
+		for (uint8_t i = 0; i < w; i++) {
+			for (uint8_t j = 0; j < h; j++) {
+				putPixelDirect(x + i, y + j, c);
+			}
+		}
+	}
 
 
-	float zBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+	void drawChar(int16_t x, int16_t y, unsigned char c,
+		CRGB color, CRGB bg, uint8_t size) {
+
+		color = color.scale8(textOpacity);
+
+		if (!gfxFont) { // 'Classic' built-in font
+
+			if ((x >= SCREEN_WIDTH) || // Clip right
+				(y >= SCREEN_HEIGHT) || // Clip bottom
+				((x + 6 * size - 1) < 0) || // Clip left
+				((y + 8 * size - 1) < 0))   // Clip top
+				return;
+
+			if ((c >= 176)) c++; // Handle 'classic' charset behavior
+
+			for (int8_t i = 0; i < 6; i++) {
+				uint8_t line;
+				if (i < 5) line = pgm_read_byte(font + (c * 5) + i);
+				else      line = 0x0;
+				for (int8_t j = 0; j < 8; j++, line >>= 1) {
+					if (line & 0x1) {
+						if (size == 1) putPixelDirect(x + i, y + j, color);
+						else          fillRectDirect(x + (i*size), y + (j*size), size, size, color);
+					}
+					//else if (bg != color) {
+					//	if (size == 1) putPixel(x + i, y + j, bg);
+					//	else          fillRect(x + i * size, y + j * size, size, size, bg);
+					//}
+				}
+			}
+
+		}
+		else { // Custom font
+
+	   // Character is assumed previously filtered by write() to eliminate
+	   // newlines, returns, non-printable characters, etc.  Calling drawChar()
+	   // directly with 'bad' characters of font may cause mayhem!
+
+			c -= pgm_read_byte(&gfxFont->first);
+			FXglyph *glyph = pgm_read_glyph_ptr(gfxFont, c);
+			uint8_t  *bitmap = (uint8_t *)pgm_read_pointer(&gfxFont->bitmap);
+
+			uint16_t bo = pgm_read_word(&glyph->bitmapOffset);
+			uint8_t  w = pgm_read_byte(&glyph->width),
+				h = pgm_read_byte(&glyph->height);
+			// xa = pgm_read_byte(&glyph->xAdvance);
+			int8_t   xo = pgm_read_byte(&glyph->xOffset),
+				yo = pgm_read_byte(&glyph->yOffset);
+			uint8_t  xx, yy, bits = 0, bit = 0;
+			int16_t  xo16 = 0, yo16 = 0;
+
+			if (size > 1) {
+				xo16 = xo;
+				yo16 = yo;
+			}
+
+			for (yy = 0; yy < h; yy++) {
+				for (xx = 0; xx < w; xx++) {
+					if (!(bit++ & 7)) {
+						bits = pgm_read_byte(&bitmap[bo++]);
+					}
+					if (bits & 0x80) {
+						if (size == 1) {
+							putPixelDirect(x + xo + xx, y + yo + yy, color);
+						}
+						else {
+							fillRectDirect(x + (xo16 + xx)*size, y + (yo16 + yy)*size, size, size, color);
+						}
+					}
+					bits <<= 1;
+				}
+			}
+
+		} // End classic vs custom font
+	}
+
+	size_t print(const String &s) {
+		return write(s.c_str(), s.length());
+	}
+
+	CRGB textcolor = CRGB::White, textbgcolor;
+	uint8_t textOpacity = 128;
+	uint8_t textsize = 1;
+	uint8_t cursor_x = 0;
+	uint8_t cursor_y = 0;
+	bool wrap = true;
+	FXfont *gfxFont;// = (FXfont *)FreeSans12pt7b;
+
+	//f;
 	
+	
+	float zBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+
 	CRGBPalette16	currentPalette;// = RainbowColors_gp;
 	CRGBPalette16	targetPalette;// = RainbowColors_p;
 	TBlendType		currentBlending = LINEARBLEND;
-	
+
 	CRGBArray < SCREEN_WIDTH * SCREEN_HEIGHT > leds;
 
 };
+
+

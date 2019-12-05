@@ -12,21 +12,23 @@ public:
 	GraphicsFastLED(Leds *ledControl) :
 		ledRef(ledControl) {}
 
-	void clear() {
-		ledRef->clear();
-	}
+	//void clear() {
+	//	ledRef->clear();
+	//}
 
-	virtual void fill(CRGB c) {
-		ledRef->fillScreen(c);
-	}
+	//virtual void fill(CRGB c) {
+	//	ledRef->fillScreen(c);
+	//}
 
-	void fade(unsigned char a = 128) {
-		ledRef->fade(a);
-	}
+	//void fade(unsigned char a = 128) {
+	//	ledRef->fade(a);
+	//}
+
 	void setColorTemp(uint32_t i) {
 		FastLED.setTemperature(i);
 	}
-	void show() {
+
+	void update() {
 		// change to use gfx.leds and copy to fastled buffer for double buffering
 		//ledRef->fillScreen(CRGB::Black);
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
@@ -35,9 +37,9 @@ public:
 				ledsRaw[XY(x, y)] = leds[(x)+(y)* SCREEN_WIDTH];
 			}
 		}
-		// overlays
-		// e.g. Text
-		// foreground effect
+	}
+	void show() {
+		FastLED.setBrightness(Data::brightness);
 		FastLED.show();
 	}
 
@@ -46,21 +48,29 @@ public:
 	//}
 
 	void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {
-		ledRef->drawPixel(x, y, CRGB(r, g, b));
+		leds[myXY(x, y)] = CRGB(r, g, b);
+		//ledRef->drawPixel(x, y, CRGB(r, g, b));
 	}
 
 	void putPixel(int x, int y, CRGB c) {
-		ledRef->drawPixel(x, y, c);
+		leds[myXY(x, y)] = c;
+		//ledRef->drawPixel(x, y, c);
+	}
+
+	void putPixelDirect(int x, int y, CRGB c) {
+		ledsRaw[XY(x, y)] = c;
+		//ledRef->drawPixel(x, y, c);
 	}
 
 	void putPixel(int x, int y, unsigned char h) {
 		CRGB c = getColour(h);
-		ledRef->drawPixel(x, y, c);
+		putPixel(x, y, c);
+		//ledRef->drawPixel(x, y, c);
 	}
 
-	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
-		ledRef->drawBlend(x, y, c, a);
-	}
+	//void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+	//	ledRef->drawBlend(x, y, c, a);
+	//}
 
 	// crgb getcolor(unsigned char offset = 0) {
 

@@ -9,8 +9,8 @@
 //2
 // change first pin to one earlier i.e 25 and skip first NUM_LEDS_PER_STRIP
 #include <FastLED.h>
-#include <FastLED_GFX.h>
-#include <Fonts/PicopixelFL.h>
+//#include <FastLED_GFX.h>
+//#include <Fonts/PicopixelFL.h>
 
 #define ROWS                32
 #define COLS                64
@@ -120,9 +120,9 @@ uint16_t XY(uint8_t x, uint8_t y) {
 }
 
 
-class Leds : public FastLED_GFX {
+class Leds {
   public:
-    Leds() : FastLED_GFX(COLS, ROWS) {}
+    Leds() {};// : FastLED_GFX(COLS, ROWS) {}
 
     void init() {
       #if defined(ESP32)
@@ -148,26 +148,26 @@ class Leds : public FastLED_GFX {
       currentPalette = RainbowColors_p;
       currentBlending = LINEARBLEND;
 
-      setFont(&Picopixel);
-      setTextSize(1);
-      setTextWrap(true);
+//      setFont(&Picopixel);
+//      setTextSize(1);
+//      setTextWrap(true);
       FastLED.setDither( 0 );
 
       #if 0
       //test strips
       uint8_t j = 0;
       while(true){
-      setTextSize(2);
+//      setTextSize(2);
       j += 5;
       for (int i = 0; i < 8; i++) {
         
 //        ledsRaw(i*NUM_LEDS_PER_STRIP + 10, i*NUM_LEDS_PER_STRIP + 15).fill_solid(CHSV(i * 26, 255, 255));
         ledsRaw(i*NUM_LEDS_PER_STRIP + 17, i*NUM_LEDS_PER_STRIP + 17 + i).fill_solid(CRGB::Red);
-        setTextColor(CHSV(j, 255, 255));
-        setCursor(1+ i * COLS / 8, 10);
-        print(i);
+//        setTextColor(CHSV(j, 255, 255));
+//        setCursor(1+ i * COLS / 8, 10);
+//        print(i);
       }
-      setTextSize(1);
+//      setTextSize(1);
       FastLED.show();
       delay(50);
       }
@@ -251,89 +251,89 @@ class Leds : public FastLED_GFX {
     bool blendOnDrawPixel = false;
 
     // GFX OVERRIDDEN CLASSES BELOW
-    void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB color) {
-      int16_t steep = abs(y1 - y0) > abs(x1 - x0);
-      if (steep) {
-        adagfxswap(x0, y0);
-        adagfxswap(x1, y1);
-      }
-
-      if (x0 > x1) {
-        adagfxswap(x0, x1);
-        adagfxswap(y0, y1);
-      }
-
-      int16_t dx, dy;
-      dx = x1 - x0;
-      dy = abs(y1 - y0);
-
-      int16_t err = dx / 2;
-      int16_t ystep;
-
-      if (y0 < y1) {
-        ystep = 1;
-      } else {
-        ystep = -1;
-      }
-
-      for (; x0 <= x1; x0++) {
-        if (steep) {
-          drawPixel(y0 % COLS, x0, color);
-        } else {
-          drawPixel(x0 % COLS, y0, color);
-        }
-        err -= dy;
-        if (err < 0) {
-          y0 += ystep;
-          err += dx;
-        }
-      }
-    }
-
-    void drawRGBBitmap(int16_t x, int16_t y,
-                       const uint16_t bitmap[], int16_t w, int16_t h) {
-      for (int16_t j = 0; j < h; j++, y++) {
-        for (int16_t i = 0; i < w; i++ ) {
-          uint16_t color = pgm_read_word(&bitmap[j * w + i]);
-          drawPixel(x + i, y, CRGB( pgm_read_byte(&gamma5[ color >> 11       ]),
-                                    pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
-                                    pgm_read_byte(&gamma5[ color       & 0x1F])));
-        }
-      }
-    }
-
-    void drawRGBBitmap(int16_t x, int16_t y,
-                       const uint8_t bitmap[], int16_t w, int16_t h) {
-      uint16_t buffOffset = 0;
-      uint8_t r, g, b;
-      for (int16_t j = 0; j < h; j++, y++) {
-        for (int16_t i = 0; i < w; i++ ) {
-          r = pgm_read_word(&bitmap[buffOffset++]);
-          g = pgm_read_word(&bitmap[buffOffset++]);
-          b = pgm_read_word(&bitmap[buffOffset++]);
-          drawPixel(x + i, y, CRGB(r, g, b));
-        }
-      }
-    }
-
-    // draw gradient scale between two colours fg and bg
-    void drawGrayscaleBitmap(int16_t x, int16_t y,
-                             const uint8_t bitmap[], int16_t w, int16_t h, CRGB fg, CRGB bg) {
-      // col = x * cos( uint8_t((y - COLS/2)*6) );
-      //          uint16_t iOffset = ((x+i) * cos8( uint8_t(y-ROWS/2)*6 )) / 256;
-      // therefore, if x = 0, i = 10, y = 0iOffset =
-      // 10 * cos8(-96=160) / 256 = 6. a 4 unit reduction
-      // but then we also need to blend with the other 4 pixels... otherwise lastone takes preference
-      uint16_t buffidx = 0;
-      for (int16_t j = 0; j < h; j++) {
-        for (int16_t i = 0; i < w; i++ ) {
-          //          CRGB colour = blend(fg, bg, (uint8_t)pgm_read_byte(&bitmap[j * w + i]));
-          CRGB colour = blend(bg, fg, pgm_read_byte(bitmap + buffidx));
-          buffidx++;
-          drawPixel((x + i + COLS) % COLS, j + y, colour);
-        }
-      }
-    }
+//    void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB color) {
+//      int16_t steep = abs(y1 - y0) > abs(x1 - x0);
+//      if (steep) {
+//        adagfxswap(x0, y0);
+//        adagfxswap(x1, y1);
+//      }
+//
+//      if (x0 > x1) {
+//        adagfxswap(x0, x1);
+//        adagfxswap(y0, y1);
+//      }
+//
+//      int16_t dx, dy;
+//      dx = x1 - x0;
+//      dy = abs(y1 - y0);
+//
+//      int16_t err = dx / 2;
+//      int16_t ystep;
+//
+//      if (y0 < y1) {
+//        ystep = 1;
+//      } else {
+//        ystep = -1;
+//      }
+//
+//      for (; x0 <= x1; x0++) {
+//        if (steep) {
+//          drawPixel(y0 % COLS, x0, color);
+//        } else {
+//          drawPixel(x0 % COLS, y0, color);
+//        }
+//        err -= dy;
+//        if (err < 0) {
+//          y0 += ystep;
+//          err += dx;
+//        }
+//      }
+//    }
+//
+//    void drawRGBBitmap(int16_t x, int16_t y,
+//                       const uint16_t bitmap[], int16_t w, int16_t h) {
+//      for (int16_t j = 0; j < h; j++, y++) {
+//        for (int16_t i = 0; i < w; i++ ) {
+//          uint16_t color = pgm_read_word(&bitmap[j * w + i]);
+//          drawPixel(x + i, y, CRGB( pgm_read_byte(&gamma5[ color >> 11       ]),
+//                                    pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
+//                                    pgm_read_byte(&gamma5[ color       & 0x1F])));
+//        }
+//      }
+//    }
+//
+//    void drawRGBBitmap(int16_t x, int16_t y,
+//                       const uint8_t bitmap[], int16_t w, int16_t h) {
+//      uint16_t buffOffset = 0;
+//      uint8_t r, g, b;
+//      for (int16_t j = 0; j < h; j++, y++) {
+//        for (int16_t i = 0; i < w; i++ ) {
+//          r = pgm_read_word(&bitmap[buffOffset++]);
+//          g = pgm_read_word(&bitmap[buffOffset++]);
+//          b = pgm_read_word(&bitmap[buffOffset++]);
+//          drawPixel(x + i, y, CRGB(r, g, b));
+//        }
+//      }
+//    }
+//
+//    // draw gradient scale between two colours fg and bg
+//    void drawGrayscaleBitmap(int16_t x, int16_t y,
+//                             const uint8_t bitmap[], int16_t w, int16_t h, CRGB fg, CRGB bg) {
+//      // col = x * cos( uint8_t((y - COLS/2)*6) );
+//      //          uint16_t iOffset = ((x+i) * cos8( uint8_t(y-ROWS/2)*6 )) / 256;
+//      // therefore, if x = 0, i = 10, y = 0iOffset =
+//      // 10 * cos8(-96=160) / 256 = 6. a 4 unit reduction
+//      // but then we also need to blend with the other 4 pixels... otherwise lastone takes preference
+//      uint16_t buffidx = 0;
+//      for (int16_t j = 0; j < h; j++) {
+//        for (int16_t i = 0; i < w; i++ ) {
+//          //          CRGB colour = blend(fg, bg, (uint8_t)pgm_read_byte(&bitmap[j * w + i]));
+//          CRGB colour = blend(bg, fg, pgm_read_byte(bitmap + buffidx));
+//          buffidx++;
+//          drawPixel((x + i + COLS) % COLS, j + y, colour);
+//        }
+//      }
+//    }
 
 };
 

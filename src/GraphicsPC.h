@@ -40,24 +40,35 @@ public:
 		}
 	}
 
-	void fill(CRGB c) {
-		for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
-			leds[i] = c;
-		}
-	}
-
-	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+	void putPixelDirect(int x, int y, CRGB c) {
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
-			if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
-				leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
-				//leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
-			}
-			else
-				putPixel(x, y, c);
+			ofColor col;
+			col.set(c.r, c.g, c.b);
+			ofSetColor(col);
+			ofDrawRectangle(x*scale, y*scale, scale, scale);
 		}
 	}
 
-	void show() {
+	//void fill(CRGB c) {
+	//	for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+	//		leds[i] = c;
+	//	}
+	//}
+
+	//void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+	//	if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
+	//		if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
+	//			leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
+	//			//leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
+	//		}
+	//		else
+	//			putPixel(x, y, c);
+	//	}
+	//}
+
+
+
+	void update() {
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
 				CRGB c0, c1, c2, c3;// c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15;
@@ -104,24 +115,28 @@ public:
 				c.set(buf.r, buf.g, buf.b);
 				ofSetColor(c);
 				ofDrawRectangle(i*scale, j*scale, scale, scale);*/
-			}
-		}
-		hue++;
-	}
-	void clear() {
-		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			for (int j = 0; j < SCREEN_HEIGHT; j++) {
-				leds[i + j * SCREEN_WIDTH] = CRGB::Black;
+				
+				
 			}
 		}
 	}
-	void fade(uint8_t a = 128) {
-		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			for (int j = 0; j < SCREEN_HEIGHT; j++) {
-				leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
-			}
-		}
-	}
+
+	void show() {}
+
+	//void clear() {
+	//	for (int i = 0; i < SCREEN_WIDTH; i++) {
+	//		for (int j = 0; j < SCREEN_HEIGHT; j++) {
+	//			leds[i + j * SCREEN_WIDTH] = CRGB::Black;
+	//		}
+	//	}
+	//}
+	//void fade(uint8_t a = 128) {
+	//	for (int i = 0; i < SCREEN_WIDTH; i++) {
+	//		for (int j = 0; j < SCREEN_HEIGHT; j++) {
+	//			leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
+	//		}
+	//	}
+	//}
 
 	//CRGB getColour(uint8_t offset = 0) {
 	//	uint8_t h = (Data::getHue() + offset) % 256;

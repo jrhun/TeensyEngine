@@ -125,7 +125,14 @@ public:
 
 	static VariableOscilate beat;
 
+	static uint8_t blurFx;
+	static uint8_t fadeFx;
+	static uint8_t textFx;
+
 };
 
 VariableOscilate _Pattern::beat = VariableOscilate();
-bool _Pattern::useDefaultEffect = false;
+bool _Pattern::useDefaultEffect = true;
+uint8_t _Pattern::blurFx = 0;
+uint8_t _Pattern::fadeFx = 0;
+uint8_t _Pattern::textFx = 0;
