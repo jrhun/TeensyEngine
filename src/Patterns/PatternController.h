@@ -50,6 +50,7 @@ public:
 	PatternDualWaves	dualWaves;
 	PatternFire			fire;
 	PatternFountain		particleFountain;
+
 	PatternNoise1		noise1;
 	PatternParametric	parametric;
 	PatternParametric2	parametricSpiral;
@@ -57,6 +58,7 @@ public:
 	PatternRaymarcher	raymarcher;
 	PatternSolid		solid;
 	PatternSparks		sparks;
+	PatternSpinningParticles	SpinningParticles;
 	PatternSpiral		spiral;
 	PatternSuperShape	superShape;
 	PatternVWaves		verticalWaves;
@@ -68,12 +70,13 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 19;
+	static const uint8_t numPatterns = 20;
     _Pattern *patternList[numPatterns] = {
 		&dualWaves,
 		&purpleRain,
 		&wheelParticle,
 		&wheelBlur,
+		&SpinningParticles,
 		
 		&noise1,
 		&verticalWaves,
@@ -132,7 +135,7 @@ public:
 	unsigned long nextUpdate = 0;
 	unsigned long nextHueUpdate = 0;
 	unsigned long nextCursorUpdate = 0;
-	uint8_t cursorPos = 0;
+	uint8_t cursorPos = SCREEN_WIDTH;
 
 	void run() {
 		if (nextUpdate == 0) {
@@ -148,7 +151,7 @@ public:
 			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
 
 			//add effects
-			if (!_Pattern::useDefaultEffect) {
+			if (_Pattern::useCustomEffect) {
 				if (_Pattern::fadeFx)
 					gfx.fade(_Pattern::fadeFx);
 				if (_Pattern::blurFx)

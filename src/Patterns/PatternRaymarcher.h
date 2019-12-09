@@ -11,7 +11,7 @@ public:
 
 	uint8_t drawFrame() {
 		//gfx.clear();
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 
 			gfx.fade(64);
 		}

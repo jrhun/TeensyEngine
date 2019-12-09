@@ -599,8 +599,8 @@ sizeof(gGradientPalettes) / sizeof(TProgmemRGBGradientPalettePtr) + 1; //one ext
 extern uint8_t Data::paletteIndex;
 extern uint8_t Data::hbPaletteIndex;
 
-VariableReference paletteIndex_t{ "Current Palette", &Data::paletteIndex, 0, 0, gGradientPaletteCount - 1 };
-VariableReference paletteIndexHb_t{ "Current HB Palette", &Data::hbPaletteIndex, 0, 0, gGradientPaletteCount - 1 };
+VariableReference paletteIndex_t{ "Current Palette", &Data::paletteIndex, 0, 0, gGradientPaletteCount -1};
+VariableReference paletteIndexHb_t{ "Current HB Palette", &Data::hbPaletteIndex, 0, 0, gGradientPaletteCount -1};
 
 
 

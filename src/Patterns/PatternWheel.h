@@ -26,7 +26,7 @@ public:
 			gfx.putPixel(x + 1, y + 1, c);
 		}
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.blur(75); // 75 works well for blur
 		}
 
@@ -179,7 +179,7 @@ public:
 	}
 	uint8_t drawFrame() {
 		gfx.resetZ();
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(128);
 		}
 		//ps.applyForce(Vec3(0.0f, 0.005*(GuiVars6-1), 0.0f)); // gravity
@@ -191,4 +191,67 @@ public:
 		return returnVal;
 	}
 	particleFountain ps;
+};
+
+
+class ParticleSystemSpin : public ParticleSystem {
+public: 
+	Particle getParticle(bool side) {
+		Particle p;
+		float t;
+		if (side)		t = theta;
+		else			t = TWO_PI - theta;
+		//lastSide = !lastSide;
+		p.pos.x = 2.1 * cos(t);
+		p.pos.z = 2.1 * sin(t);
+
+		p.vel = Vec3::getRandom() - Vec3(0.5f, 0.5f, 0.5f);
+		p.vel *= 0.1;
+		p.acc = Vec3(0.0f, 0.0f, 0.0f);
+		p.alpha = 255.0f;
+		p.col = gfx.getColour(random8(40));
+		p.hue = Data::getHue() + random8(40);
+		p.mass = 1.0f;
+		return p;
+	}
+
+	void addParticle(bool side) {
+		if (particles.size() == maxParticles)
+			return;
+		particles.push_back(getParticle(side));
+	}
+
+	void incTheta(float d = 0.02) {
+		theta += d;
+		if (theta > TWO_PI)
+			theta -= TWO_PI;
+	}
+
+	float theta = 0;
+
+
+};
+
+class PatternSpinningParticles : public _Pattern {
+public:
+	PatternSpinningParticles() : _Pattern("Spinning Particles") {
+	}
+
+	void start() {
+		ps.init();
+	}
+	uint8_t drawFrame() {
+		gfx.resetZ();
+		if (!_Pattern::useCustomEffect) {
+			gfx.fade(128);
+		}
+		ps.addParticle(true);
+		ps.addParticle(false);
+		ps.run();
+		ps.incTheta();
+		return 0;
+	}
+	
+
+	ParticleSystemSpin ps;
 };

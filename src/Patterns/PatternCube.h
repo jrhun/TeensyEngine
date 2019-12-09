@@ -12,7 +12,7 @@ public:
 
 	uint8_t drawFrame() {
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(128);
 		}
 		//gfx.blur(GuiVars1 * 127.0);

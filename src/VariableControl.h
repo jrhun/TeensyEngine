@@ -288,7 +288,7 @@ private:
 	bool triggerActive = false;
 
 	accum88 bpm = (120 << 8);
-	uint8_t oscType = GATE;
+	uint8_t oscType = OFF;
 
 	unsigned long timebase = 0;
 	unsigned long smoothTimebase = 0;

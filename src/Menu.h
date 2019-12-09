@@ -563,23 +563,25 @@ public:
 			else
 				r += "  ";
 
-			if (i < paletteIndex_t.max)
+			if (i <= paletteIndex_t.max)
 				r += getPaletteName(i);
-			else if (i == paletteIndex_t.max)
+			else if (i == paletteIndex_t.max+1)
 				r += "Back";
 
 			r += "\n";
 		}
-		if (frame + maxLines <= paletteIndex_t.max) {
+		if (frame + maxLines <= paletteIndex_t.max+1) {
 			if (*paletteIndex_t > frame + maxLines) r += "x ...";
 			else r += "  ...";
 		}
-		callback(selected);
+		if (callback) {
+			callback(selected);
+		}
 		return r;
 	}
 
 	void up() {
-		if (selected < paletteIndex_t.max) selected++;
+		if (selected <= paletteIndex_t.max) selected++;
 		if (selected >= maxLines + frame) frame++; 
 		
 	}
@@ -632,14 +634,14 @@ public:
 			else
 				r += "  ";
 
-			if (i < paletteIndexHb_t.max)
+			if (i <= paletteIndexHb_t.max)
 				r += getPaletteName(i);
-			else if (i == paletteIndexHb_t.max)
+			else if (i == paletteIndexHb_t.max+1)
 				r += "Back";
 
 			r += "\n";
 		}
-		if (frame + maxLines <= paletteIndexHb_t.max) {
+		if (frame + maxLines <= paletteIndexHb_t.max+1) {
 			if (*paletteIndexHb_t > frame + maxLines) r += "x ...";
 			else r += "  ...";
 		}
@@ -647,7 +649,7 @@ public:
 	}
 
 	void up() {
-		if (selected < paletteIndexHb_t.max) selected++;
+		if (selected <= paletteIndexHb_t.max) selected++;
 		if (selected >= maxLines + frame) frame++;
 	}
 	void down() {
@@ -1137,7 +1139,7 @@ public:
 	MenuTextList TextList;
 	MenuTextSelection TextSelection1;
 	MenuTextSelection TextSelection2;
-	MenuBool CustomOn{ "Custom fx", &_Pattern::useDefaultEffect };
+	MenuBool CustomOn{ "Custom fx", &_Pattern::useCustomEffect };
 
 	VariableReference blurFx{ "Blur", &_Pattern::blurFx };
 	VariableReference fadeFx{ "Fade", &_Pattern::fadeFx };
@@ -1421,6 +1423,7 @@ public:
 		r = currentPage()->getPageData();
 		//log page data
 		// return r;
+		
 	}
 };
 

@@ -16,7 +16,7 @@ public:
 
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(30);
 			gfx.blur(90);
 		}
@@ -91,7 +91,7 @@ public:
 
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(30);
 			gfx.blur(90);
 		}

@@ -7,7 +7,7 @@ public:
 	PatternWireFrame() : _Pattern("Wireframe") {}
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			int beat = beatsin8(2, 80, 224);
 			int beat2 = beatsin8(2, 224, 80);
 			gfx.fade(beat);

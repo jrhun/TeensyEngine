@@ -137,7 +137,7 @@ public:
 		// --> affects always a square with an odd length
 
 		
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
 			// increase the contrast
 			gfx.fade(5);
@@ -145,8 +145,8 @@ public:
 		//SpiralStream(3*SCREEN_WIDTH/4, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2, GuiVars1 * 127);
 
 		// why not several times?!
-		//SpiralStream(16, 6, 6, GuiVars2 * 127);
-		//SpiralStream(10, 24, 10, GuiVars3 * 127);
+		SpiralStream(16, 6, 6, GuiVars2 * 127);
+		SpiralStream(10, 24, 10, GuiVars3 * 127);
 
 
 		xOffset += beatsin8(30, 1 , 10) / 10.0;

@@ -121,7 +121,7 @@ public:
 		return "";
 	}
 
-	static bool useDefaultEffect;
+	static bool useCustomEffect;
 
 	static VariableOscilate beat;
 
@@ -132,7 +132,7 @@ public:
 };
 
 VariableOscilate _Pattern::beat = VariableOscilate();
-bool _Pattern::useDefaultEffect = true;
+bool _Pattern::useCustomEffect = false;
 uint8_t _Pattern::blurFx = 0;
 uint8_t _Pattern::fadeFx = 0;
 uint8_t _Pattern::textFx = 0;

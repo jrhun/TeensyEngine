@@ -650,7 +650,7 @@ public:
 	PatternWheelPart() : _Pattern("Wheel Particles") {}
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(255);
 		}
 		ps.applyForces();

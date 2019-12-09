@@ -108,7 +108,7 @@ public:
 	void setPalette(uint8_t i) {
 		if (i < gGradientPaletteCount) {
 			if (i == 0)		targetPalette = RainbowColors_p;
-			else			targetPalette = gGradientPalettes[*paletteIndex_t+1];
+			else			targetPalette = gGradientPalettes[*paletteIndex_t-1];
 		}
 	}
 
@@ -549,7 +549,7 @@ public:
 					cursor_y += textsize * 8; // Advance y one line
 				}
 				cursor_x %= SCREEN_WIDTH; //wrap around
-				drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+				drawChar(cursor_x, cursor_y, c, textcolor, textsize);
 				cursor_x += textsize * 6;
 			}
 
@@ -576,7 +576,7 @@ public:
 								(uint8_t)pgm_read_byte(&gfxFont->yAdvance);
 						}
 						cursor_x %= SCREEN_WIDTH; //wrap around
-						drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+						drawChar(cursor_x, cursor_y, c, textcolor, textsize);
 					}
 					cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
 				}
@@ -616,11 +616,15 @@ public:
 
 
 	void drawChar(int16_t x, int16_t y, unsigned char c,
-		CRGB color, CRGB bg, uint8_t size) {
+		CRGB color, uint8_t size) {
 
-		color = color.scale8(textOpacity);
+		//color = color.scale8(textOpacity);
 
 		if (!gfxFont) { // 'Classic' built-in font
+
+			if (x + 6 * size - 1 < 0) {
+				x = x;
+			}
 
 			if ((x >= SCREEN_WIDTH) || // Clip right
 				(y >= SCREEN_HEIGHT) || // Clip bottom
@@ -636,8 +640,8 @@ public:
 				else      line = 0x0;
 				for (int8_t j = 0; j < 8; j++, line >>= 1) {
 					if (line & 0x1) {
-						if (size == 1) putPixelDirect(x + i, y + j, color);
-						else          fillRectDirect(x + (i*size), y + (j*size), size, size, color);
+						if (size == 1) putPixelDirect((x + i) % SCREEN_WIDTH, y + j, color);
+						else          fillRectDirect( (x + (i*size)) % SCREEN_WIDTH, y + (j*size), size, size, color);
 					}
 					//else if (bg != color) {
 					//	if (size == 1) putPixel(x + i, y + j, bg);
@@ -678,10 +682,10 @@ public:
 					}
 					if (bits & 0x80) {
 						if (size == 1) {
-							putPixelDirect(x + xo + xx, y + yo + yy, color);
+							putPixelDirect( (x + xo + xx) % SCREEN_WIDTH, y + yo + yy, color);
 						}
 						else {
-							fillRectDirect(x + (xo16 + xx)*size, y + (yo16 + yy)*size, size, size, color);
+							fillRectDirect( (x + (xo16 + xx)*size ) % SCREEN_WIDTH, y + (yo16 + yy)*size, size, size, color);
 						}
 					}
 					bits <<= 1;
@@ -695,7 +699,7 @@ public:
 		return write(s.c_str(), s.length());
 	}
 
-	CRGB textcolor = CRGB::White, textbgcolor;
+	CRGB textcolor = CRGB::White;
 	uint8_t textOpacity = 128;
 	uint8_t textsize = 1;
 	uint8_t cursor_x = 0;

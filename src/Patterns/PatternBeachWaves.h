@@ -14,7 +14,7 @@ public:
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(5);// ledControl.fade();
 			gfx.blur(176);
 		}
@@ -54,7 +54,7 @@ public:
 		//      CRGB colour1 = ledControl.getColour();
 		//      CRGB colour2 = ledControl.getColour(64);
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(5);// ledControl.fade();
 			gfx.blur(176);
 		}
@@ -110,7 +110,7 @@ public:
 
 	uint8_t drawFrame() {
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(10);// ledControl.fade();
 			gfx.blur(175);
 		}

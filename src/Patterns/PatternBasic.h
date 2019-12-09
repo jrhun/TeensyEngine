@@ -45,7 +45,7 @@ public:
 		//  adjustGamma(colour);
 		while (index <= nextIndex) {
 
-			if (_Pattern::useDefaultEffect) {
+			if (!_Pattern::useCustomEffect) {
 				gfx.fade(40);
 			}
 
@@ -130,7 +130,7 @@ public:
 
 		chance = *beat;
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			uint8_t fade = 10;
 			if (chance > GuiVars1*128) //128 gui1
 				fade = myMap(chance, GuiVars1 * 128, 255, 10, GuiVars3*20); //gui3 23
@@ -168,7 +168,7 @@ public:
 	uint8_t drawFrame() {
 		_Pattern::drawFrame();
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 
 			gfx.fade(64);
 			//gfx.blur(177);

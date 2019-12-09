@@ -121,7 +121,11 @@ void drawPalette(uint8_t paletteIndex) {
 
 //  uint8_t currentHue = (Data::getHue() + 128) % 255; // current hue centered in middle
   uint8_t currentHue = 0;
-  CRGBPalette16 p = gGradientPalettes[paletteIndex];
+  CRGBPalette16 p;
+  if (paletteIndex == 0)
+    p = RainbowColors_p;
+  else 
+    p = gGradientPalettes[paletteIndex-1];
   for (uint8_t i = 0; i < w; i++) {
     //center current hue in middle
     

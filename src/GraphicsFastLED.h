@@ -57,8 +57,18 @@ public:
 		//ledRef->drawPixel(x, y, c);
 	}
 
-	void putPixelDirect(int x, int y, CRGB c) {
-		ledsRaw[XY(x, y)] = c;
+	void putPixelDirect(int x, int y, CRGB c0) {
+		CRGB c1 = leds[x + y * SCREEN_WIDTH];
+		CRGB out;
+		int16_t dr, dg, db;
+		dr = c0.r - c1.r;
+		dg = c0.g - c1.g;
+		db = c0.b - c1.b;
+		ledsRaw[XY(x, y)].r = c1.r + (dr * textOpacity) / 255;
+		ledsRaw[XY(x, y)].g = c1.g + (dg * textOpacity) / 255;
+		ledsRaw[XY(x, y)].b = c1.b + (db * textOpacity) / 255;
+
+		//ledsRaw[XY(x, y)] = c;
 		//ledRef->drawPixel(x, y, c);
 	}
 
