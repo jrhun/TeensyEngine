@@ -54,6 +54,7 @@ public:
 	PatternNoise1		noise1;
 	PatternParametric	parametric;
 	PatternParametric2	parametricSpiral;
+	ParticleSystemWater	particlesWater;
 	PatternPurpleRain	purpleRain;
 	PatternRaymarcher	raymarcher;
 	PatternSolid		solid;
@@ -70,8 +71,9 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 20;
+	static const uint8_t numPatterns = 21;
     _Pattern *patternList[numPatterns] = {
+		&particlesWater,
 		&dualWaves,
 		&purpleRain,
 		&wheelParticle,
@@ -137,6 +139,13 @@ public:
 	unsigned long nextCursorUpdate = 0;
 	uint8_t cursorPos = SCREEN_WIDTH;
 
+	uint8_t blinkTimer = 0;
+
+
+	void blinkText() {
+		blinkTimer = 64;
+	}
+
 	void run() {
 		if (nextUpdate == 0) {
 			getCurrentPattern()->start();// initial
@@ -168,7 +177,14 @@ public:
 			//gfx.setFont(&Org_01);
 			
 			//gfx.print("Meredith!");
-			if (Data::textOn) {
+			if (Data::textOn or blinkTimer) {
+				uint8_t oldOpacity = gfx.textOpacity;
+
+				if (blinkTimer) {
+					gfx.textOpacity = decayData[blinkTimer];
+					blinkTimer--;
+				}
+
 				gfx.setCursor(cursorPos, 12);
 				
 				String text;
@@ -180,6 +196,8 @@ public:
 				}
 				else {text = Data::textOptions[Data::textIndex];}
 				gfx.print(text);
+
+				gfx.textOpacity = oldOpacity;
 			}
 
 			gfx.show();

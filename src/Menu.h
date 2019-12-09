@@ -16,13 +16,18 @@
 #endif
 // menu
 
-
-
 #include "VariableControl.h"
 
-
-
 #define MAX_LINES	8
+
+
+String intToString(uint8_t i) {
+#if defined(ESP32) || defined(CORE_TEENSY)
+	return String(i);// .c_str();
+#else
+	return to_string(i);
+#endif 
+}
 
 
 
@@ -99,6 +104,8 @@ public:
 
 
 
+
+
 class MenuTextSelection : public MenuAbstract {
 public:
 	MenuTextSelection() : MenuAbstract("Custom text") {
@@ -109,8 +116,19 @@ public:
 	static uint8_t counter;
 	uint8_t index;
 
+	String getData() {
+		return intToString(index + 1);
+	}
+
 	String getDataExtended() {
-		return msg;
+		String r = msg;
+		//static uint8_t tick = 0;
+		//tick++;
+		//if (tick > 4)
+		//	r[sel] = 178;
+		//if (tick > 6)
+		//	tick = 0;
+		return r;
 	}
 
 	void inc() {
@@ -157,11 +175,11 @@ public:
 	}
 
 	void up() {
-		if (msg[sel] >= 'a') msg[sel] -= 32;
+		if (msg[sel]  >= 'A' and msg[sel] <= 'Z') msg[sel] += 32;
 	}
 
 	void down() {
-		if (msg[sel] <= 'Z') msg[sel] += 32;
+		if (msg[sel] >= 'a' and msg[sel] <= 'z') msg[sel] -= 32;
 	}
 
 	void left() {
@@ -315,9 +333,15 @@ public:
 		hasSelection = true;
 	}
 
+	const char* getName() {
+		if (var)
+			return var->name;
+	}
+
 
 	virtual String getData() {
-		return var->getValue();
+		if (var)
+			return var->getValue();
 	}
 
 	String getDataExtended() {
@@ -485,17 +509,18 @@ public:
 	MenuTextList() :MenuAbstract("Text list") {
 		hasSelection = true;
 	}
+
 	String getDataExtended() {
 		String r = "";
 		//for (uint8_t i = 0; i < paletteIndex_t.max + 1; i++) {
 		for (uint8_t i = frame; i < frame + maxLines; i++) {
 
 			if (i == *Data::textIndex_t)
-				r += "x ";
+				r += "+";
 			else if (i == selected)
-				r += "> ";
+				r += ">";
 			else
-				r += "  ";
+				r += " ";
 
 			if (i < Data::textIndex_t.max)
 				r += Data::textOptions[i];
@@ -557,11 +582,11 @@ public:
 		for (uint8_t i = frame; i < frame + maxLines; i++) {
 
 			if (i == *paletteIndex_t)
-				r += "x ";
+				r += "+";
 			else if (i == selected)
-				r += "> ";
+				r += ">";
 			else
-				r += "  ";
+				r += " ";
 
 			if (i <= paletteIndex_t.max)
 				r += getPaletteName(i);
@@ -594,7 +619,7 @@ public:
 	void dec() { paletteIndex_t.dec(); }
 
 	void press() {
-		if (selected < paletteIndex_t.max)
+		if (selected <= paletteIndex_t.max)
 			*paletteIndex_t = selected;
 	}
 
@@ -628,11 +653,11 @@ public:
 		for (uint8_t i = frame; i < frame + maxLines; i++) {
 
 			if (i == *paletteIndexHb_t)
-				r += "x ";
+				r += "+";
 			else if (i == selected)
-				r += "> ";
+				r += ">";
 			else
-				r += "  ";
+				r += " ";
 
 			if (i <= paletteIndexHb_t.max)
 				r += getPaletteName(i);
@@ -660,7 +685,7 @@ public:
 	void dec() { paletteIndexHb_t.dec(); if (callback)	callback();	}
 
 	void press() {
-		if (selected < paletteIndexHb_t.max)
+		if (selected <= paletteIndexHb_t.max)
 			*paletteIndexHb_t = selected;
 		if (callback)
 			callback();
@@ -705,11 +730,11 @@ public:
 			//}
 
 			if (i == Data::currentPattern)
-				r += "x ";
+				r += "+";
 			else if (i == selectedPattern)
-				r += "> ";
+				r += ">";
 			else
-				r += "  ";
+				r += " ";
 
 			//if (i < frame + maxLines) {
 			//	if (i < patterns.numPatterns)
@@ -800,11 +825,11 @@ public:
 		String r = "";
 		for (uint8_t i = frame; i < maxI; i++) {
 			if (i == Data::hbCurrentPattern)
-				r += "x ";
+				r += "+";
 			else if (i == selectedPattern)
-				r += "> ";
+				r += ">";
 			else
-				r += "  ";
+				r += " ";
 
 			if (i < Data::hbMaxPatterns)
 				r += Data::hbPatternNames[i];
@@ -1037,19 +1062,29 @@ public:
 	MenuPatternList PatternList;
 	MenuVariable Brightness{ &Data::brightness_t };
 	
+	
+	
 	VariableReference tempo_t{ "Tempo", &_Pattern::beat.bpmVal, 120, 30,240 };
 	MenuVariable Tempo{ &tempo_t };
 	MenuAction TapTempo{ "Tap tempo" };
 	MenuTrigger OscType;
 
-	static const size_t numItems = 6;
+	VariableReference audioThreshold_t{ "Audio thres", &Data::audioThreshold, 128, 0, 255 };
+	VariableReference noiseFloor_t{ "Noise floor", &Data::noiseFloor, 65, 0, 255 };
+	MenuVariable AudioThreshold{ &audioThreshold_t };
+	MenuVariable NoiseFloor{ &noiseFloor_t };
+
+	static const size_t numItems = 8;
 	MenuAbstract *items[numItems] = {
 		&PatternList,
 		&CurrentPattern,
 		&Brightness,
 		&Tempo,
 		&TapTempo,
-		&OscType
+		&OscType,
+		&AudioThreshold,
+		&NoiseFloor
+
 	};
 
 
@@ -1108,7 +1143,11 @@ public:
 
 class PageEffects : public MenuPage {
 public:
-	PageEffects() : MenuPage("Effects") {}
+	PageEffects() : MenuPage("Effects") {
+		TextSingleShot.setCallback([]() {
+			patterns.blinkText();
+		});
+	}
 
 
 	size_t getNumItems() {
@@ -1135,37 +1174,47 @@ public:
 		return items[currentItem];
 	}
 
+	VariableReference blurFx_t{ "Blur", &_Pattern::blurFx };
+	VariableReference fadeFx_t{ "Fade", &_Pattern::fadeFx };
+	VariableReference spiralFx_t{ "Fade", &_Pattern::spiralFx, 128, 108, 148 };
+	VariableReference textOpacity_t{ "Text opacity", &gfx.textOpacity };
+
 	MenuBool TextOn{ "Text: ", &Data::textOn };
+	MenuVariable TextOpacity{ &textOpacity_t };
+	MenuAction TextSingleShot{ "Blink once" };
+	
 	MenuTextList TextList;
 	MenuTextSelection TextSelection1;
 	MenuTextSelection TextSelection2;
-	MenuBool CustomOn{ "Custom fx", &_Pattern::useCustomEffect };
+	
+	MenuBool CustomOn{ "Effects: ", &_Pattern::useCustomEffect };
+	MenuVariable BlurFx{ &blurFx_t };
+	MenuVariable FadeFx{ &fadeFx_t };
+	MenuVariable SpiralFx{ &spiralFx_t };
 
-	VariableReference blurFx{ "Blur", &_Pattern::blurFx };
-	VariableReference fadeFx{ "Fade", &_Pattern::fadeFx };
-	VariableReference textFx{ "Text opacity", &_Pattern::textFx };
-	VariableReference textOpacity{ "Text opacity", &gfx.textOpacity };
 
-	MenuVariable BlurFx{ &blurFx };
-	MenuVariable FadeFx{ &fadeFx };
-	MenuVariable TextFx{ &textOpacity };
+
+	
 
 	//menu items
-	static const size_t numItems = 8;
+	static const size_t numItems = 10;
 	MenuAbstract *items[numItems] = {
 		&TextOn,
-		&TextFx,
+		&TextOpacity,
+		&TextSingleShot,
 		&TextList,
 		&TextSelection1,
 		&TextSelection2,
 		&CustomOn,
 		&BlurFx, 
-		&FadeFx
+		&FadeFx,
+		&SpiralFx
 		
 	};
 
 
 };
+
 
 class PageHeadbands : public MenuPage {
 public:

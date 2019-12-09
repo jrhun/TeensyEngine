@@ -411,7 +411,8 @@ void uiSetup() {
   });
 
   menu.Colour.PaletteList.setCallback([](uint8_t i) {
-    drawPalette(i);
+    if (i <= paletteIndex_t.max)
+      drawPalette(i);
   });
 
   menu.Settings.Save.setCallback([]() {

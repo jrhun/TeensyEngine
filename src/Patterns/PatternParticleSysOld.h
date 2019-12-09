@@ -651,7 +651,8 @@ public:
 
 	uint8_t drawFrame() {
 		if (!_Pattern::useCustomEffect) {
-			gfx.fade(255);
+			//gfx.fade(10);
+			gfx.blur(75);
 		}
 		ps.applyForces();
 		ps.addParticle();

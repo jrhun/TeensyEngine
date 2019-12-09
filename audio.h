@@ -111,7 +111,7 @@ void adcRead() {
     }
     
     beat = beatFilter(envelope);
-    if (beat > Data::threshold) {
+    if (beat > Data::audioThreshold) {
       // beat detected
       Serial.print("beat! val: ");
       Serial.println(beat);

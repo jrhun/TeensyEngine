@@ -58,16 +58,17 @@ void initMPU() {
 
 void updateMPU() {
   IMU.readSensor();
-  Data::ax = IMU.getAccelY_mss();
-  Data::ay = IMU.getAccelZ_mss();
-  Data::az = IMU.getAccelX_mss();
-  Data::gx = IMU.getGyroX_rads();
-  Data::gy = IMU.getGyroY_rads();
-  Data::gz = IMU.getGyroZ_rads();
+//  Data::ax = IMU.getAccelY_mss();
+//  Data::ay = IMU.getAccelZ_mss();
+//  Data::az = IMU.getAccelX_mss();
+//  Data::gx = IMU.getGyroX_rads();
+//  Data::gy = IMU.getGyroY_rads();
+//  Data::gz = IMU.getGyroZ_rads();
 }
 
 void getPitchBasic(){
-  updateMPU();
+//  updateMPU();
+  IMU.readSensor();
   
   const float alpha = 0.5;
   
@@ -75,18 +76,18 @@ void getPitchBasic(){
   static double fYg = 0;
   static double fZg = 0;
   //Low Pass Filter
-    fXg = Data::ax * alpha + (fXg * (1.0 - alpha));
-    fYg = Data::ay * alpha + (fYg * (1.0 - alpha));
-    fZg = Data::az * alpha + (fZg * (1.0 - alpha));
+    fXg = IMU.getAccelY_mss() * alpha + (fXg * (1.0 - alpha));
+    fYg = IMU.getAccelZ_mss() * alpha + (fYg * (1.0 - alpha));
+    fZg = IMU.getAccelX_mss() * alpha + (fZg * (1.0 - alpha));
  
     //Roll & Pitch Equations
-    roll  = (atan2(-fYg, fZg)*180.0)/M_PI;
-    pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+    Data::pitch  = -(atan2(-fYg, fZg)*180.0)/M_PI;
+    Data::roll = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
 
   Serial.print("Pitch: ");
-  Serial.println(pitch,5);
+  Serial.println(Data::pitch,5);
   Serial.print("Roll: ");
-  Serial.println(roll,5);
+  Serial.println(Data::roll,5);
 }
 
 

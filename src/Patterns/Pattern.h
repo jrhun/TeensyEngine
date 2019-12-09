@@ -127,12 +127,11 @@ public:
 
 	static uint8_t blurFx;
 	static uint8_t fadeFx;
-	static uint8_t textFx;
-
+	static uint8_t spiralFx;
 };
 
 VariableOscilate _Pattern::beat = VariableOscilate();
 bool _Pattern::useCustomEffect = false;
-uint8_t _Pattern::blurFx = 0;
-uint8_t _Pattern::fadeFx = 0;
-uint8_t _Pattern::textFx = 0;
+uint8_t _Pattern::blurFx = 10;
+uint8_t _Pattern::fadeFx = 10;
+uint8_t _Pattern::spiralFx = 128;

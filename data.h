@@ -189,7 +189,7 @@ namespace Data {
 	// audio vars
   bool audioOn = false;
 	uint8_t noiseFloor = 65;
-  uint8_t threshold = 200;
+  uint8_t audioThreshold = 128;
   float beat = 0;
 
 
@@ -234,8 +234,10 @@ namespace Data {
 
   //accelerometer
   bool MPUOn = false;
-  float ax = 0.0f, ay = 0.0f, az = 0.0f;
-  float gx = 0.0f, gy = 0.0f, gz = 0.0f;
+//  float ax = 0.0f, ay = 0.0f, az = 0.0f;
+//  float gx = 0.0f, gy = 0.0f, gz = 0.0f;
+  float pitch = 0.0f;
+  float roll = 0.0f;
 
   //headbands
   enum {hbPaletteUpdate = 1, hbBrightnessUpdate, hbPatternUpdate}; // update type
