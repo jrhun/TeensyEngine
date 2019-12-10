@@ -196,42 +196,84 @@ public:
 class ParticleSystemWater : public _Pattern {
 public: 
 	ParticleSystemWater() : _Pattern("Water") {
-		initParticles();
+		//addParticles(64);
 	}
 
 	uint8_t drawFrame() {
+		gfx.resetZ();
+		if (!_Pattern::useCustomEffect) {
+			gfx.fade(80);
+		}
+		addParticles(8);
 		update();
 		run();
 
 		return returnVal;
 	}
 
-	void initParticles() {
+	void addParticles(uint8_t n) {
 		float step = TWO_PI / numParticles;
-		float theta = 0;
-		for (uint8_t i = 0; i < numParticles; i++) {
+		static float theta = 0;
+		static uint8_t j = 0;
+
+		for (uint8_t i = 0; i < n; i++) {
 			Particle p;
-			p.pos.x = 2.1 * cos(theta);
-			p.pos.z = 2.1 * sin(theta);
-			p.pos.y = 0.0f;
-			p.vel = Vec3(0.0f, 0.0f, 0.0f);
+			p.pos.x = 2.1 * cos(theta) * cos(Data::roll * PI / 180.0f);
+			p.pos.z = 2.1 * sin(theta) * cos(Data::pitch * PI / 180.0f);
+			p.pos.y = sin(Data::pitch* PI / 180.0f) * p.pos.z + sin(Data::roll* PI / 180.0f) * p.pos.x;// +0.2f * i / 2;
+
+			p.vel = Vec3::getRandom();
+			p.vel *= 0.02;
+
 			p.acc = Vec3(0.0f, 0.0f, 0.0f);
 			p.alpha = 255.0f;
-			p.hue = i;
+
+			p.mass = theta;
+
+			p.hue = j + random8(20);
+			
+			//if (i > numParticles / 2)
+			//	p.hue = i*2;
+			//else
+			//	p.hue = numParticles - i * 2;
 			particles.push_back(p);
-			theta += step;
+			
 		}
+		theta += step;
+		j += 1;
+		if (theta >= TWO_PI)
+			theta -= TWO_PI;
 	}
 
 	void update() {
 		float step = TWO_PI / numParticles;
-		float t = 0;
-		for (Particle p : particles) {
-			p.pos.x = 2.1 * cos(t) * cos(Data::roll);
-			p.pos.z = 2.1 * sin(t) * cos(Data::pitch);
-			p.pos.y = sin(Data::pitch) * p.pos.z + sin(Data::roll) * p.pos.x;
+		static float theta = 0;
+		float lastTheta = 0;
+		uint8_t count = 0;
 
-			t += step;
+		for (Particle &p : particles) {
+			Vec3 desired; 
+			float theta = p.mass;
+			desired.x = 2.1 * cos(theta) * cos(Data::roll * PI / 180.0f);
+			desired.z = 2.1 * sin(theta) * cos(Data::pitch * PI / 180.0f);
+			desired.y = sin(Data::pitch* PI / 180.0f) * desired.z + sin(Data::roll* PI / 180.0f) * desired.x;
+			if (theta == lastTheta) {
+				count++;
+				//desired.y += 0.4f * count/2;
+			}
+			else {
+				count = 0;
+			}
+			
+			Vec3 v = Vec3::getRandom();
+			v *= 0.005;
+
+			Vec3 dir = desired - p.pos;
+			p.applyForce(dir * 0.008f  + v);
+
+			if (p.alpha - 2.5f < 0) p.alpha = 0;
+			else p.alpha -= 2.5f;
+			lastTheta = theta;
 		}
 	}
 
@@ -251,7 +293,7 @@ public:
 			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
 			float dis = myMap(p.pos.Len(), 2, 4, 255, 128, true);
-			CRGB c = CHSV(p.hue, dis, constrain(p.alpha, 0, 255));
+			CRGB c = CHSV(p.hue + Data::getHue(), dis, constrain(p.alpha, 0, 255));
 			gfx.drawPointDepth(pos, c);
 
 			if (p.isDead())

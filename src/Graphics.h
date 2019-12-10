@@ -508,6 +508,34 @@ public:
 		return false;
 	}
 
+
+
+	//void drawRGBBitmap(int16_t x, int16_t y,
+	//	const uint16_t bitmap[], int16_t w, int16_t h) {
+	//	for (int16_t j = 0; j < h; j++, y++) {
+	//		for (int16_t i = 0; i < w; i++) {
+	//			uint16_t color = pgm_read_word(&bitmap[j * w + i]);
+	//			putPixel(x + i, y, CRGB(pgm_read_byte(&gamma5[color >> 11]),
+	//				pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
+	//				pgm_read_byte(&gamma5[color & 0x1F])));
+	//		}
+	//	}
+	//}
+
+	void drawRGBBitmap(int16_t x, int16_t y,
+		const uint8_t bitmap[], int16_t w, int16_t h) {
+		for (int16_t j = 0; j < h; j++, y++) {
+			for (int16_t i = 0; i < w; i++) {
+				uint8_t image = pgm_read_word(&bitmap[j * w + i * 2]);
+				uint8_t image2 = pgm_read_word(&bitmap[j * w + i * 2 + 1]);
+					uint16_t color = image << 8 | image;
+				putPixel(x + i, y, CRGB(pgm_read_byte(&gamma5[color >> 11]),
+					pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
+					pgm_read_byte(&gamma5[color & 0x1F])));
+			}
+		}
+	}
+
 	void setTextColour(CRGB c) {
 		textcolor = c;
 	}

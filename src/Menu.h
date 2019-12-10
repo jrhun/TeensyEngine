@@ -122,6 +122,11 @@ public:
 
 	String getDataExtended() {
 		String r = msg;
+		r += "\n";
+		for (uint8_t i = 0; i < sel; i++) {
+			r += " ";
+		}
+		r += "^";
 		//static uint8_t tick = 0;
 		//tick++;
 		//if (tick > 4)
@@ -249,7 +254,7 @@ public:
 		String r = "";
 		for (uint8_t i = 0; i < _Pattern::beat.numTypes() + 1; i++) {
 			if (i == _Pattern::beat.getType())
-				r += "x";
+				r += "+";
 			else if (i == selected)
 				r += ">";
 			else
@@ -1176,7 +1181,7 @@ public:
 
 	VariableReference blurFx_t{ "Blur", &_Pattern::blurFx };
 	VariableReference fadeFx_t{ "Fade", &_Pattern::fadeFx };
-	VariableReference spiralFx_t{ "Fade", &_Pattern::spiralFx, 128, 108, 148 };
+	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 128, 108, 148 };
 	VariableReference textOpacity_t{ "Text opacity", &gfx.textOpacity };
 
 	MenuBool TextOn{ "Text: ", &Data::textOn };

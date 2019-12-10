@@ -126,10 +126,10 @@ void ofApp::keyPressed(int key) {
 	if (key == '6') _Pattern::beat.setType(5);
 	if (key == '7') _Pattern::beat.setType(6);
 
-	if (key == OF_KEY_HOME) Data::pitch++;
-	if (key == OF_KEY_END) Data::pitch--;
-	if (key == OF_KEY_DEL) Data::roll++;
-	if (key == OF_KEY_PAGE_DOWN) Data::roll--;
+	if (key == OF_KEY_HOME) Data::pitch+= 5;
+	if (key == OF_KEY_END) Data::pitch -= 5;
+	if (key == OF_KEY_DEL) Data::roll+= 5;
+	if (key == OF_KEY_PAGE_DOWN) Data::roll-= 5;
 
 	menu.display();
 }

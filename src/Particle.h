@@ -29,12 +29,12 @@ public:
 		pos += vel;
 		acc *= 0;
 
-		if (pos.y >= 1.5f) {
-			pos.y = 1.5f;
-			//vel.y = 0;
-			vel.y = -vel.y * 0.5;
-			vel *= 0.9;
-		}
+		//if (pos.y >= 1.5f) {
+		//	pos.y = 1.5f;
+		//	//vel.y = 0;
+		//	vel.y = -vel.y * 0.5;
+		//	vel *= 0.9;
+		//}
 
 		//if (pos.y <= 0 || pos.y >= SCREEN_HEIGHT)
 		//	alpha = 0;

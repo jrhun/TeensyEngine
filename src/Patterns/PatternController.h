@@ -48,6 +48,7 @@ public:
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
 	PatternDualWaves	dualWaves;
+	PatternFish			fish;
 	PatternFire			fire;
 	PatternFountain		particleFountain;
 
@@ -71,8 +72,9 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 21;
+	static const uint8_t numPatterns = 22;
     _Pattern *patternList[numPatterns] = {
+		&fish,
 		&particlesWater,
 		&dualWaves,
 		&purpleRain,
@@ -157,26 +159,27 @@ public:
 			
 			gfx.updatePalette();
 
-			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
 
-			//add effects
+			//add effects to previous frame
 			if (_Pattern::useCustomEffect) {
 				if (_Pattern::fadeFx)
 					gfx.fade(_Pattern::fadeFx);
 				if (_Pattern::blurFx)
 					gfx.blur(_Pattern::blurFx);
-				//if (FxSpiral)
+				if (_Pattern::spiralFx)
+					gfx.spiral(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, _Pattern::spiralFx);
 				//	SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
 				//if (FxNoiseSmear)
 				//	standardNoiseSmearing();
 			}
 
+			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
+
+			
+
 			gfx.update(); ////copys from gfx led buffer to FastLED/screen buffer
 
 			//text
-			//gfx.setFont(&Org_01);
-			
-			//gfx.print("Meredith!");
 			if (Data::textOn or blinkTimer) {
 				uint8_t oldOpacity = gfx.textOpacity;
 
