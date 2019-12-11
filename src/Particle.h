@@ -29,6 +29,8 @@ public:
 		pos += vel;
 		acc *= 0;
 
+		//limit vel
+
 		//if (pos.y >= 1.5f) {
 		//	pos.y = 1.5f;
 		//	//vel.y = 0;
@@ -56,6 +58,12 @@ public:
 	float alpha = 0;
 	CRGB col = CRGB::Black;
 	uint8_t hue = 0;
+
+	static float distance(Particle p1, Particle p2) {
+		Vec3 d = p2.pos - p1.pos;
+		float d1 = d * d;
+		return sqrt(d1);
+	}
 };
 
 constexpr int maxParticles = 500;

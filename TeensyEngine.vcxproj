@@ -279,6 +279,7 @@
     <ClInclude Include="src\Patterns\PatternFluidSim.h" />
     <ClInclude Include="src\Patterns\PatternNoise.h" />
     <ClInclude Include="src\Patterns\PatternParametric.h" />
+    <ClInclude Include="src\Patterns\PatternParticleSysOld.h" />
     <ClInclude Include="src\Patterns\PatternPictures.h" />
     <ClInclude Include="src\Patterns\PatternPurpleRain.h" />
     <ClInclude Include="src\Patterns\PatternRaymarcher.h" />

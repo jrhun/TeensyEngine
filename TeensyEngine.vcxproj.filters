@@ -392,6 +392,9 @@
     <ClInclude Include="src\Fonts\TomThumb.h">
       <Filter>src\Fonts</Filter>
     </ClInclude>
+    <ClInclude Include="src\Patterns\PatternParticleSysOld.h">
+      <Filter>src\Patterns</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

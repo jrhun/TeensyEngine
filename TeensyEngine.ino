@@ -24,7 +24,6 @@ void setup() {
 
 void loop() {
   audioLoop();
-//  getPitchBasic();
   
   EVERY_N_MILLISECONDS(50) {
     getPitchBasic();
