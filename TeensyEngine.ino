@@ -33,6 +33,10 @@ void loop() {
 //  if (Data::MPUOn) updateMPU();
   patterns.run();
   uiLoop();
+  
+//  EVERY_N_SECONDS(Data::changePaletteDelay ? Data::changePaletteDelay : 1) {
+//  	thistimer.setPeriod
+//  }
 
   
 

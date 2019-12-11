@@ -164,6 +164,7 @@ namespace Data {
 	uint8_t hueInc = 1;
 	uint16_t hue = 0;
 	bool hueChange = true;
+	uint8_t hueSpeed = 30;
 	uint8_t getHue() {
 		return hue / hueScale;
 	}
@@ -180,6 +181,7 @@ namespace Data {
  
 	uint8_t paletteIndex = 0;
   uint8_t hbPaletteIndex = 0;
+  uint8_t changePaletteDelay = 0; //seconds
 
   uint32_t colorTemp = 0;
 

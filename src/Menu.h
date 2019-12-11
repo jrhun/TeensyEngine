@@ -1127,20 +1127,28 @@ public:
 		return items[currentItem];
 	}
 
-	VariableReference blendTime_t{ "Blend steps", &gfx.IncAmount, 12, 1, 64 };
+	VariableReference blendTime_t{ "Blend amount", &gfx.IncAmount, 12, 1, 64 };
+	VariableReference hueSpeed_t{ "Hue speed", &Data::hueSpeed, 50, 10, 200 };
+	VariableReference paletteSpeed_t{ "Palette change", &Data::changePaletteDelay, 0, 0, 120 };
+
 
 	//menu items
 	MenuCurrentPalette	CurrentPalette;
 	MenuPaletteList		PaletteList;
-	MenuBool			HueChange{ "Hue change", &Data::hueChange };
-	MenuVariable		BlendTime{ &blendTime_t };
+	MenuBool					HueChange{ "Hue change", &Data::hueChange };
+	MenuVariable 			HueSpeed{hueSpeed_t};
+	MenuVariable 			PaletteSpeed{paletteSpeed_t};
+	MenuVariable			BlendTime{ &blendTime_t };
 
-	static const size_t numItems = 4;
+	static const size_t numItems = 6;
 	MenuAbstract *items[numItems] = {
 		&PaletteList,
 		&CurrentPalette,
-		&HueChange,
+		&PaletteSpeed,
 		&BlendTime
+		&HueChange,
+		&HueSpeed
+		
 	};
 
 

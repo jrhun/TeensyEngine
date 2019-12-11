@@ -139,6 +139,7 @@ public:
 	unsigned long nextUpdate = 0;
 	unsigned long nextHueUpdate = 0;
 	unsigned long nextCursorUpdate = 0;
+	unsigned long nextPaletteUpdate = 0;
 	uint8_t cursorPos = SCREEN_WIDTH;
 
 	uint8_t blinkTimer = 0;
@@ -206,7 +207,7 @@ public:
 			gfx.show();
 
 		}
-		if (Data::hueChange and now - nextHueUpdate > 1000 / 60) {
+		if (Data::hueChange and now - nextHueUpdate > 1000 / Data::hueSpeed) {
 			nextHueUpdate = now;
 			Data::incHue();
 		}
@@ -214,6 +215,11 @@ public:
 		if (now - nextCursorUpdate > 1000 / 40) {
 			nextCursorUpdate = now;
 			cursorPos = (cursorPos - 1 + SCREEN_WIDTH) % SCREEN_WIDTH;
+		}
+		
+		if (Data::changePaletteDelay and now - nextPaletteUpdate > 1000 * Data::changePaletteDelay) {
+			nextPaletteUpdate = now;
+			gfx.setPalette(random8(gGradientPaletteCount));
 		}
 
 	}
