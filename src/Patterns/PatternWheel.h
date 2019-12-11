@@ -176,6 +176,7 @@ public:
 
 	void start() {
 		ps.init();
+		ps.limit = true;
 	}
 	uint8_t drawFrame() {
 		gfx.resetZ();

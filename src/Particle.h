@@ -24,19 +24,21 @@ public:
 		acc += force;// (force / mass);
 	}
 
-	void update() {
+	void update(bool limit = false) {
 		vel += acc;
 		pos += vel;
 		acc *= 0;
 
 		//limit vel
-
-		//if (pos.y >= 1.5f) {
-		//	pos.y = 1.5f;
-		//	//vel.y = 0;
-		//	vel.y = -vel.y * 0.5;
-		//	vel *= 0.9;
-		//}
+		
+		if (limit) {
+			if (pos.y >= 1.5f) {
+			pos.y = 1.5f;
+			//vel.y = 0;
+			vel.y = -vel.y * 0.5;
+			vel *= 0.9;
+			}
+		}
 
 		//if (pos.y <= 0 || pos.y >= SCREEN_HEIGHT)
 		//	alpha = 0;
@@ -74,7 +76,7 @@ std::vector<Particle> particles;
 
 class ParticleSystem {
 public:
-	ParticleSystem() {
+	ParticleSystem() : limit(false){
 		//if (!initalised) {
 		//	initalised = true;
 		//	init();
@@ -186,7 +188,7 @@ public:
 			rotateY += TWO_PI;
 		auto end = std::remove_if(particles.begin(), particles.end(), [this, m](Particle &p) {
 			// update particle
-			p.update();
+			p.update(limit);
 			
 			// render particle
 			Vec3 pos = p.pos;// *m;
@@ -210,6 +212,8 @@ public:
 
 	}
 
+
+	bool limit;
 
 
 	static void init() {
