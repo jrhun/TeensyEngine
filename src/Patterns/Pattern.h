@@ -135,5 +135,5 @@ VariableOscilate _Pattern::beat = VariableOscilate();
 bool _Pattern::useCustomEffect = false;
 uint8_t _Pattern::blurFx = 10;
 uint8_t _Pattern::fadeFx = 10;
-uint8_t _Pattern::spiralFx = 128;
-uint8_t _Pattern::glitterFx = 0;
+uint8_t _Pattern::spiralFx = 0;
+uint8_t _Pattern::glitterFx = 10;

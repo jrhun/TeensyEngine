@@ -204,9 +204,9 @@ public:
 				gfx.textOpacity = oldOpacity;
 			}
 			
-			if (_Pattern::useCustomEffect and _Pattern::glitterFx) {
+			if (_Pattern::glitterFx) {
 			//can put in sampleavg here
-				const uint8_t num = 40;
+				const uint8_t num = 30;
 				static uint16_t glitter[num];
 				static uint8_t glitterVal[num];
 				static uint8_t lastGlitterPos = 0;
@@ -236,6 +236,10 @@ public:
 						c.b = v;
 						gfx.putPixelDirect(uint8_t(glitter[i] >> 8), uint8_t(glitter[i]), c);
 					}
+				}
+				if (count > 20) {
+					count;
+					uint8_t x = count;
 				}
 			}
 

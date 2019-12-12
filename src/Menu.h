@@ -1189,8 +1189,8 @@ public:
 
 	VariableReference blurFx_t{ "Blur", &_Pattern::blurFx };
 	VariableReference fadeFx_t{ "Fade", &_Pattern::fadeFx };
-	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 128, 108, 148 };
-	VariableReference glitterFx_t{ "Glitter", &_Pattern::glitterFx, 0, 0, 10 };
+	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 0, 0, 148 };
+	VariableReference glitterFx_t{ "Glitter", &_Pattern::glitterFx, 0, 0, 20 };
 	VariableReference textOpacity_t{ "Text opacity", &gfx.textOpacity };
 	
 
@@ -1213,7 +1213,7 @@ public:
 	
 
 	//menu items
-	static const size_t numItems = 10;
+	static const size_t numItems = 11;
 	MenuAbstract *items[numItems] = {
 		&TextOn,
 		&TextOpacity,
