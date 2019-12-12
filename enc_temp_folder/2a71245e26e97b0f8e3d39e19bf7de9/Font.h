@@ -44,7 +44,7 @@ FXglyph * pgm_read_glyph_ptr(const FXfont *gfxFont, uint8_t c)
 #include <avr/pgmspace.h>
 #elif defined(ESP8266)
 #include <pgmspace.h>
-#elif !defined(PROGMEM)
+#else
 #define PROGMEM
 #endif
 

@@ -37,9 +37,22 @@ public:
 	_Vec3&	Normalize()
 	{
 		const T length = Len();
-		x /= length;
-		y /= length;
-		z /= length;
+		if (length != 0) {
+			x /= length;
+			y /= length;
+			z /= length;
+		}
+		return *this;
+	}
+	_Vec3&	Limit(T l)
+	{
+		const T length = Len();
+		if (length > l) {
+			x /= length;
+			y /= length;
+			z /= length;
+			*this *= l;
+		}
 		return *this;
 	}
 	_Vec3&	Clamp()

@@ -27,12 +27,12 @@ void ofApp::setup() {
 	// GUI
 	gui.setup();
 	gui.setPosition(SCREEN_WIDTH * 8, 50);
-	gui.add(floatSlider1.setup("X1", 1.6, 0.0, 2.0));
+	gui.add(floatSlider1.setup("X1", 1.04, 0.0, 2.0));
 	gui.add(floatSlider2.setup("Y1", 0.6, 0.0, 2.0));
-	gui.add(floatSlider3.setup("Z1", 1.25, 0.0, 2.0));
-	gui.add(floatSlider4.setup("X2", 0.87, 0.0, 2.0));
-	gui.add(floatSlider5.setup("Y2", 1.25, 0.0, 2.0));
-	gui.add(floatSlider6.setup("Z2", 1.15, 0.0, 2.0));
+	gui.add(floatSlider3.setup("Z1", 0.11, 0.0, 2.0));
+	gui.add(floatSlider4.setup("X2", 1.0, 0.0, 2.0));
+	gui.add(floatSlider5.setup("Y2", 1.0, 0.0, 2.0));
+	gui.add(floatSlider6.setup("Z2", 1.0, 0.0, 2.0));
 	gui.add(intSliderFade.setup("Fade", 128, 0, 255));
 	gui.add(intSliderBlur.setup("Blur", 0, 0, 255));
 	gui.add(intSliderSpiral.setup("Spiral", 0, 0, 255));

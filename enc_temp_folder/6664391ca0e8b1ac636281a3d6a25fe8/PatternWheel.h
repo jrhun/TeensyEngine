@@ -270,8 +270,7 @@ public:
 			v *= 0.005;
 
 			Vec3 dir = desired - p.pos;
-			dir = dir * 0.008f + v;
-			p.applyForce(dir);
+			p.applyForce(dir * 0.008f  + v);
 
 			if (p.alpha - 2.5f < 0) p.alpha = 0;
 			else p.alpha -= 2.5f;

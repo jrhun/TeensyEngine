@@ -1189,7 +1189,7 @@ public:
 
 	VariableReference blurFx_t{ "Blur", &_Pattern::blurFx };
 	VariableReference fadeFx_t{ "Fade", &_Pattern::fadeFx };
-	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 128, 108, 148 };
+	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 128, 60, 148 };
 	VariableReference textOpacity_t{ "Text opacity", &gfx.textOpacity };
 
 	MenuBool TextOn{ "Text: ", &Data::textOn };

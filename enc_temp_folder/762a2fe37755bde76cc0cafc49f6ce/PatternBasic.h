@@ -535,7 +535,7 @@ public:
 					count++;
 				}
 			}
-			if (count) {
+			if (count) {		
 				separation /= count;
 				separation.Normalize();
 				separation *= maxSpeed;
@@ -547,21 +547,18 @@ public:
 				alignment *= maxSpeed;
 				alignment -= p.vel;
 				alignment.Limit(maxForce);
-
+							   
 				cohesion /= count;
-				cohesion -= p.pos;
+				cohesion -= p.pos; 
 				cohesion.Normalize();
 				cohesion *= maxSpeed;
 				cohesion -= p.vel;
 				cohesion.Limit(maxForce);
 
 				//apply forces & weight
-				cohesion *= 0.64f;
-				alignment *= 1.05f;
-				separation *= 1.4f;
-				p.applyForce(cohesion);
-				p.applyForce(alignment);
-				p.applyForce(separation);
+				p.applyForce(cohesion * 0.64f);
+				p.applyForce(alignment * 1.05f);
+				p.applyForce(separation * 1.4f);
 			}
 		}
 
@@ -622,7 +619,7 @@ public:
 		}
 
 		fish_p[i].acc *= 0;
-
+		
 	}
 
 	void drawFish(uint8_t i) {

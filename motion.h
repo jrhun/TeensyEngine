@@ -45,7 +45,7 @@ void initMPU() {
   // setting SRD to 19 for a 50 Hz update rate
   IMU.setSrd(19);
 
-  IMU.calibrateAccel();
+//  IMU.calibrateAccel();
 //  if (status > 0)
 //    Serial.println("Accel calibrated");
 
