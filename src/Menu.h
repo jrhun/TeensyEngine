@@ -83,6 +83,8 @@ public:
 
 	void press() {
 		*val = !*val;
+		if (callback)
+			callback();
 	}
 
 	String getData() {
@@ -100,10 +102,13 @@ public:
 	}
 
 	bool *val;
+
+	void setCallback(void(*fn)()) { callback = fn; }
+	void(*callback)() = NULL;
 };
 
 
-
+//matt, christina, louisa, kate, laura, kat 
 
 
 class MenuTextSelection : public MenuAbstract {
@@ -1192,10 +1197,12 @@ public:
 	VariableReference spiralFx_t{ "Spiral", &_Pattern::spiralFx, 0, 0, 148 };
 	VariableReference glitterFx_t{ "Glitter", &_Pattern::glitterFx, 0, 0, 20 };
 	VariableReference textOpacity_t{ "Text opacity", &gfx.textOpacity };
+	VariableReference textSpeed_t{ "Text speed", &gfx.textSpeed, 20, 5, 40 };
 	
 
 	MenuBool TextOn{ "Text: ", &Data::textOn };
 	MenuVariable TextOpacity{ &textOpacity_t };
+	MenuVariable TextSpeed{ &textSpeed_t };
 	MenuAction TextSingleShot{ "Blink once" };
 	
 	MenuTextList TextList;
@@ -1213,10 +1220,11 @@ public:
 	
 
 	//menu items
-	static const size_t numItems = 11;
+	static const size_t numItems = 12;
 	MenuAbstract *items[numItems] = {
 		&TextOn,
 		&TextOpacity,
+		&TextSpeed,
 		&TextSingleShot,
 		&TextList,
 		&TextSelection1,
@@ -1334,15 +1342,19 @@ public:
 
 	MenuVariable Temperature{ &temperature_t};
 	MenuVariable Backlight{ &Data::backlight_t };
+	MenuBool	Dither{ "Dither", &Data::dither };
+	MenuBool	Accelerometer{ "Accelerometer", &Data::accelerometer };
 	MenuAction Save{ "Save Settings" };
 	MenuAction Load{ "Load Settings" };
 
 
 	//menu items
-	static const size_t numItems = 4;
+	static const size_t numItems = 6;
 	MenuAbstract *items[numItems] = {
 		&Temperature,
 		&Backlight,
+		&Dither,
+		&Accelerometer,
 		&Save,
 		&Load
 	};

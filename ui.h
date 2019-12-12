@@ -4,7 +4,7 @@
 #include "headbands.h"
 
 #include "data.h"
-#include "ledControl.h"
+//#include "ledControl.h"
 #include "src\Patterns\PatternController.h"
 
 // Use hardware SPI
@@ -415,17 +415,21 @@ void uiSetup() {
       drawPalette(i);
   });
 
+  menu.Settings.Dither.setCallback([]() {
+    FastLED.setDither(Data::dither);
+  });
+  
   menu.Settings.Save.setCallback([]() {
-    Serial.print("Saved settings. Brightness: ");
-    Serial.println(*Data::brightness_t);
+//    Serial.print("Saved settings. Brightness: ");
+//    Serial.println(*Data::brightness_t);
     saveSettings();
     updateSettings();
   });
 
   menu.Settings.Load.setCallback([]() {
     loadSettings();
-    Serial.print("Loaded settings. Brightness: ");
-    Serial.print(*Data::brightness_t);
+//    Serial.print("Loaded settings. Brightness: ");
+//    Serial.print(*Data::brightness_t);
     updateSettings();
   });
 

@@ -288,6 +288,9 @@ namespace Data {
 
   bool syncPalettes = false;
 
+  bool dither = false;
+  bool accelerometer = true;
+
 
 } //end nameSpace Data
 

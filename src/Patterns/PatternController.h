@@ -256,7 +256,7 @@ public:
 			Data::incHue();
 		}
 
-		if (now - nextCursorUpdate > 1000 / 40) {
+		if (now - nextCursorUpdate > 1000 / gfx.textSpeed) {
 			nextCursorUpdate = now;
 			cursorPos = (cursorPos - 1 + SCREEN_WIDTH) % SCREEN_WIDTH;
 		}

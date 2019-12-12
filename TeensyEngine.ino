@@ -1,5 +1,5 @@
 #include "data.h"
-#include "ledControl.h"
+//#include "ledControl.h"
 #include "audio.h"
 #include "motion.h"
 
@@ -18,18 +18,24 @@ void setup() {
 //  audioSetup();
   pinMode(MIC_IN_PIN, INPUT);
   pinMode(EQ_AUDIO_PIN, INPUT);
-  
-  ledControl.init();
+
+  gfx.init();
+//  ledControl.init();
   uiSetup();
 
-//  initMPU();
+  initMPU();
 }
 
 void loop() {
   audioLoop();
   
   EVERY_N_MILLISECONDS(50) {
-//    getPitchBasic();
+    if (Data::accelerometer)
+      getPitchBasic();
+    else {
+      Data::pitch = beatsin8(30, 0, 60) - 30;
+      Data::roll = beatsin8(32, 0, 60) - 30;
+    }
   }
 
 //  if (Data::audioOn) audioLoop();

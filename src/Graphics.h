@@ -117,7 +117,7 @@ public:
 	virtual void putPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) {};
 	virtual void putPixel(int x, int y, CRGB c) {};
 	virtual void putPixel(int x, int y, unsigned char h) {};
-	virtual void putPixelDirect(int x, int y, CRGB c) {};
+	virtual void putPixelDirect(int x, int y, CRGB c, uint8_t opacity = 255) {};
 	
 	
 	//virtual void blendPixel(int x, int y, CRGB c, uint8_t a=128) {};
@@ -656,7 +656,7 @@ public:
 				else      line = 0x0;
 				for (int8_t j = 0; j < 8; j++, line >>= 1) {
 					if (line & 0x1) {
-						if (size == 1) putPixelDirect((x + i) % SCREEN_WIDTH, y + j, color);
+						if (size == 1) putPixelDirect((x + i) % SCREEN_WIDTH, y + j, color, textOpacity);
 						else          fillRectDirect( (x + (i*size)) % SCREEN_WIDTH, y + (j*size), size, size, color);
 					}
 					//else if (bg != color) {
@@ -698,7 +698,7 @@ public:
 					}
 					if (bits & 0x80) {
 						if (size == 1) {
-							putPixelDirect( (x + xo + xx) % SCREEN_WIDTH, y + yo + yy, color);
+							putPixelDirect( (x + xo + xx) % SCREEN_WIDTH, y + yo + yy, color, textOpacity);
 						}
 						else {
 							fillRectDirect( (x + (xo16 + xx)*size ) % SCREEN_WIDTH, y + (yo16 + yy)*size, size, size, color);
@@ -717,6 +717,7 @@ public:
 
 	CRGB textcolor = CRGB::White;
 	uint8_t textOpacity = 128;
+	uint8_t textSpeed = 20;
 	uint8_t textsize = 1;
 	uint8_t cursor_x = 0;
 	uint8_t cursor_y = 0;

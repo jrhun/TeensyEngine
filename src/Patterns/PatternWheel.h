@@ -161,7 +161,7 @@ public:
 		p.mass = 1.0f;
 		return p;
 	}
-	void incTheta(float d = 0.025) {
+	void incTheta(float d = 0.02) {
 		theta += d;
 		if (theta > TWO_PI)
 			theta -= TWO_PI;

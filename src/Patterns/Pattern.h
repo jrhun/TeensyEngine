@@ -9,9 +9,10 @@
 
 #if defined(ESP32) || defined(CORE_TEENSY)
 #include "FastLED.h"
-#include "../../ledControl.h"
+//#include "../../ledControl.h"
 #include "../GraphicsFastLED.h"
-GraphicsFastLED gfx(&ledControl);
+//GraphicsFastLED gfx(&ledControl);
+GraphicsFastLED gfx;
 #define returnVal 10
 #else 
 #include "FastLED_PC.h"

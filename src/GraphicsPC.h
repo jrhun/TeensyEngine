@@ -40,7 +40,7 @@ public:
 		}
 	}
 
-	void putPixelDirect(int x, int y, CRGB c0) {
+	void putPixelDirect(int x, int y, CRGB c0, uint8_t opacity = 255) {
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			//alpha blending
 			CRGB c1 = leds[x + y * SCREEN_WIDTH];
@@ -49,9 +49,9 @@ public:
 			dr = c0.r - c1.r;
 			dg = c0.g - c1.g;
 			db = c0.b - c1.b;
-			out.r = c1.r + (dr * textOpacity) / 255;
-			out.g = c1.g + (dg * textOpacity) / 255;
-			out.b = c1.b + (db * textOpacity) / 255;
+			out.r = c1.r + (dr * opacity) / 255;
+			out.g = c1.g + (dg * opacity) / 255;
+			out.b = c1.b + (db * opacity) / 255;
 			ofColor col;
 			col.set(out.r, out.g, out.b);
 			ofSetColor(col);

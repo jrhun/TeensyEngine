@@ -21,7 +21,7 @@ public:
 		for (int j = 0; j < SCREEN_WIDTH; j++) {
 			for (int i = 0; i < tempsamp; i++) {
 				uint8_t index = inoise8(i*Data::sampleAvg + GET_MILLIS(), 5000 + i * Data::sampleAvg);
-				gfx.putPixel(j, SCREEN_HEIGHT - i - 1, CHSV(Data::getHue(), 255, Data::sampleAvg));
+				gfx.putPixel(j, SCREEN_HEIGHT - i - 1, CHSV(index, 255, constrain(Data::sampleAvg, 64, 255)));
 			}
 		}
 
