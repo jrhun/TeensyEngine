@@ -203,6 +203,20 @@ public:
 
 				gfx.textOpacity = oldOpacity;
 			}
+			
+			if (_Pattern::glitterFx) {
+			//can put in sampleavg here
+				static uint16_t glitter[100];
+				static uint8_t glitterVal[100];
+				static uint8_t lastGlitterPos = 0;
+				if (random8() > _Pattern::glitterFx * 20) {
+				uint8_t x,y;
+				x = random8(SCREEN_WIDTH);
+				y = random8(SCREEN_HEIGHT);
+					gfx.putPixelDirect(x, y, CRGB::White);
+					glitter[lastGlitterPos++] = x << 8 | y;
+				}
+			}
 
 			gfx.show();
 
