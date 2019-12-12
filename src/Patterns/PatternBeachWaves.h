@@ -30,8 +30,14 @@ public:
 			x2 %= SCREEN_WIDTH;
 			uint8_t h1 = Data::getHue() + y * 2 + random8(10);
 			uint8_t h2 = Data::getHue() + 64 + y * 2 + random8(15);
-			CRGB c1 = CHSV(h1, 255 - y * 2, 255);
-			CRGB c2 = CHSV(h2, 255 - y * 2, 255);
+			CRGB c1, c2;
+			if (Data::paletteIndex) {
+				c1 = gfx.getColour(h1);
+				c2 = gfx.getColour(h2);
+			} else {
+				c1 = CHSV(h1, 255 - y * 2, 255);
+				c2 = CHSV(h2, 255 - y * 2, 255);
+			}
 			gfx.putPixel(x1, y, c1);
 			gfx.putPixel(x2, y, c2);
 		}

@@ -142,7 +142,9 @@ public:
 		p.pos.x = 2.1 * cos(t);
 		p.pos.z = 2.1 * sin(t);
 
-		p.vel.x = 0.5 * cos(t*6);
+		float vy = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2,-1.4, -1.8, true);
+
+		p.vel.x = 0.5 * cos(t*6); //initial 0.5
 		p.vel.z = 0.5 * sin(t*6);
 		p.vel.y = -1.45;// (GuiVars2 - 1);
 		//p.vel = { GuiVars1 - 1, GuiVars2 - 1, GuiVars3 - 1 };
@@ -159,10 +161,14 @@ public:
 		p.mass = 1.0f;
 		return p;
 	}
-	void incTheta(float d = 0.02) {
+	void incTheta(float d = 0.025) {
 		theta += d;
 		if (theta > TWO_PI)
 			theta -= TWO_PI;
+	}
+
+	virtual void decreaseLife(Particle &p) {
+		p.alpha -= 1.5f;
 	}
 
 	float theta = 0;
@@ -177,6 +183,9 @@ public:
 	void start() {
 		ps.init();
 		ps.limit = true;
+	}
+	void stop() {
+		particles.clear();
 	}
 	uint8_t drawFrame() {
 		gfx.resetZ();
@@ -198,6 +207,10 @@ class ParticleSystemWater : public _Pattern {
 public: 
 	ParticleSystemWater() : _Pattern("Water") {
 		//addParticles(64);
+	}
+
+	void stop() {
+		particles.clear();
 	}
 
 	uint8_t drawFrame() {
@@ -295,7 +308,12 @@ public:
 			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
 			float dis = myMap(p.pos.Len(), 2, 4, 255, 128, true);
-			CRGB c = CHSV(p.hue + Data::getHue(), dis, constrain(p.alpha, 0, 255));
+
+			CRGB c;
+			if (Data::paletteIndex == 0)
+				c = CHSV(p.hue + Data::getHue(), dis, constrain(p.alpha, 0, 255));
+			else 
+				c = gfx.getColour(p.hue, constrain(p.alpha * 1.5f, 0, 255));
 			gfx.drawPointDepth(pos, c);
 
 			if (p.isDead())
@@ -319,19 +337,19 @@ public:
 		Particle p;
 		float t;
 		if (side)		t = theta;
-		else			t = PI + theta;
+		else			t = TWO_PI - theta;
 		//lastSide = !lastSide;
 #if 0
-		p.pos.x = 2.1 * cos(t) * cos(Data::roll);
-		p.pos.z = 2.1 * sin(t) * cos(Data::pitch);
+		p.pos.x = 2.2 * cos(t) * cos(Data::roll);
+		p.pos.z = 2.2 * sin(t) * cos(Data::pitch);
 		p.pos.y = sin(Data::pitch) * p.pos.z + sin(Data::roll) * p.pos.x;
 #else
-		p.pos.x = 2.1 * cos(t);
-		p.pos.z = 2.1 * sin(t);
+		p.pos.x = 2.2 * cos(t);
+		p.pos.z = 2.2 * sin(t);
 		p.pos.y = cos(t / 4);
 #endif
 		p.vel = Vec3::getRandom();
-		p.vel *= 0.1;
+		p.vel *= 0.08;
 		if ((p.pos + p.vel).Len() < GuiVars1) {
 			p.vel = -p.vel;
 		}
@@ -356,7 +374,11 @@ public:
 		particles.push_back(getParticle(side));
 	}
 
-	void incTheta(float d = 0.1) {
+	virtual void decreaseLife(Particle &p) {
+		p.alpha -= 3;
+	}
+
+	void incTheta(float d = 0.08) {
 		theta += d;
 		if (theta > 4*TWO_PI)
 			theta -= 4*TWO_PI;
@@ -374,6 +396,10 @@ public:
 
 	void start() {
 		ps.init();
+	}
+
+	void stop() {
+		particles.clear();
 	}
 	uint8_t drawFrame() {
 		gfx.resetZ();

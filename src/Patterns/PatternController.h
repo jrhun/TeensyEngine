@@ -5,6 +5,7 @@
 
 // include all patterns
 #include "Pattern.h"
+#include "PatternAudio.h"
 #include "PatternBasic.h"
 #include "PatternBeachWaves.h"
 #include "PatternCube.h"
@@ -43,7 +44,9 @@ public:
 	//uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
 
 	//add patterns as members here
+	PatternAudio1		audio1;
 	PatternRowThenCol	rowThenCol;
+	PatternBlank		blank;
 	PatternBeachWaves	beachWaves;
 	PatternBeachWaves2	beachWaves2;
 	PatternCube			cube3d;
@@ -57,6 +60,7 @@ public:
 	PatternParametric2	parametricSpiral;
 	ParticleSystemWater	particlesWater;
 	PatternPurpleRain	purpleRain;
+	PatternRain			rain;
 	PatternRaymarcher	raymarcher;
 	PatternSolid		solid;
 	PatternSparks		sparks;
@@ -68,16 +72,20 @@ public:
 	PatternWheelBlur	wheelBlur;
 	PatternWheelPart	wheelParticle;
 	PatternWorld		world;
+	PatternWorld2		worldNoWater;
 	
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 22;
+	static const uint8_t numPatterns = 26;
     _Pattern *patternList[numPatterns] = {
+		&blank,
+		&audio1,
 		&fish,
 		&particlesWater,
 		&dualWaves,
 		&purpleRain,
+		&rain, 
 		&wheelParticle,
 		&wheelBlur,
 		&SpinningParticles,
@@ -97,6 +105,7 @@ public:
 		&particleFountain,
 		&fire, 
 		&world,
+		&worldNoWater,
 		
 		&wireFrame,
 		&cube3d,

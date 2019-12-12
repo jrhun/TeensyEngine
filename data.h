@@ -194,6 +194,16 @@ namespace Data {
   uint8_t audioThreshold = 128;
   float beat = 0;
 
+  uint8_t maxVol = 20;
+
+  const uint8_t numSamples = 16;
+  uint16_t sampleArray[numSamples];
+  uint16_t sampleSum = 0;
+  uint16_t sampleAvg = 0;
+  uint16_t sampleCount = 0;
+  uint8_t samplePeak = 0;
+  unsigned long peakTime;
+
 
   // backlight
   uint8_t backlight_brightness = 63;
@@ -208,8 +218,8 @@ namespace Data {
   uint8_t scrollSpeed = 1;
   uint8_t textIndex = 0;
   const uint8_t textOptionsCount = 17; // custom options at index 15 and 16
-  const uint8_t customIndex1 = 15;
-  const uint8_t customIndex2 = 16;
+  const uint8_t customIndex1 = textOptionsCount-2;
+  const uint8_t customIndex2 = textOptionsCount-1;
   VariableReference textIndex_t{"Text", &textIndex, 0, 0, textOptionsCount};
   const String textOptions[textOptionsCount] = {
     "Dance!",
@@ -222,11 +232,11 @@ namespace Data {
     "Yew!",
     "Wow!", 
     "Boot!",
-    "Pham!",
     "Love it!",
     "Kick it!", 
     "Hi Mum!",
     "Nailed it!",
+    "Happy Meredith!",
     "Custom 1",
     "Custom 2"
   };

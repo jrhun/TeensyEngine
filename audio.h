@@ -185,8 +185,36 @@ void audioLoop() {
   float sample, value, envelope, beat, thresh;
   static unsigned char i;
 
-  // Read ADC and center so +-512
-  sample = (float) analogRead(MIC_IN_PIN) - 1512.f;
+  
+
+  // Read ADC and center
+  int16_t raw = analogRead(MIC_IN_PIN) - 1512;
+
+  sample = (float) raw;
+  
+  raw = abs(raw);
+  Serial.print(raw);
+  raw = (raw <= Data::noiseFloor) ? 0 : (raw - Data::noiseFloor);
+  raw = ((Data::sampleArray[Data::sampleCount] * 7) + raw) >> 3;
+  Serial.print(" ");
+  Serial.println(raw);
+  Data::sampleSum += raw - Data::sampleArray[Data::sampleCount];
+  Data::sampleAvg = Data::sampleSum / Data::numSamples;
+  Data::sampleArray[Data::sampleCount] = raw;
+  Data::sampleCount = (Data::sampleCount +1) % Data::numSamples;
+
+  if ((raw > (Data::sampleAvg + Data::maxVol)) and
+              (millis() > (Data::peakTime + 50)) and
+              (Data::samplePeak == 0)) {
+        Data::samplePeak = 1; 
+        Data::peakTime = millis();
+  } else {
+//    Data::samplePeak = 0;  //reset by patterns
+  }
+
+
+  // filterd sound
+  
 
   // Filter only bass component
   value = bassFilter(sample);

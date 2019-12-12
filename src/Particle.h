@@ -197,7 +197,11 @@ public:
 			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
 			float dis = myMap(p.pos.Len(), 2, 4, 255, 128, true);
-			CRGB c = CHSV(p.hue, dis, constrain(p.alpha, 0, 255));
+			CRGB c;
+			if (Data::paletteIndex == 0)
+				c = CHSV(p.hue + Data::getHue(), dis, constrain(p.alpha, 0, 255));
+			else
+				c = gfx.getColour(p.hue, constrain(p.alpha * 1.5f, 0, 255));
 			gfx.drawPointDepth(pos, c);
 			//gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(constrain(p.alpha, 0, 255), 0, 255, 64, 255)));
 

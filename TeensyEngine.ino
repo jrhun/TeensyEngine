@@ -16,17 +16,20 @@ void setup() {
   Serial.println("Started");
   
 //  audioSetup();
+  pinMode(MIC_IN_PIN, INPUT);
+  pinMode(EQ_AUDIO_PIN, INPUT);
+  
   ledControl.init();
   uiSetup();
 
-  initMPU();
+//  initMPU();
 }
 
 void loop() {
   audioLoop();
   
   EVERY_N_MILLISECONDS(50) {
-    getPitchBasic();
+//    getPitchBasic();
   }
 
 //  if (Data::audioOn) audioLoop();

@@ -164,8 +164,8 @@ public:
 				multiTimer[2].count,
 				multiTimer[2].count + 64);
 
-			SpiralStream(x1, y1, SCREEN_HEIGHT / 3, 120);
-			SpiralStream(x2, y2, SCREEN_HEIGHT / 3, 120);
+			SpiralStream(x1, y1, SCREEN_HEIGHT / 2, GuiVars1 * 127);
+			SpiralStream(x2, y2, SCREEN_HEIGHT / 2, GuiVars1 * 127);
 		//}
 
 

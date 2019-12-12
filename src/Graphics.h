@@ -96,6 +96,8 @@ public:
 		}
 	}
 
+	virtual void shiftRawX(int8_t amount) {}
+
 	//void incPalette() {
 	//	*paletteIndex_t = (*paletteIndex_t + 1) % gGradientPaletteCount;
 	//	setPalette(*paletteIndex_t);

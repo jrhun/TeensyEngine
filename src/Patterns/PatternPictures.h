@@ -85,7 +85,8 @@ public:
 
 		CRGB bg = CHSV(157, 255, 255);
 		CRGB fg = CHSV(93, 255, 255);
-		static uint16_t offset = SCREEN_WIDTH * 6;
+		static uint16_t offset = SCREEN_WIDTH;
+		static uint8_t offsetDelay = 0;
 //#if defined(ARDUINO)
 //		ledControl.drawGrayscaleBitmap(offset / 8, 0, world_64_32_8bit, 64, 32, fg, bg);
 //#else 
@@ -95,13 +96,53 @@ public:
 			for (int16_t i = 0; i < SCREEN_WIDTH; i++) {
 				CRGB colour = blend(bg, fg, (world_64_32_8bit[buffidx]));
 				buffidx++;
-				gfx.putPixel(((offset/6) + i + SCREEN_WIDTH) % SCREEN_WIDTH, j + 0, colour);
+				gfx.putPixel(((offset) + i + SCREEN_WIDTH) % SCREEN_WIDTH, j + 0, colour);
 			}
 		}
 //#endif
-		offset--;
+		offsetDelay = (offsetDelay + 1) % 6;
+		if (offsetDelay == 0)
+			offset--;
 		if (offset < 0)
-			offset = SCREEN_WIDTH * 6;
+			offset = SCREEN_WIDTH;
+		return returnVal;
+	}
+
+
+};
+
+class PatternWorld2 : public _Pattern {
+public:
+	PatternWorld2() : _Pattern("World (no water)") {}
+
+
+
+	uint8_t drawFrame() {
+
+		CRGB bg = CHSV(0, 0, 0);
+		CRGB fg = gfx.getColour();// CHSV(93, 255, 255);
+		static uint16_t offset = SCREEN_WIDTH;
+		static uint8_t offsetDelay = 0;
+		//#if defined(ARDUINO)
+		//		ledControl.drawGrayscaleBitmap(offset / 8, 0, world_64_32_8bit, 64, 32, fg, bg);
+		//#else 
+		//		
+		uint16_t buffidx = 0;
+		for (int16_t j = 0; j < SCREEN_HEIGHT; j++) {
+			for (int16_t i = 0; i < SCREEN_WIDTH; i++) {
+				//fg = gfx.getColour(-i);
+				CRGB colour = blend(bg, fg, (world_64_32_8bit[buffidx]));
+				buffidx++;
+				gfx.putPixel(((offset) + i ) % SCREEN_WIDTH, j + 0, colour);
+			}
+		}
+		//#endif
+		offsetDelay = (offsetDelay + 1) % 6;
+		if (offsetDelay == 0)
+			offset--;
+		if (offset < 0)
+			offset = SCREEN_WIDTH;
+
 		return returnVal;
 	}
 

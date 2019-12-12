@@ -34,11 +34,13 @@ public:
 		}
 		offset += 0.1;
 
-		centerA.x = 2.5 * cos(angle + PI);
-		centerA.z = 2.5 * sin(angle + PI);
+		float radius = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2, 2.5, 1.8, true);
 
-		centerB.x = 2.5 * cos(angle + PI + PI);
-		centerB.z = 2.5 * sin(angle + PI + PI);
+		centerA.x = radius * cos(angle + PI);
+		centerA.z = radius * sin(angle + PI);
+
+		centerB.x = radius * cos(angle + PI + PI);
+		centerB.z = radius * sin(angle + PI + PI);
 
 		angle += 0.005;
 		if (angle >= TWO_PI)
@@ -108,11 +110,13 @@ public:
 
 		offset += 0.05;
 
-		centerA.x = 2.5 * cos(angle + PI);
-		centerA.z = 2.5 * sin(angle + PI);
+		float radius = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2, 2.5, 1.8, true);
 
-		centerB.x = 2.5 * cos(angle + PI + PI);
-		centerB.z = 2.5 * sin(angle + PI + PI);
+		centerA.x = radius * cos(angle + PI);
+		centerA.z = radius * sin(angle + PI);
+
+		centerB.x = radius * cos(angle + PI + PI);
+		centerB.z = radius * sin(angle + PI + PI);
 
 		angle += 0.005;
 		if (angle >= TWO_PI)

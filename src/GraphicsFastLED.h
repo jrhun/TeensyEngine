@@ -72,6 +72,10 @@ public:
 		//ledRef->drawPixel(x, y, c);
 	}
 
+	void shiftRawX(int8_t amount) {
+	
+	}
+
 	void putPixel(int x, int y, unsigned char h) {
 		CRGB c = getColour(h);
 		putPixel(x, y, c);

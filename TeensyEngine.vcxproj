@@ -270,6 +270,7 @@
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Patterns\FastLED_PC.h" />
     <ClInclude Include="src\Patterns\Pattern.h" />
+    <ClInclude Include="src\Patterns\PatternAudio.h" />
     <ClInclude Include="src\Patterns\PatternBasic.h" />
     <ClInclude Include="src\Patterns\PatternBeachWaves.h" />
     <ClInclude Include="src\Patterns\PatternController.h" />

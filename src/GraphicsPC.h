@@ -59,6 +59,10 @@ public:
 		}
 	}
 
+	void shiftRawX(int8_t amount) {
+		
+	}
+
 	//void fill(CRGB c) {
 	//	for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
 	//		leds[i] = c;

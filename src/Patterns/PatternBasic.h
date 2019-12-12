@@ -3,6 +3,24 @@
 #include "Pattern.h"
 
 
+class PatternBlank : public _Pattern {
+public:
+	PatternBlank() : _Pattern("Blank") {}
+
+	void start() {
+		gfx.clear();
+		//gfx.fillRect(5, 5, 10, 10, CRGB::White);
+	}
+
+	uint8_t drawFrame() {
+
+		//gfx.fillRect(5, 5, 10, 10, CRGB::White);
+		//shiftX(1);
+
+		return returnVal;
+	}
+};
+
 class PatternSolid : public _Pattern {
 public:
 	PatternSolid() : _Pattern("Solid") {}

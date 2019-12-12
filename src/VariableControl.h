@@ -138,12 +138,12 @@ public:
 
 	}
 
-	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, OFF };
+	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, AUDIO, OFF };
 
 
 	const char* getTriggerName(uint8_t i) {
 		const char* triggerTypeName[VariableOscilate::OFF + 1]{
-			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Gate", "Off"
+			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Gate", "Audio", "Off"
 		};
 		if (i <= OFF) {
 			return triggerTypeName[i];
@@ -193,6 +193,7 @@ public:
 
 		if (triggerActive and var > min) {
 			var = myMap(now - triggerStart, 0, triggerDuration, max, min, true);
+			var = gamma6[var / 4];
 		}
 		else { triggerActive = false; var = min; }
 
@@ -230,6 +231,10 @@ public:
 			var = (((now * (b) * 280) >> 16) >> 8);
 			var += 128;
 			if (var > 128)
+				trigger();
+			break;
+		case AUDIO:
+			if (Data::samplePeak)
 				trigger();
 			break;
 		case OFF:

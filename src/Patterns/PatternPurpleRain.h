@@ -11,6 +11,7 @@ public:
 		y = random8(SCREEN_WIDTH*2) - SCREEN_WIDTH*2;
 		ySpeed += myMap(y, -SCREEN_WIDTH*2, 0, 0, 4.0) / 6.0f;
 		//ySpeed = 0.05;
+		hue = random8(20);
 	}
 
 	void init() {
@@ -26,6 +27,7 @@ public:
 	float z;
 	float ySpeed;
 	float len;
+	uint8_t hue;
 
 	void fall() {
 		this->y = this->y + this->ySpeed;
@@ -37,11 +39,25 @@ public:
 
 	static CRGB background;
 
-	void show() {
-		CRGB c1 = CRGB(138, 43, 226);
-		CRGB c2 = background;
-		uint8_t scale = myMap(z, 0, 20, 160, 255);
-		c1.nscale8(scale);
+	 void show(bool purple = true) {
+		 CRGB c1, c2;
+		 uint8_t scale = myMap(z, 0, 20, 160, 255);
+		 if (purple) {
+			 c1 = CRGB(138, 43, 226);
+			 c1.nscale8(scale);
+		 }
+		 else {
+			 uint8_t offset = x;
+			 if (x < SCREEN_WIDTH / 2)
+				 offset = SCREEN_WIDTH/2 - x;
+			 if (Data::paletteIndex)
+				 c1 = gfx.getColour(offset + hue, scale);
+			 else {
+				 //uint8_t sat = myMap(y, 0, SCREEN_HEIGHT, 255, 150, true);
+				 c1 = CHSV(offset + Data::getHue() + hue, 255, scale);
+			 }
+		 }
+		c2 = background;
 		gfx.drawLine(x, y, x, y + len, c1, c2);
 	}
 };
@@ -64,6 +80,27 @@ public:
 		for (Drop &d : drops) {
 			d.fall();
 			d.show();
+		}
+
+		return returnVal;
+	}
+};
+
+
+class PatternRain : public _Pattern {
+public:
+	PatternRain() : _Pattern("Rain") {}
+
+	uint8_t drawFrame() {
+		//Drop::background = CRGB(230, 230, 250).nscale8(GuiVars1 * 128);
+		//Drop::background = CHSV(Data::getHue(), 255, 255);
+		//Drop::background.nscale8(GuiVars1 * 128);
+
+		gfx.fill(Drop::background);
+
+		for (Drop &d : drops) {
+			d.fall();
+			d.show(false);
 		}
 
 		return returnVal;
