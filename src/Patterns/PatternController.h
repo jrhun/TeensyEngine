@@ -207,7 +207,7 @@ public:
 			gfx.show();
 
 		}
-		if (Data::hueChange and now - nextHueUpdate > 1000 / Data::hueSpeed) {
+		if (Data::hueChange and (now - nextHueUpdate > (1000 / Data::hueSpeed)) ) {
 			nextHueUpdate = now;
 			Data::incHue();
 		}
@@ -217,7 +217,7 @@ public:
 			cursorPos = (cursorPos - 1 + SCREEN_WIDTH) % SCREEN_WIDTH;
 		}
 		
-		if (Data::changePaletteDelay and now - nextPaletteUpdate > 1000 * Data::changePaletteDelay) {
+		if (Data::changePaletteDelay and (now - nextPaletteUpdate > (1000 * Data::changePaletteDelay))) {
 			nextPaletteUpdate = now;
 			gfx.setPalette(random8(gGradientPaletteCount));
 		}
