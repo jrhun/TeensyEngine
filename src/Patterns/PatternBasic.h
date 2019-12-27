@@ -297,6 +297,8 @@ typedef struct
 } lv_img_dsc_t;
 
 
+// https://littlevgl.com/image-to-c-array
+
 const uint8_t fish_map[] = {
   0x04, 0x02, 0x04, 0xff, 	/*Color of index 0*/
   0x3c, 0x7e, 0xfc, 0xff, 	/*Color of index 1*/
