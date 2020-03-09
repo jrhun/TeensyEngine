@@ -10,6 +10,7 @@
 #include "PatternBeachWaves.h"
 #include "PatternCube.h"
 #include "PatternFire.h"
+#include "PatternFireworks.h"
 #include "PatternNoise.h"
 #include "PatternParametric.h"
 #include "PatternParticleSysOld.h"
@@ -53,6 +54,7 @@ public:
 	PatternDualWaves	dualWaves;
 	PatternFish			fish;
 	PatternFire			fire;
+	PatternFireworks	fireworks;
 	PatternFountain		particleFountain;
 
 	PatternNoise1		noise1;
@@ -77,10 +79,11 @@ public:
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 26;
+	static const uint8_t numPatterns = 27;
     _Pattern *patternList[numPatterns] = {
 		&blank,
 		&audio1,
+		&fireworks,
 		&fish,
 		&particlesWater,
 		&dualWaves,

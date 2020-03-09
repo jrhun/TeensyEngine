@@ -179,7 +179,53 @@ void adc1_isr() {
 //  }
 }
 
+  //settings for a 160 led rhombus - pulsating and spinning settings
+
+  int stripNumOfLeds = 64;                                 // the total number of leds
+  int stripsOn2Pins = false;                                // set to true if the LED strips or rings are connected to 2 input pins
+//  uint32_t stripColor[81];                                  // half of the number of leds + 1
+  int displayMiddleLed = true;                              // display the middle led (blue). set to true for one strip, false for two strips or rings
+  int splitStrip = true;                                    // set to true when using 2 strips or rings, false for one strip
+  int middleOffset = 0;                                     // offset for the middle led when using one strip
+  int startupAnimationDelay = 0;                            // delay for the startup animation
+  int orangeLimitAmount = 0;                                // limit the amount of green of the middle LEDs to make them more orange
+  int swapLeftRight = false;                                // swap the left and right input values or not
+  
+  int dropDelay = 4;                                        // hold time before dropping the leds
+  float dropFactor = .92;                                   // value for dropping the leds
+  
+  int peakTimeNoDropDelay = 150;                            // peak hold time when not dropping the peaks (when droppingPeak is false)
+  int peakTimeFirstDropDelay = 70;                          // peak hold time when dropping the first peak
+  int peakTimeDropDelay = 7;                                // peak hold time when dropping the rest of the peaks
+  float peakDropFactor = .94;                               // value for dropping the peaks
+  int droppingPeakFade = false;                             // display the dropping peak fading to black or not
+  
+  int bouncingPeaksNumOfLeds = 10;                          // how many leds to bounce up (max)
+  int bouncingPeaksNumOfLedsMin = 5;                        // how many leds to bounce up (min) when using dynamicBouncingPeaks
+  int bouncingPeakDelay = 4;                                // delay between peak bounce updates
+  int bouncingPeakCounterInc = 6;       
+
+  // basic settings
+int pulsing = true;                                       // pulsing will display from the middle of each strip or ring  @EB
+
+int spinCircle = true;                                    // spin the animation. will not work with stripsOn2Pins  @EB
+
+int animType = 0;                                         // startup animation selection (1 looks nice for 1 ring)  @EB
+int colorScheme = 10;                                     // 0: green-red, 1: blue-green, 2: blue-red, 3: red-blue, 4: green-blue, 5: red-green, 6: blue-white-red
+                                                          // 7: red-white-blue, 8: green-white-red, 9: green-white-blue, 10: color wheel, 11: spinning color wheel,
+                                            // 12: as 11 but spread with factor colorScheme12Factor  @EB
+int maxColorScheme = 12;                                  // used for looping through the color schemes with the switch button
+int colorScheme11SpinDelay = stripNumOfLeds / 4 ;         // delay for spinning scheme 11
+int colorScheme12Factor = 3;                              // wheel spread factor for scheme 12 @EB
+
+int minValue = 10;                                        // min analog input value
+int sensitivityValue = 110;                               // 0 - 255, initial value (value read from the potentiometer if useSensorValues = true)
+
 void audioLoop() {
+
+
+
+  
   unsigned long now = micros(); // Used to track rate
   static unsigned long lastUpdate = 0;
   float sample, value, envelope, beat, thresh;
@@ -193,11 +239,11 @@ void audioLoop() {
   sample = (float) raw;
   
   raw = abs(raw);
-  Serial.print(raw);
+//  Serial.print(raw);
   raw = (raw <= Data::noiseFloor) ? 0 : (raw - Data::noiseFloor);
   raw = ((Data::sampleArray[Data::sampleCount] * 7) + raw) >> 3;
-  Serial.print(" ");
-  Serial.println(raw);
+//  Serial.print(" ");
+//  Serial.println(raw);
   Data::sampleSum += raw - Data::sampleArray[Data::sampleCount];
   Data::sampleAvg = Data::sampleSum / Data::numSamples;
   Data::sampleArray[Data::sampleCount] = raw;
@@ -245,8 +291,5 @@ void audioLoop() {
     //Reset sample counter
     i = 0;
   }
-
-  // Consume excess clock cycles, to keep at 5000 hz
-  //    for (unsigned long up = time + SAMPLEPERIODUS; time > 20 && time < up; time = micros());
-
+  
 }

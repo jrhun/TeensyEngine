@@ -40,7 +40,7 @@ void setupRadio() {
   radio.setPALevel(RF24_PA_LOW);
   radio.setDataRate(RF24_2MBPS);
 
-  radio.setRetries(5, retries);
+  radio.setRetries(2, retries);
 }
 
 uint8_t prepareUpdate(UpdateType t) {
@@ -100,7 +100,7 @@ void sendClientUpdate(UpdateType t, uint16_t clientIDmask = 1023) {
   }
   else {
     for (uint8_t i = 0; i < numClients; i++) {
-      if (bit_is_set(clientIDmask, i)) {
+      if (true) {//bit_is_set(clientIDmask, i)) {
         radio.openWritingPipe(addressTable[i]);
         uint8_t payloadSize = prepareUpdate(t);
         if (radio.write(&radioBuffer, payloadSize)) {

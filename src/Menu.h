@@ -159,7 +159,7 @@ public:
 		else if (msg[sel] == '!') {
 			msg[sel] = '?';
 		}
-		else {
+		else if (msg[sel] == ' ') {
 			msg[sel] = 'A';
 		}
 	}
@@ -175,6 +175,9 @@ public:
 		}
 		else if (msg[sel] == 'A') {
 			msg[sel] = ' ';
+		}
+		else if (msg[sel] == 'a') {
+			msg[sel] = 'Z';
 		}
 		else if (msg[sel] == '?') {
 			msg[sel] = '!';
@@ -1081,10 +1084,12 @@ public:
 
 	VariableReference audioThreshold_t{ "Audio thres", &Data::audioThreshold, 128, 0, 255 };
 	VariableReference noiseFloor_t{ "Noise floor", &Data::noiseFloor, 65, 0, 255 };
+	VariableReference peakThreshold_t{ "Peak Thres", &Data::maxVol , 40, 10, 255 };
 	MenuVariable AudioThreshold{ &audioThreshold_t };
 	MenuVariable NoiseFloor{ &noiseFloor_t };
+	MenuVariable PeakThreshold{ &peakThreshold_t };
 
-	static const size_t numItems = 8;
+	static const size_t numItems = 9;
 	MenuAbstract *items[numItems] = {
 		&PatternList,
 		&CurrentPattern,
@@ -1093,7 +1098,8 @@ public:
 		&TapTempo,
 		&OscType,
 		&AudioThreshold,
-		&NoiseFloor
+		&NoiseFloor,
+		&PeakThreshold
 
 	};
 

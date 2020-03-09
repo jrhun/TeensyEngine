@@ -81,13 +81,15 @@ void getPitchBasic(){
     fZg = IMU.getAccelX_mss() * alpha + (fZg * (1.0 - alpha));
  
     //Roll & Pitch Equations
+    // initial pitch negative, roll positive
+    // 1st try, pitch negative, roll negative
     Data::pitch  = -(atan2(-fYg, fZg)*180.0)/M_PI;
-    Data::roll = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+    Data::roll = -(atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
 
-  Serial.print("Pitch: ");
-  Serial.println(Data::pitch,5);
-  Serial.print("Roll: ");
-  Serial.println(Data::roll,5);
+//  Serial.print("Pitch: ");
+//  Serial.println(Data::pitch,5);
+//  Serial.print("Roll: ");
+//  Serial.println(Data::roll,5);
 }
 
 

@@ -8,11 +8,11 @@
 int16_t gravity = 1;
 const uint16_t STEP = 256;
 const uint16_t MAX_PARTICLES = 150;
-const uint16_t alignmentPerceptionRadius = 1000;
-const uint16_t cohesionPerceptionRadius = 1000;
-const uint16_t separationPerceptionRadius = 400;
-const uint16_t maxForce = 10;
-const uint16_t maxSpeed = 150;
+const uint16_t alignmentPerceptionRadius = 0;// 1000;
+const uint16_t cohesionPerceptionRadius = 0;// 1000;
+uint16_t separationPerceptionRadius = 400;
+uint16_t maxForce = 10;
+uint16_t maxSpeed = 150;
 
 uint16_t baseHue = 0;
 uint8_t baseHueScale = 4;
@@ -397,7 +397,7 @@ public:
 
 	}
 
-	fParticle(int _x, int _y, int h) {
+	fParticle(int16_t _x, int16_t _y, uint8_t h) {
 		x = _x;
 		y = _y;
 		vx = random8(200) - 100;
@@ -407,6 +407,18 @@ public:
 		alpha = 255;
 		mass = 0;
 		hue = (h + int(random8(15))) % 255;
+	}
+
+	void set(int16_t _x, int16_t _y, uint8_t h) {
+			x = _x;
+			y = _y;
+			vx = random8(250) - 125;
+			vy = random8(250) - 125;
+			ax = 0;
+			ay = 0;
+			alpha = 255;
+			mass = 0;
+			hue = h + random8(24);
 	}
 
 	bool finished() {
@@ -424,14 +436,14 @@ public:
 		vy += ay;
 		ax = 0;
 		ay = 0;
-		x = (x + vx + SCREEN_HEIGHT * STEP) % (SCREEN_HEIGHT * STEP);
+		x = (x + vx + SCREEN_WIDTH * STEP) % (SCREEN_WIDTH * STEP);
 		y += vy;
 		if (y < (-STEP)) {
 			alpha = 0;
 		}
 		else if (mass == 0) {
-			if (alpha - 5 < 0) alpha = 0;
-			else               alpha -= 5;
+			if (alpha - 8 < 0) alpha = 0;
+			else               alpha -= 8;
 			vx = (vx * 235) >> 8;
 			vy = (vy * 235) >> 8;
 		}
@@ -440,63 +452,100 @@ public:
 
 class Firework {
 public:
-	std::vector<fParticle> part;
+	//std::vector<fParticle> part;
+	enum { nParts = 24 };
+	fParticle part[nParts];
 	fParticle firework;
 
+	uint8_t state = 0;
+	uint8_t index = 0;
+
+	static uint8_t c;
+
 	Firework() {
-		part.reserve(30);
+		//part.reserve(30);
+		index = c;
+		c++;
 		reset();
+		state = 2;
 	}
 
 	void reset() {
 		firework.clear();
-		firework.x = random16(4 * STEP, (SCREEN_HEIGHT - 4) * STEP);
-		firework.y = SCREEN_WIDTH * STEP;
-		firework.vx = random8(80) - 40;
-		firework.vy = -random8(150, 190);
+		state = 0;
+		for (int i = 0; i < nParts; i++) {
+			part[i].clear();
+		}
+		firework.x = random16(0, SCREEN_WIDTH * STEP);
+		firework.y = SCREEN_HEIGHT * STEP;
+		firework.vx = random8(90) - 45;
+		firework.vy = -random8(80, 130);
 		firework.alpha = 255;
 		firework.mass = 1;
-		firework.hue = int(((random8(32) + (4 * firework.x / STEP) + baseHue / baseHueScale)) % 256);
+		firework.hue = uint8_t(((random8(8) + index * 14 + Data::getHue())));
 	}
 
-	bool done() {
-		if (firework.alpha == 0 && part.empty()) {
+	bool done() { 
+		if (state == 2) {
 			return true;
+		//if (firework.alpha == 0 && part.empty()) {
+			//return true;
 		}
 		else {
 			return false;
 		}
 	}
 	void run() {
-		if (firework.alpha != 0) {
+		if (state == 0) {//firework.alpha != 0) {
 			firework.ay += 1;
 			firework.update();
+			firework.alpha = 255;
 			firework.show();
 			if (firework.explode()) {
-				for (int i = 0; i < 20; i++) {
-					part.push_back(fParticle(firework.x, firework.y, firework.hue));    // Add "num" amount of _particles to the arraylist
+				for (int i = 0; i < nParts; i++) {
+					part[i].set(firework.x, firework.y, firework.hue);
+					//part.push_back(fParticle(firework.x, firework.y, firework.hue));    // Add "num" amount of _particles to the arraylist
 				}
 				firework.alpha = 0;
+				state = 1;
 			}
 		}
 
-		if (part.end() != part.begin()) {
-			for (std::vector<fParticle>::iterator it = part.end(); it != part.begin(); it--) {
-				fParticle *p = &(*it);
-				p->ay += 1;
-				p->update();
-				p->show();
-				if (p->finished()) {
-					it = part.erase(it);
+		else if (state == 1) {
+			uint8_t count = 0;
+			for (uint8_t i = 0; i < nParts; i++) {
+				if (part[i].finished()) {
+					count++;
+					continue;
 				}
+				part[i].ay += 1;
+				part[i].update();
+				part[i].show();
+			}
+			if (count >= nParts-2) {
+				state = 2;
 			}
 		}
+
+		//if (part.end() != part.begin()) {
+		//	for (std::vector<fParticle>::iterator it = part.end(); it != part.begin(); it--) {
+		//		fParticle *p = &(*it);
+		//		p->ay += 1;
+		//		p->update();
+		//		p->show();
+		//		if (p->finished()) {
+		//			it = part.erase(it);
+		//		}
+		//	}
+		//}
 	}
 };
 
+uint8_t Firework::c = 0;
+
 class FireworkSystem : public ParticleSystemOld {
 public:
-	enum { maxFireworks = 6 };
+	enum { maxFireworks = 8 };
 	FireworkSystem() {
 		//      fireworks.reserve(maxFireworks);
 	}
@@ -527,7 +576,7 @@ public:
 		for (uint8_t i = 0; i < maxFireworks; i++) {
 			Firework *f = &fireworks[i];
 			if (f->done()) {
-				if (random8(10) < 1) {
+				if (random8(14) < 1) {
 					f->reset();
 				}
 			}
@@ -570,7 +619,10 @@ public:
 				continue;
 			}
 			else {
-				//p->allFlock(_particles);
+				//maxForce = GuiVars1 * 15;
+				//separationPerceptionRadius = GuiVars2 * 200;
+				p->allFlock(_particles);
+				
 				p->update();
 				if (p->alpha - 10 < 0) p->alpha = 0;
 				else {
@@ -650,12 +702,16 @@ public:
 	PatternWheelPart() : _Pattern("Wheel Particles") {}
 
 	uint8_t drawFrame() {
+		_Pattern::drawFrame();
 		if (!_Pattern::useCustomEffect) {
 			//gfx.fade(10);
 			gfx.blur(75);
 		}
+		
+		//maxSpeed = myMap(*beat, 0, 255, 150, 180);
 		ps.applyForces();
 		ps.addParticle();
+		maxForce = myMap(*beat, 0, 255, 0, 30);
 		ps.run();
 		baseHue = Data::getHue();
 		return returnVal;

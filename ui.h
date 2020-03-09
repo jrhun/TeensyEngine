@@ -148,24 +148,35 @@ void tftDisplayFPS() {
 void tftDisplayVoltsAmps() {
   static uint8_t lastValue = 0;
   const uint8_t numVals = 10;
-  float volts[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-  float voltsSum = 0;
-  float amps[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-  float ampsSum = 0;
+  static float volts[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  static float voltsSum = 0.0f;
+  static float amps[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  static float ampsSum = 0.0f;
 
 
 
   float v = analogRead(VOLTS_IN_PIN);
+//  Serial.print("volt raw: ");
+//  Serial.print(v);
   const float VREF = 3.292f;
   const uint16_t VMAX = 4095;
   v = (v * VREF) / VMAX;
+//  Serial.print("\tcalc: ");
+//  Serial.print(v);
   // I think R1 is 508k, R2 96k...
   v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
-
+//  Serial.print("\tmap: ");
+//  Serial.println(v);
+  
   int16_t ampsRaw = analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
   //  amps = (ampsRaw * VREF) / VMAX; // amps measured in volts where 100mv = 1a
+//  Serial.print("amp raw: ");
+//  Serial.print(ampsRaw);
   float a = map(ampsRaw, 3169, 3347, 580, 2050);
+//  Serial.print("amp map: ");
+//  Serial.println(a);
   a /= 1000.0f;
+
 
   voltsSum -= volts[lastValue];
   voltsSum += v;
@@ -186,6 +197,8 @@ void tftDisplayVoltsAmps() {
   char t[12];
   sprintf(t, "V: %.2f", voltsAvg);
   tft.print(t);
+
+  
 
   tft.setCursor(180, 16);
   sprintf(t, "A: %.2fA", ampsAvg);

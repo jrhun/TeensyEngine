@@ -194,7 +194,7 @@ namespace Data {
   uint8_t audioThreshold = 128;
   float beat = 0;
 
-  uint8_t maxVol = 20;
+  uint8_t maxVol = 40;
 
   const uint8_t numSamples = 16;
   uint16_t sampleArray[numSamples];
@@ -202,6 +202,7 @@ namespace Data {
   uint16_t sampleAvg = 0;
   uint16_t sampleCount = 0;
   uint8_t samplePeak = 0;
+  float samplePeakVal = 0.0f;
   unsigned long peakTime;
 
 
@@ -223,6 +224,7 @@ namespace Data {
   VariableReference textIndex_t{"Text", &textIndex, 0, 0, textOptionsCount};
   const String textOptions[textOptionsCount] = {
     "Dance!",
+    "Golden!",
     "Good job!",
     "Well done!",
     "Good tune!", 
@@ -236,7 +238,6 @@ namespace Data {
     "Kick it!", 
     "Hi Mum!",
     "Nailed it!",
-    "Happy Meredith!",
     "Custom 1",
     "Custom 2"
   };
