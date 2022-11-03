@@ -282,30 +282,36 @@ void uiLoop() {
       tft.setTextSize(3);
       tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
       tft.println("Radience");
-      const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
+      //const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
+      const uint8_t headingBottom = tft.getTextSizeY() + headingOffset;
       tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
 
       //print page name
       tft.setCursor(2, headingBottom + 6);
       tft.setTextSize(2);
-      tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
+      //tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
+      tft.fillRect(0, headingBottom + 4, tft.width(), tft.getTextSizeY() + 2, ILI9341_BLACK);      
       //    tft.print("Current pattern\n> ");
       tft.println(menu.currentPage()->getName());
       for (uint8_t i = 0; i < menu.numPages; i++) {
         const uint8_t xPos = tft.width() - 52;
         const uint8_t yPos = headingBottom + 2 + 2 + 2;
         if (i == menu.currentPageIndex) {
-          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
+          //tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
+          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY(), 2, TFT_TEXT);
         }
         else {
-          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
+          //tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
+          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY(), 2, TFT_TEXT - 0x0841);
         }
       }
-      tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
+      //tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
+      tft.drawFastHLine(0, headingBottom + tft.getTextSizeY() + 9, tft.width(), TFT_TEXT);
 
 
       //Print body
-      const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
+      //const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
+      const uint8_t bodyY = headingBottom + tft.getTextSizeY() + 12;
       tft.setCursor(0, bodyY);
 
       tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
