@@ -28,7 +28,7 @@ public:
 	uint8_t drawFrame() {
 		_Pattern::drawFrame();
 
-		uint8_t val = myMap(*beat, 0, 255, 128, 255);
+		uint8_t val = myMap(*beat, 0, 255, 196, 255);
 
 		gfx.fill(gfx.getColour().nscale8(val));
 

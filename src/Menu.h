@@ -1044,6 +1044,9 @@ public:
 		tempo_t.setCallback([]() {
 			_Pattern::beat.setBPM(_Pattern::beat.bpmVal << 8);
 		});
+		TriggerAction.setCallback([]() {
+			patterns.getCurrentPattern()->trigger();
+		});
 	}
 	
 	size_t getNumItems() {
@@ -1089,7 +1092,9 @@ public:
 	MenuVariable NoiseFloor{ &noiseFloor_t };
 	MenuVariable PeakThreshold{ &peakThreshold_t };
 
-	static const size_t numItems = 9;
+	MenuAction TriggerAction{ "Trigger" };
+
+	static const size_t numItems = 10;
 	MenuAbstract *items[numItems] = {
 		&PatternList,
 		&CurrentPattern,
@@ -1099,7 +1104,8 @@ public:
 		&OscType,
 		&AudioThreshold,
 		&NoiseFloor,
-		&PeakThreshold
+		&PeakThreshold, 
+		&TriggerAction
 
 	};
 
