@@ -75,12 +75,13 @@ public:
 	PatternWheelPart	wheelParticle;
 	PatternWorld		world;
 	PatternWorld2		worldNoWater;
+	PatternMario		mario; 
 	
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 27;
-    _Pattern *patternList[numPatterns] = {
+	static const uint8_t numPatterns = 28;
+    _Pattern *patternList[numPatterns] = {	
 		&blank,
 		&audio1,
 		&fireworks,
@@ -109,6 +110,7 @@ public:
 		&fire, 
 		&world,
 		&worldNoWater,
+		&mario,
 		
 		&wireFrame,
 		&cube3d,

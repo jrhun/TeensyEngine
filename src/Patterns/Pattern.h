@@ -96,7 +96,7 @@ public:
 		beat.update();
 	}
 
-	void trigger() {
+	virtual void trigger() {
 		beat.sync();
 	}
 
@@ -124,7 +124,7 @@ public:
 
 	static bool useCustomEffect;
 
-	static VariableOscilate beat;
+	static VariableOscilate beat; //use *beat to access the val directly
 
 	static uint8_t blurFx;
 	static uint8_t fadeFx;

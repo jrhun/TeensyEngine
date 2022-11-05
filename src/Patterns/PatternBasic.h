@@ -589,7 +589,7 @@ public:
 	}
 
 	void moveFish(uint8_t i) {
-		if (random8(10) == 0) {
+		if (random8(20) == 0) {
 			//fishX[i] = (SCREEN_WIDTH + fishX[i] + (fishDir[i] ? -1 : 1)) % SCREEN_WIDTH;
 			fish_p[i].pos.x += (fishDir[i] ? -1 : 1);
 			if (fish_p[i].pos.x > SCREEN_WIDTH)
@@ -600,7 +600,7 @@ public:
 		if (random8(255) == 0)
 			fishDir[i] = !fishDir[i];
 
-		if (random8(30) == 0) {
+		if (random8(40) == 0) {
 			if (random8(2)) {
 				//if (fishY[i] < fishYMax)
 				//	fishY[i]++;
