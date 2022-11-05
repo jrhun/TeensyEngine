@@ -145,7 +145,10 @@ void tftDisplayFPS() {
   tft.print(p);
 }
 
+
+
 void tftDisplayVoltsAmps() {
+  static unsigned lastUpdate = 0;
   static uint8_t lastValue = 0;
   const uint8_t numVals = 10;
   static float volts[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -153,29 +156,54 @@ void tftDisplayVoltsAmps() {
   static float amps[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
   static float ampsSum = 0.0f;
 
+//
 
+  if (lastUpdate + 100 < millis()) {
+    //update due 
+    lastUpdate = millis();
+    //run code below
+  } else {
+    return;
+  }
 
-  float v = analogRead(VOLTS_IN_PIN);
-//  Serial.print("volt raw: ");
+  float v = adc->adc0->analogRead(VOLTS_IN_PIN);
+//  Serial.print("\nVolt raw: ");
 //  Serial.print(v);
-  const float VREF = 3.292f;
-  const uint16_t VMAX = 4095;
-  v = (v * VREF) / VMAX;
-//  Serial.print("\tcalc: ");
-//  Serial.print(v);
-  // I think R1 is 508k, R2 96k...
-  v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
-//  Serial.print("\tmap: ");
-//  Serial.println(v);
+  v = v*3.3/adc->adc0->getMaxValue();
+
   
-  int16_t ampsRaw = analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
-  //  amps = (ampsRaw * VREF) / VMAX; // amps measured in volts where 100mv = 1a
-//  Serial.print("amp raw: ");
+//  const float VREF = 3.292f; //value of 3.292f gives vmax 4095
+//  const uint16_t VMAX = 4095;
+//  v = (v * VREF) / VMAX;
+//  Serial.print("\tcalc: ");
+//  Serial.print(v, DEC);
+  // I think R1 is 508k, R2 96k...
+  // this means voltage of 16.49v becomes 2.62v (, 12.34 becomes 1.96v, 12v -> 1.907v
+  // these values should be 3251 raw, and 2432 raw respectively
+  // converting from divider is v out = v in * 0.159 -> v in = v out / 0.159
+  //new value 0.0922
+  float vv = v / 0.0922f;
+//  v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
+//  Serial.print("\tmap: ");
+//  Serial.print(v);
+//  Serial.print("\tdivided: ");  
+//  Serial.print(vv);
+  v = vv;
+  
+  int16_t ampsRaw = adc->adc0->analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
+  float a = ampsRaw*3.3/adc->adc0->getMaxValue();
+  // amps measured in volts where 100mv = 1a 
+//  Serial.print("\nAmp raw: ");
 //  Serial.print(ampsRaw);
-  float a = map(ampsRaw, 3169, 3347, 580, 2050);
-//  Serial.print("amp map: ");
+//  Serial.print("\tAmps volt: ");
+//  Serial.print(a, DEC);
+//  Serial.print("Map: ");
+  float aa = (a - 2.5) / 0.1f; //gives us AMPS
+//  Serial.print(aa, DEC);
+//  a = map(ampsRaw, 3169, 3347, 580, 2050);
+//    a /= 1000.0f;
 //  Serial.println(a);
-  a /= 1000.0f;
+  a = aa;
 
 
   voltsSum -= volts[lastValue];
@@ -283,14 +311,14 @@ void uiLoop() {
       tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
       tft.println("Radience");
       //const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
-      const uint8_t headingBottom = tft.getTextSizeY() + headingOffset;
+      const uint8_t headingBottom = tft.getTextSizeY()*8 + headingOffset;
       tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
 
       //print page name
       tft.setCursor(2, headingBottom + 6);
       tft.setTextSize(2);
       //tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
-      tft.fillRect(0, headingBottom + 4, tft.width(), tft.getTextSizeY() + 2, ILI9341_BLACK);      
+      tft.fillRect(0, headingBottom + 4, tft.width(), tft.getTextSizeY()*8 + 2, ILI9341_BLACK);      
       //    tft.print("Current pattern\n> ");
       tft.println(menu.currentPage()->getName());
       for (uint8_t i = 0; i < menu.numPages; i++) {
@@ -298,20 +326,20 @@ void uiLoop() {
         const uint8_t yPos = headingBottom + 2 + 2 + 2;
         if (i == menu.currentPageIndex) {
           //tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
-          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY(), 2, TFT_TEXT);
+          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY()*8, 2, TFT_TEXT);
         }
         else {
           //tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
-          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY(), 2, TFT_TEXT - 0x0841);
+          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY()*8, 2, TFT_TEXT - 0x0841);
         }
       }
       //tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
-      tft.drawFastHLine(0, headingBottom + tft.getTextSizeY() + 9, tft.width(), TFT_TEXT);
+      tft.drawFastHLine(0, headingBottom + tft.getTextSizeY()*8 + 9, tft.width(), TFT_TEXT);
 
 
       //Print body
       //const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
-      const uint8_t bodyY = headingBottom + tft.getTextSizeY() + 12;
+      const uint8_t bodyY = headingBottom + tft.getTextSizeY()*8 + 12;
       tft.setCursor(0, bodyY);
 
       tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
@@ -380,6 +408,16 @@ void updateSettings() {
 }
 
 void uiSetup() {
+
+  // voltsin 20/A6, AmpIn 21/A7 - both can use either ADC
+  pinMode(VOLTS_IN_PIN, INPUT);
+  pinMode(AMP_IN_PIN, INPUT);
+  adc->adc0->setReference(ADC_REFERENCE::REF_3V3);
+  adc->adc0->setAveraging(16); // set number of averages
+  adc->adc0->setResolution(16); // set bits of resolution
+  adc->adc0->recalibrate();
+  adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED); // change the conversion speed
+  adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED ); // change the sampling speed
 
   pinMode(TFT_BACKLIGHT, OUTPUT);
   digitalWrite(TFT_BACKLIGHT, LOW);

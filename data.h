@@ -63,6 +63,9 @@
 
 // MPU9250 on SCL2/ SDA2
 
+#include <ADC.h>
+ADC *adc = new ADC(); 
+
 #endif // teensy 4.x
 
 #define NUM_VARS    6

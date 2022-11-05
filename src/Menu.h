@@ -1507,6 +1507,11 @@ public:
 		r = currentPage()->getPageData();
 		//log page data
 		// return r;
+#if defined(ESP32) || defined(CORE_TEENSY)
+		
+#else
+		std::cout << r << "\n";
+#endif 
 		
 	}
 };

@@ -15,15 +15,22 @@ void setup() {
   delay(200);
   Serial.println("Started");
   
-//  audioSetup();
-  pinMode(MIC_IN_PIN, INPUT);
-  pinMode(EQ_AUDIO_PIN, INPUT);
+  audioSetup();
+  
+//  pinMode(MIC_IN_PIN, INPUT);
+//  pinMode(EQ_AUDIO_PIN, INPUT);
 
   gfx.init();
 //  ledControl.init();
   uiSetup();
 
   initMPU();
+
+  //ADC setup
+  //A6 volt, A7 amp on ADC0, A13 audio on ADC1
+
+
+  
 }
 
 void loop() {

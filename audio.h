@@ -4,6 +4,7 @@
 
 //#include "ADC.h"
 //ADC *adc = new ADC();
+//audioIn (pin27, A13) is on ADC2
 
 // references
 //noise processing code https://github.com/atuline/FastLED-Demos/blob/master/soundmems_noise/soundmems_noise.ino
@@ -127,7 +128,14 @@ void adcRead() {
 }
 
 void audioSetup() {
-    pinMode(MIC_IN_PIN, INPUT);
+  pinMode(MIC_IN_PIN, INPUT);
+  adc->adc1->setReference(ADC_REFERENCE::REF_3V3);
+  adc->adc1->setAveraging(8); // set number of averages
+  adc->adc1->setResolution(16); // set bits of resolution
+  adc->adc1->recalibrate();
+  adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::MED_SPEED ); // change the conversion speed
+  adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED  ); // change the sampling speed
+    
 
 //    adc->adc1->setAveraging(8);
 //    adc->adc1->setResolution(10);
@@ -149,7 +157,7 @@ void audioSetup() {
 //    adc->adc1->startPDB(5000);
 
 
-  myTimer.begin(adcRead, 1000000.0f / 5000.0f);
+//  myTimer.begin(adcRead, 1000000.0f / 5000.0f);
 }
 void adc0_isr() {}
 
@@ -234,7 +242,7 @@ void audioLoop() {
   
 
   // Read ADC and center
-  int16_t raw = analogRead(MIC_IN_PIN) - 1512;
+  int16_t raw = adc->adc1->analogRead(MIC_IN_PIN) - 1512;
 
   sample = (float) raw;
   
