@@ -290,13 +290,10 @@ void uiLoop() {
     lastTFTUpdate = now;
     // fast text updates only!
     tft.useFrameBuffer(false);
+    
     tftDisplayVoltsAmps();
     //FPS
-
-    if (displayFPS) {
-      tftDisplayFPS();
-
-    }
+    if (displayFPS) {tftDisplayFPS();}
 
 #if 1
     if (updateDisplay) {
@@ -368,8 +365,8 @@ void uiLoop() {
 //        drawPalette(0, 300, gfx.currentPalette);
 //      }
 
-      tftDisplayVoltsAmps();
-      if (displayFPS) tftDisplayFPS();
+//      tftDisplayVoltsAmps();
+//      if (displayFPS) tftDisplayFPS();
       tft.updateScreenAsync(false);
     }
 #endif

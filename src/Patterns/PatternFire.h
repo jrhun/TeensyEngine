@@ -62,8 +62,14 @@ public:
 		//SPARKING = myMap(*beat, 0, 255, GuiVars3 * 128, GuiVars4 * 128);
 
 		if (beat.getType() != beat.OFF) {
-			COOLING = myMap(*beat, 0, 255, 170, 100);
-			SPARKING = myMap(*beat, 0, 255, 20, 150);
+			if (beat.getType() == beat.TRIGGER) {
+				COOLING = myMap(*beat, 0, 255, 150, 90);
+				SPARKING = myMap(*beat, 0, 255, 50, 150);
+			}
+			else {
+				COOLING = myMap(*beat, 0, 255, 170, 100);
+				SPARKING = myMap(*beat, 0, 255, 30, 150);
+			}
 		}
 
 		static byte heat[SCREEN_WIDTH][SCREEN_HEIGHT];// use noise array to save ram
@@ -98,7 +104,11 @@ public:
 		}
 
 		//offset++;
+#if defined(ESP32) || defined(CORE_TEENSY)
 		return 15;
+#else 
+		return returnVal;
+#endif
 	}
 
 };

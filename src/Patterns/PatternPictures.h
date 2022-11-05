@@ -288,7 +288,7 @@ public:
 	PatternMario() : _Pattern("Mario") {}
 
 	uint8_t drawFrame() {
-
+		_Pattern::drawFrame();
 
 		frameCounter = (frameCounter + 1) % 12;
 		if (frameCounter == 0) {
