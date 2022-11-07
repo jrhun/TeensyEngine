@@ -159,7 +159,7 @@ public:
 	//}
 
 
-	int scale = 8;
+	int scale = 16;
 	uint8_t hue = 0;
 	/*CRGB leds[SCREEN_WIDTH * SCREEN_HEIGHT];*/
 };

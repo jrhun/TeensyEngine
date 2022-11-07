@@ -180,6 +180,13 @@ void drawGrayscaleBitmap(int16_t x, int16_t y,
 	}
 }
 
+//void drawGrayscaleBitmapColour(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h) {
+//	//colourise greyscale bitmap 0
+//	uint8_t l = c.getLuma();
+//	CRGB colour = CHSV(pattern)
+//	gfx.putPixel(x + i + SCREEN_WIDTH) % SCREEN_WIDTH, j + y, gfx.hue
+//}
+
 // 16bit 565 encoded image
 void drawRGBBitmap(int16_t x, int16_t y,
 	const uint16_t bitmap[], int16_t w, int16_t h) {
@@ -195,7 +202,7 @@ void drawRGBBitmap(int16_t x, int16_t y,
 
 //16bit a555 encoded image
 void drawARGBBitmap(int16_t x, int16_t y,
-	const uint16_t bitmap[], int16_t w, int16_t h) {
+	const uint16_t bitmap[], int16_t w, int16_t h, bool flip = false) {
 	for (int16_t j = 0; j < h; j++) {
 		for (int16_t i = 0; i < w; i++) {
 			uint16_t color = pgm_read_word(&bitmap[j * w + i]);
@@ -203,7 +210,8 @@ void drawARGBBitmap(int16_t x, int16_t y,
 				uint8_t r = pgm_read_byte(&gamma5[(color >> 10) & 0x1F]);
 				uint8_t g = pgm_read_byte(&gamma5[(color >>  5) & 0x1F]);
 				uint8_t b = pgm_read_byte(&gamma5[(color >>  0) & 0x1F]);
-				gfx.putPixel((i + x) % SCREEN_WIDTH, j + y, CRGB(r,g,b));
+				uint16_t xPos = (flip) ? SCREEN_WIDTH - i - 1 : i;
+				gfx.putPixel((xPos + x) % SCREEN_WIDTH, j + y, CRGB(r,g,b));
 			}
 		}
 	}
@@ -371,4 +379,432 @@ public:
 	uint8_t staticPos = 0;
 
 	
+};
+
+
+static const uint16_t PROGMEM eye_bg_14_8_16bit[112] = {
+	//A1R8G8B8
+	//these are right eyes (on a person, looking at them as an image should be on the left)
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7,
+	0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7,
+	0x5cc7, 0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0xffff, 0xffff, 0xffff, 0xffff, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7
+};
+static const uint16_t PROGMEM eye_bg_blink1_14_8_16bit[112] = {
+	//A1R8G8B8
+	0x0000, 0x0000, 0x0000, 0x0000, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x2db1, 0x2db1, 0x2db1, 0x2db1, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0x10a8, 0x10a8, 0x2db1, 0x0000, 0x0000, 0x0000,
+	0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0x2db1, 0x2db1, 0x0000,
+	0x0000, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde,
+	0x0000, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0x5f3b, 0x0000,
+	0x0000, 0x0000, 0x5f3b, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0x5f3b, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0xfbde, 0xfbde, 0xfbde, 0xfbde, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+};
+
+static const uint16_t PROGMEM eye_fg_14_8_16bit[112]{
+	//A1R8G8B8
+	0x0000, 0x0000, 0x0000, 0x0000, 0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0xadb1, 0x0000, 0x0000, 0x0000,
+	0x0000, 0xadb1, 0xdf3b, 0x7fff, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x2db1, 0xdf3b, 0xadb1, 0x2db1, 0x0000,
+	0x0000, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0xadb1, 0xadb1,
+	0x0000, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0x0000,
+	0x0000, 0x0000, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0xdf3b, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0xdf3b, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+};
+static const uint16_t PROGMEM eye_fg_blink1_14_8_16bit[112]{
+	//A1R8G8B8
+	0x0000, 0x0000, 0x0000, 0x0000, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x2db1, 0x2db1, 0x2db1, 0x2db1, 0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x10a8, 0x10a8, 0x2db1, 0x0000, 0x0000, 0x0000,
+	0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0xadb1, 0x2db1, 0x2db1, 0x0000,
+	0x0000, 0xadb1, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0xadb1, 0xadb1, 0xadb1,
+	0x0000, 0xdf3b, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0x5f3b, 0x0000,
+	0x0000, 0x0000, 0x5f3b, 0xdf3b, 0xdf3b, 0x0000, 0x0000, 0x0000, 0x0000, 0xdf3b, 0xdf3b, 0x5f3b, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+};
+static const uint16_t PROGMEM eye_fg_blink2_14_8_16bit[112]{
+	//A1R8G8B8 - eye closed
+	0x0000, 0x0000, 0x0000, 0x0000, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x2db1, 0x10a8, 0x10a8, 0x2db1, 0x0000, 0x0000, 0x0000,
+	0x2db1, 0x2db1, 0x2db1, 0x2db1, 0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x10a8, 0x10a8, 0x2db1, 0x2db1, 0x2db1, 0x0000,
+	0xadb1, 0xadb1, 0xadb1, 0xadb1, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0xadb1, 0xadb1, 0xadb1, 0xadb1,
+	0x0000, 0xadb1, 0xdf3b, 0xdf3b, 0xdf3b, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0xdf3b, 0xdf3b, 0xdf3b, 0x5f3b, 0x0000,
+	0x0000, 0x0000, 0x5f3b, 0x5f3b, 0x5f3b, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x5f3b, 0x5f3b, 0x5f3b, 0x5f3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+};
+
+static const uint16_t PROGMEM eye_iris_6_6_16bit[36]{
+	//A1R8G8B8
+	0x0000, 0x0000, 0x8930, 0x8930, 0x0000, 0x0000,
+	0x0000, 0x8930, 0x827b, 0x827b, 0x8930, 0x0000,
+	0x8930, 0x827b, 0x94a8, 0xffff, 0x827b, 0x8930,
+	0x8930, 0x827b, 0x94a8, 0x94a8, 0x827b, 0x8930,
+	0x0000, 0x8930, 0x9b9e, 0x9b9e, 0x8930, 0x0000,
+	0x0000, 0x0000, 0x8930, 0x8930, 0x0000, 0x0000
+};
+
+static const uint16_t PROGMEM eyebrow_14_4_16bit[56]{
+	//A1R8G8B8
+	0x0000, 0x0000, 0x0000, 0x0000, 0x90a8, 0x90a8, 0x90a8, 0x90a8, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x10a8, 0x90a8, 0x90a8, 0x90a8, 0x10a8, 0x10a8, 0x10a8, 0x10a8, 0x90a8, 0x90a8, 0x90a8, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x10a8, 0x5f3b, 0x10a8, 0x2db1, 0x0000, 0x0000, 0x0000, 0x0000, 0x2db1, 0x10a8, 0x90a8, 0x90a8, 0x10a8,
+	0x0000, 0x5f3b, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x5f3b, 0x10a8, 0x90a8
+};
+
+static const uint16_t PROGMEM mouth_neutral_19_8_16bit[152]{
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0xdf3b, 0xdf3b, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0xdf3b, 0xdf3b, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0xdf3b, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7,
+	0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7, 0x5cc7
+};
+
+//static const uint16_t PROGMEM mouth_neutral_19_8_16bit[152]{
+//
+//};
+
+
+class PatternEyes : public _Pattern {
+public:
+	PatternEyes() : _Pattern("Eyes") {}
+
+	uint8_t drawFrame() {
+		_Pattern::drawFrame();
+		//draw background, iris (taking into account movement), then outline (overwrite iris)
+		// if part of iris is outside of outline need to delete it (...)
+		gfx.clear();
+
+		if ((random8() == 0) and (random8(4) == 0) and blinkCounter == 0 and winkCounter == 0) {
+			blinkCounter = blinkCounterMax;
+		}
+		if ((random8() == 0) and (random8(10) == 0) and blinkCounter == 0 and winkCounter == 0) {
+			winkCounter = winkCounterMax;
+		}
+
+		uint8_t x = random8(); 
+		x = ease8InOutCubic(x);
+		x = lerp8by8(x, myMap(irisPosX, -3, 3, 0, 255), 128);
+		x = myMap(x, 0, 255, -irisHorizontalMovementMax, irisHorizontalMovementMax);
+		if (random8(64) == 0) 
+			irisPosX = x;
+		
+		//irisPosX = myMap(GuiVars1, 0, 2, -irisHorizontalMovementMax, irisHorizontalMovementMax);
+		//irisPosY = myMap(GuiVars2, 0, 2, -irisVerticalMovementMax, irisVerticalMovementMax);
+		if (beat.getType() != beat.OFF) {
+			irisPosX = myMap(*beat, 0, 255, -irisHorizontalMovementMax, irisHorizontalMovementMax);
+		}
+		//eyebrowsOffestLeft = myMap(GuiVars3, 0, 2, 0, -3);
+		EyeState esLeft = EyeState::NORMAL; 
+		EyeState esRight = EyeState::NORMAL;
+
+		if (blinkCounter) {
+			blinkCounter--; 
+			float p = myMap(blinkCounter, 0, blinkCounterMax, 0, 1);
+			if (p > 0.90) {
+				esLeft = esRight = EyeState::NORMAL;
+			}
+			else if (p > 0.80) {
+				esLeft = EyeState::BLINK1;
+			}
+			else if (p > 0.6) {
+				esLeft = esRight = EyeState::BLINK1;
+			}
+			else if (p > 0.40) {
+				esLeft = EyeState::BLINK2;
+				esRight = EyeState::BLINK1;
+			}
+			else {
+				esLeft = esRight = EyeState::BLINK2;
+				eyebrowsOffestLeft++;
+				eyebrowsOffestRight++;
+			}
+		}
+		if (winkCounter) {
+			winkCounter--;
+			float p = myMap(winkCounter, 0, winkCounterMax, 0, 1);
+			if (p > 0.80) {
+				esRight = EyeState::NORMAL;
+			}
+			else if (p > 0.50) {
+				esRight = EyeState::BLINK1;
+			}
+			else {
+				esRight = EyeState::BLINK2;
+				eyebrowsOffestRight++;
+			}
+		}
+
+		if (raiseEyebrowsCounter) {
+			raiseEyebrowsCounter--;
+			float p = myMap(raiseEyebrowsCounter, 0, raiseEyebrowsCounterMax, 0, 1);
+			if (p > 0.85) {
+				eyebrowsOffestLeft = eyebrowsOffestRight = -1;
+			}
+			else if (p > 0.70) {
+				eyebrowsOffestLeft = eyebrowsOffestRight = -2;
+			}
+			else if (p > 0.30) {
+				eyebrowsOffestLeft = eyebrowsOffestRight = -3;
+			}
+			else if (p > 0.15) {
+				eyebrowsOffestLeft = eyebrowsOffestRight = -2;
+			}
+			else {
+				eyebrowsOffestLeft = eyebrowsOffestRight = -1;
+			}
+			
+		}
+
+		drawEyes(irisPosX, irisPosY, esLeft, esRight, eyebrowsOffestLeft, eyebrowsOffestRight);
+		uint8_t leftHolder = leftEyeX; 
+		uint8_t rightHolder = rightEyeX; 
+		leftEyeX += SCREEN_WIDTH / 2;
+		rightEyeX += SCREEN_WIDTH / 2;
+		drawEyes(irisPosX, irisPosY, esLeft, esRight, eyebrowsOffestLeft, eyebrowsOffestRight);
+		leftEyeX = leftHolder; 
+		rightEyeX = rightHolder;
+
+		eyebrowsOffestLeft = 0;
+		eyebrowsOffestRight = 0;
+
+		//uint8_t ms = myMap(GuiVars1, 0, 2, 0, MouthState::SMILE4 + 1);
+		MouthState ms = mouthBaseState;
+		if (random8() == 0 and mouthCounter == 0) {
+			//change to new mouth position 
+			mouthTargetState = (MouthState)myMap(random8(), 0, 255, 0, MouthState::SMILE4);
+			mouthCounter = mouthCounterMax;
+		}
+		if (mouthCounter) {
+			mouthCounter--;
+			float i = myMap(mouthCounter, 0, mouthCounterMax, 0, 1);
+			if (i > 0.7) {
+				//go to targetState
+				ms = (MouthState)interpolate((uint8_t)mouthBaseState, (uint8_t)mouthTargetState, myMap(i, 1, 0.7, 0, 1));
+			}
+			else if (i > 0.3) {
+				//hold
+				ms = mouthTargetState; 
+			}
+			else {
+				//go to baseState
+				ms = (MouthState)interpolate((uint8_t)mouthTargetState, (uint8_t)mouthBaseState, myMap(i, 0.3, 0, 0, 1));
+			}
+		}
+
+		if ((random8() == 0) and (random8(4) == 0)) {
+			if (mouthBaseState == MouthState::NEUTRAL) {
+				mouthBaseState = MouthState::SMILE4;
+			}
+			else {
+				mouthBaseState = MouthState::NEUTRAL;
+			}
+		}
+		
+		drawMouth( (MouthState)ms ); 
+
+		return returnVal;
+
+	}
+
+	void trigger() {
+		raiseEyebrowsCounter = raiseEyebrowsCounterMax;
+	}
+
+	uint8_t leftEyeX = 1; 
+	uint8_t rightEyeX = 17;
+	uint8_t eyeY = 9; 
+	uint8_t eyeIrisOffestX = 4;
+	uint8_t eyeIrisOffestY = 1;
+	uint8_t eyebrowOffsetX = 0;
+	int8_t eyebrowOffsetY = -2;
+
+	uint8_t mouthOffsetX = 6;
+	uint8_t mouthOffsetY = 10; 
+
+	int8_t irisPosX = 0;
+	uint8_t irisHorizontalMovementMax = 3; 
+	int8_t irisPosY = 0; 
+	uint8_t irisVerticalMovementMax = 1;
+	int8_t eyebrowsOffestLeft = 0;
+	int8_t eyebrowsOffestRight = 0;
+
+	uint8_t blinkCounter = 0;
+	uint8_t blinkCounterMax = 30;
+	uint8_t winkCounter = 0;
+	uint8_t winkCounterMax = 50;
+	uint8_t raiseEyebrowsCounter = 0;
+	uint8_t raiseEyebrowsCounterMax = 60;
+	uint8_t mouthCounter = 0; 
+	uint8_t mouthCounterMax = 200;
+
+	enum MouthState {
+		TONGUE3, TONGUE2, TONGUE1,
+		NEUTRAL,
+		SMILE1, SMILE2, SMILE3, SMILE4,
+	};
+	MouthState mouthBaseState = MouthState::NEUTRAL;
+	MouthState mouthTargetState = MouthState::NEUTRAL;
+
+	const uint16_t* eyes[3] = {
+	eye_fg_14_8_16bit,
+	eye_fg_blink1_14_8_16bit,
+	eye_fg_blink2_14_8_16bit
+	};
+
+	enum EyeState {
+		NORMAL,
+		BLINK1,
+		BLINK2,
+	};
+
+
+
+
+	//blink 
+	// set timer for blink time (not needed just run frames
+	// set frame to 1, then 2, then 0 and exit blink routine 
+
+	void drawEyes(int8_t dirX, int8_t dirY, EyeState left, EyeState right, int8_t leftEyebrows = 0, int8_t rightEyebrow = 0) {
+		//left eye
+		if (left == EyeState::NORMAL) {
+			drawARGBBitmap(leftEyeX, eyeY, eye_bg_14_8_16bit, 14, 8, false); //left eye
+			drawARGBBitmap(leftEyeX + eyeIrisOffestX + dirX, eyeY + eyeIrisOffestY + dirY, eye_iris_6_6_16bit, 6, 6);
+			drawARGBBitmap(leftEyeX, eyeY, eye_fg_14_8_16bit, 14, 8, false); //left eye
+		}
+		else if (left == EyeState::BLINK1) {
+			drawARGBBitmap(leftEyeX, eyeY, eye_bg_blink1_14_8_16bit, 14, 8, false); //left eye
+			dirX = CLAMP(dirX, -2, 2);
+			drawARGBBitmap(leftEyeX + eyeIrisOffestX + dirX, eyeY + eyeIrisOffestY + dirY, eye_iris_6_6_16bit, 6, 6);
+			drawARGBBitmap(leftEyeX, eyeY, eye_fg_blink1_14_8_16bit, 14, 8, false); //left eye
+		}
+		else if (left == EyeState::BLINK2) {
+			//dont need bg or eyes as eye closed
+			drawARGBBitmap(leftEyeX, eyeY, eye_fg_blink2_14_8_16bit, 14, 8, false); //left eye
+		}
+
+		//right eye
+		if (right == EyeState::NORMAL) {
+			drawARGBBitmap(rightEyeX + 14, eyeY, eye_bg_14_8_16bit, 14, 8, true); //flip horizontal
+			drawARGBBitmap(rightEyeX + eyeIrisOffestX + dirX, eyeY + eyeIrisOffestY + dirY, eye_iris_6_6_16bit, 6, 6);
+			drawARGBBitmap(rightEyeX + 14, eyeY, eye_fg_14_8_16bit, 14, 8, true);
+		}
+		else if (right == EyeState::BLINK1) {
+			drawARGBBitmap(rightEyeX + 14, eyeY, eye_bg_blink1_14_8_16bit, 14, 8, true); //flip horizontal
+			dirX = CLAMP(dirX, -2, 2);
+			drawARGBBitmap(rightEyeX + eyeIrisOffestX + dirX, eyeY + eyeIrisOffestY + dirY, eye_iris_6_6_16bit, 6, 6);
+			drawARGBBitmap(rightEyeX + 14, eyeY, eye_fg_blink1_14_8_16bit, 14, 8, true);
+		}
+		else if (right == EyeState::BLINK2) {
+			//dont need bg or eyes as eye closed
+			drawARGBBitmap(rightEyeX + 14, eyeY, eye_fg_blink2_14_8_16bit, 14, 8, true);
+		}
+
+		//eyebrows
+		drawARGBBitmap(leftEyeX + eyebrowOffsetX, eyeY + eyebrowOffsetY + leftEyebrows, eyebrow_14_4_16bit, 14, 4, false);
+		drawARGBBitmap(rightEyeX + 14 + eyebrowOffsetX, eyeY + eyebrowOffsetY + rightEyebrow, eyebrow_14_4_16bit, 14, 4, true);
+	}
+
+
+
+	void drawMouth(MouthState m) {
+		//colour 192, 204, 222, tongue (210, 84, 96), tongue inner (230, 130, 140)
+		CRGB mouthColour = CRGB(192, 204, 222);
+		CRGB tongueColour = CRGB(210, 84, 96); 
+		CRGB tongueColourInner = CRGB(230, 130, 140);
+
+		uint8_t posX = leftEyeX + mouthOffsetX;
+		uint8_t posY = eyeY + mouthOffsetY;
+
+		if (m == MouthState::NEUTRAL) {
+			gfx.drawLine(posX + 4, posY + 2, posX + 5, posY + 2, mouthColour); 
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 13, posY + 2, posX + 14, posY + 2, mouthColour);
+		}
+		else if (m == MouthState::SMILE1) {
+			gfx.drawLine(posX + 3, posY + 2, posX + 5, posY + 2, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 13, posY + 2, posX + 15, posY + 2, mouthColour);
+			gfx.putPixel(posX + 16, posY + 1, mouthColour);
+		}
+		else if (m == MouthState::SMILE2) {
+			gfx.drawLine(posX + 1, posY + 1, posX + 2, posY + 1, mouthColour);
+			gfx.drawLine(posX + 3, posY + 2, posX + 15, posY + 2, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 16, posY + 1, posX + 17, posY + 1, mouthColour);
+		}
+		else if (m == MouthState::SMILE3) {
+			gfx.drawLine(posX + 1, posY + 1, posX + 2, posY + 1, mouthColour);
+			gfx.drawLine(posX + 16, posY + 1, posX + 17, posY + 1, mouthColour);
+			gfx.drawLine(posX + 3, posY + 2, posX + 15, posY + 2, mouthColour);
+			gfx.drawLine(posX + 5, posY + 3, posX + 13, posY + 3, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, CRGB::White);
+			gfx.drawLine(posX + 6, posY + 4, posX + 12, posY + 4, mouthColour);
+			
+		}
+		else if (m == MouthState::SMILE4) {
+			gfx.putPixel(posX, posY, mouthColour); 
+			gfx.putPixel(posX + 18, posY, mouthColour); 
+			gfx.drawLine(posX + 1, posY + 1, posX + 17, posY + 1, mouthColour);
+
+			gfx.drawLine(posX + 3, posY + 2, posX + 15, posY + 2, mouthColour);
+			gfx.drawLine(posX + 4, posY + 2, posX + 14, posY + 2, CRGB::White);
+
+			gfx.drawLine(posX + 4, posY + 3, posX + 14, posY + 3, mouthColour);
+			gfx.drawLine(posX + 5, posY + 3, posX + 13, posY + 3, CRGB::White);
+
+			gfx.drawLine(posX + 5, posY + 4, posX + 13, posY + 4, mouthColour);
+		}
+		else if (m == MouthState::TONGUE1) {
+			gfx.drawLine(posX + 5, posY + 2, posX + 5, posY + 2, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 13, posY + 2, posX + 13, posY + 2, mouthColour);
+			gfx.drawLine(posX + 8, posY + 4, posX + 12, posY + 4, tongueColour); 
+			gfx.drawLine(posX + 9, posY + 5, posX + 11, posY + 5, tongueColour);
+			gfx.putPixel(posX + 10, posY + 4, tongueColourInner); 
+
+		}
+		else if (m == MouthState::TONGUE2) {
+			gfx.drawLine(posX + 4, posY + 2, posX + 5, posY + 2, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 13, posY + 2, posX + 14, posY + 2, mouthColour);
+			gfx.drawLine(posX + 8, posY + 4, posX + 12, posY + 4, tongueColour);
+			gfx.drawLine(posX + 8, posY + 5, posX + 12, posY + 5, tongueColour);
+			gfx.drawLine(posX + 9, posY + 6, posX + 11, posY + 6, tongueColour);
+			gfx.drawLine(posX + 10, posY + 4, posX + 10, posY + 5, tongueColourInner);
+		}
+		else if (m == MouthState::TONGUE3) {
+			gfx.drawLine(posX + 1, posY + 1, posX + 2, posY + 1, mouthColour);
+			gfx.drawLine(posX + 3, posY + 2, posX + 5, posY + 2, mouthColour);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
+			gfx.drawLine(posX + 13, posY + 2, posX + 15, posY + 2, mouthColour);
+			gfx.drawLine(posX + 16, posY + 1, posX + 17, posY + 1, mouthColour);
+			gfx.drawLine(posX + 8, posY + 4, posX + 12, posY + 4, tongueColour);
+			gfx.drawLine(posX + 8, posY + 5, posX + 12, posY + 5, tongueColour);
+			gfx.drawLine(posX + 8, posY + 6, posX + 12, posY + 6, tongueColour);
+			gfx.drawLine(posX + 9, posY + 7, posX + 11, posY + 7, tongueColour);
+			gfx.drawLine(posX + 10, posY + 4, posX + 10, posY + 6, tongueColourInner);
+		}
+	}
+
+	//animations for eyes
+	//blink, wink, raise 1 eyebrow, raise both eyebrows
+	
+	//animations for mouth 
+	// resting, tongue out, smile 
+
+	//animation - define an animation state and how long to hold each one for 
+
+
+
+
 };

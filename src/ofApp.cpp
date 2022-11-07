@@ -13,7 +13,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetWindowShape(SCREEN_WIDTH * 8 + 200, SCREEN_HEIGHT * 8);
+	ofSetWindowShape(SCREEN_WIDTH * 16 + 200, SCREEN_HEIGHT * 16);
 	ofSetWindowPosition(94, 30);
 	ofBackground(0, 0, 0);
 
@@ -26,7 +26,7 @@ void ofApp::setup() {
 
 	// GUI
 	gui.setup();
-	gui.setPosition(SCREEN_WIDTH * 8, 50);
+	gui.setPosition(SCREEN_WIDTH * 16, 50);
 	gui.add(floatSlider1.setup("X1", 1.04, 0.0, 2.0));
 	gui.add(floatSlider2.setup("Y1", 0.6, 0.0, 2.0));
 	gui.add(floatSlider3.setup("Z1", 0.11, 0.0, 2.0));
@@ -72,18 +72,18 @@ void ofApp::draw() {
 	patterns.run();
 
 	ofSetColor(ofColor(5,5,8));
-	ofDrawRectRounded(SCREEN_WIDTH * 8, 0, 200, SCREEN_HEIGHT * 8, 10);
+	ofDrawRectRounded(SCREEN_WIDTH * 16, 0, 200, SCREEN_HEIGHT * 16, 10);
 	//engine.updateModel();
 	//engine.composeFrame();
 	//engine.show();
 	gui.draw();
 	ofSetColor(ofColor::slateGrey);
-	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 8+5, 20);
+	ofDrawBitmapString(patterns.getCurrentPatternName(), SCREEN_WIDTH * 16+5, 20);
 
 	//String v = "beat: " + to_string( *_Pattern::beat );
 	//ofDrawBitmapString(v, SCREEN_WIDTH * 8+10, 40);
 	String v = String(patterns.getCurrentPattern()->getVarName(0)) + patterns.getCurrentPattern()->getVarValue(0);
-	ofDrawBitmapString(v, SCREEN_WIDTH * 8 + 90, 40);
+	ofDrawBitmapString(v, SCREEN_WIDTH * 16 + 90, 40);
 
 }
 

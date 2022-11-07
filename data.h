@@ -298,7 +298,7 @@ namespace Data {
 
 } //end nameSpace Data
 
-float GuiVars1 = 1.6; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
+float GuiVars1 = 1.0; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
 float GuiVars2 = 0.6;
 float GuiVars3 = 1.25;
 float GuiVars4 = 0.87;
