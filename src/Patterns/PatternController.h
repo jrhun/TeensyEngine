@@ -77,13 +77,14 @@ public:
 	PatternWorld2		worldNoWater;
 	PatternMario		mario; 
 	PatternEyes			eyes; 
+	PatternFlowers		flowers;
 	
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 29;
+	static const uint8_t numPatterns = 30;
     _Pattern *patternList[numPatterns] = {	
-		&eyes, 
+		&flowers,
 		&blank,
 		&audio1,
 		&fireworks,
@@ -113,6 +114,7 @@ public:
 		&world,
 		&worldNoWater,
 		&mario,
+		&eyes,
 		
 		&wireFrame,
 		&cube3d,
