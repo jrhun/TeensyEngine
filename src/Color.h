@@ -586,6 +586,52 @@ struct CRGB {
 		}
 	}
 
+	//rotate RGB colour by hue
+	//inline CRGB rotate(const float hue = 60.0) {
+	//	//call rotateCalculate first to set matrix properly
+	//	CRGB out; 
+	//	//Use the rotation matrix to convert the RGB directly
+	//	CRGB in = CRGB(r, g, b);
+	//	const float cosA = cos(hue * PI / 180.0);
+	//	const float sinA = sin(hue * PI / 180.0);
+	//	float matrix[3][3] = { {cosA + (1.0f - cosA) / 3.0f,		1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA,	 1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA},
+	//		{1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA,	cosA + 1.0f / 3.0f * (1.0f - cosA),		1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA},
+	//		{1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA,	1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA,	cosA + 1.0f / 3.0f * (1.0f - cosA)} };
+
+	//	out.r = CLAMP(in.r * matrix[0][0] + in.g * matrix[0][1] + in.b * matrix[0][2], 0, 255);
+	//	out.g = CLAMP(in.r * matrix[1][0] + in.g * matrix[1][1] + in.b * matrix[1][2], 0, 255);
+	//	out.b = CLAMP(in.r * matrix[2][0] + in.g * matrix[2][1] + in.b * matrix[2][2], 0, 255);
+	//	return out;
+	//}
+	inline CRGB rotate(const float hue) {
+		CRGB out; 
+		CRGB in = CRGB(r, g, b);
+		out.r = CLAMP(in.r * matrix[0][0] + in.g * matrix[0][1] + in.b * matrix[0][2], 0, 255);
+		out.g = CLAMP(in.r * matrix[1][0] + in.g * matrix[1][1] + in.b * matrix[1][2], 0, 255);
+		out.b = CLAMP(in.r * matrix[2][0] + in.g * matrix[2][1] + in.b * matrix[2][2], 0, 255);
+		return out; 
+	}
+	static inline void rotateCalculate(const float hue) {
+		const float cosA = cos(hue * PI / 180.0);
+		const float sinA = sin(hue * PI / 180.0);
+		//calculate the rotation matrix, only depends on Hue
+		//https://stackoverflow.com/questions/8507885/shift-hue-of-an-rgb-color
+		matrix[0][0] = cosA + (1.0f - cosA) / 3.0f;
+		matrix[0][1] = 1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA;
+		matrix[0][2] = 1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA;
+
+		matrix[1][0] = 1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA;
+		matrix[1][1] = cosA + 1.0f / 3.0f * (1.0f - cosA);
+		matrix[1][2] = 1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA;
+
+		matrix[2][0] = 1.0f / 3.0f * (1.0f - cosA) - sqrtf(1.0f / 3.0f) * sinA;
+		matrix[2][1] = 1.0f / 3.0f * (1.0f - cosA) + sqrtf(1.0f / 3.0f) * sinA;
+		matrix[2][2] = cosA + 1.0f / 3.0f * (1.0f - cosA);
+			}
+
+	// matrix for calculating hue transformation
+	static float matrix[3][3];
+
 	/// Predefined RGB colors
 	typedef enum {
 		AliceBlue = 0xF0F8FF,
@@ -747,6 +793,8 @@ struct CRGB {
 
 	} HTMLColorCode;
 };
+
+float CRGB::matrix[3][3] = { {0,0,0},{0,0,0},{0,0,0}, };
 
 
 inline  bool operator== (const CRGB& lhs, const CRGB& rhs)
