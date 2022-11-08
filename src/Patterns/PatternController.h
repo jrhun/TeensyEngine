@@ -84,7 +84,7 @@ public:
 	// add pattern members to pattern list
 	static const uint8_t numPatterns = 30;
     _Pattern *patternList[numPatterns] = {	
-		&flowers,
+		
 		&blank,
 		&audio1,
 		&fireworks,
@@ -115,6 +115,7 @@ public:
 		&worldNoWater,
 		&mario,
 		&eyes,
+		&flowers,
 		
 		&wireFrame,
 		&cube3d,

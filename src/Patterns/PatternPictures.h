@@ -216,7 +216,7 @@ void drawGrayscaleBitmapColour(int16_t x, int16_t y, const uint8_t bitmap[], int
 void drawRGBBitmap(int16_t x, int16_t y,
 	const uint16_t bitmap[], int16_t w, int16_t h, float hueShift = 0.0) {
 	if (hueShift != 0) {
-		CRGB::rotateCalculate(hueShift);
+		gfx.rotateCalculate(hueShift);
 	}
 	for (int16_t j = 0; j < h; j++) {
 		for (int16_t i = 0; i < w; i++) {
@@ -232,7 +232,7 @@ void drawRGBBitmap(int16_t x, int16_t y,
 					CRGB c = CRGB(pgm_read_byte(&gamma5[color >> 11]),
 						pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
 						pgm_read_byte(&gamma5[color & 0x1F]));
-					gfx.putPixel(x + i, j + y, c.rotate());
+					gfx.putPixel(x + i, j + y, gfx.rotate(c));
 				}
 			}
 		}
@@ -264,7 +264,7 @@ void drawRGBBitmap24bit(int16_t x, int16_t y,
 	const uint8_t buf_u8[], int16_t w, int16_t h, float hueShift = 0.0) {
 	uint8_t px_size = 3;
 	if (hueShift != 0) {
-		CRGB::rotateCalculate(hueShift);
+		gfx.rotateCalculate(hueShift);
 	}
 	CRGB color; 
 	for (int16_t j = 0; j < h; j++) {
@@ -274,7 +274,7 @@ void drawRGBBitmap24bit(int16_t x, int16_t y,
 			color.g = buf_u8[px + 1];
 			color.b = buf_u8[px + 2];
 			if (hueShift != 0) {
-				color = color.rotate();
+				color = gfx.rotate(color);
 			}
 			gfx.putPixel((i + x) % SCREEN_WIDTH, j + y, color);
 		}
@@ -799,7 +799,8 @@ public:
 
 	void drawMouth(MouthState m) {
 		//colour 192, 204, 222, tongue (210, 84, 96), tongue inner (230, 130, 140)
-		CRGB mouthColour = CRGB(192, 204, 222);
+		CRGB mouthColour = CRGB(116, 172, 255);//CRGB(192, 204, 222);
+		CRGB mouthInnerColour = CRGB(230, 230, 230);
 		CRGB tongueColour = CRGB(210, 84, 96); 
 		CRGB tongueColourInner = CRGB(230, 130, 140);
 
@@ -828,7 +829,7 @@ public:
 			gfx.drawLine(posX + 16, posY + 1, posX + 17, posY + 1, mouthColour);
 			gfx.drawLine(posX + 3, posY + 2, posX + 15, posY + 2, mouthColour);
 			gfx.drawLine(posX + 5, posY + 3, posX + 13, posY + 3, mouthColour);
-			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, CRGB::White);
+			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthInnerColour);
 			gfx.drawLine(posX + 6, posY + 4, posX + 12, posY + 4, mouthColour);
 			
 		}
@@ -838,10 +839,10 @@ public:
 			gfx.drawLine(posX + 1, posY + 1, posX + 17, posY + 1, mouthColour);
 
 			gfx.drawLine(posX + 3, posY + 2, posX + 15, posY + 2, mouthColour);
-			gfx.drawLine(posX + 4, posY + 2, posX + 14, posY + 2, CRGB::White);
+			gfx.drawLine(posX + 4, posY + 2, posX + 14, posY + 2, mouthInnerColour);
 
 			gfx.drawLine(posX + 4, posY + 3, posX + 14, posY + 3, mouthColour);
-			gfx.drawLine(posX + 5, posY + 3, posX + 13, posY + 3, CRGB::White);
+			gfx.drawLine(posX + 5, posY + 3, posX + 13, posY + 3, mouthInnerColour);
 
 			gfx.drawLine(posX + 5, posY + 4, posX + 13, posY + 4, mouthColour);
 		}
@@ -1230,11 +1231,11 @@ public:
 
 		//flower0.rotateCalculate(120);
 		//float h = myMap(GuiVars1, 0, 2, 0, 360); //22.5, 45, 180, 225, 270, 306
-		CRGB::rotateCalculate(hue);
-		flower0 = flower0.rotate();
-		flower1 = flower1.rotate();
-		flower2 = flower2.rotate();
-		flower3 = flower3.rotate();
+		gfx.rotateCalculate(hue);
+		flower0 = gfx.rotate(flower0);
+		flower1 = gfx.rotate(flower1);
+		flower2 = gfx.rotate(flower2);
+		flower3 = gfx.rotate(flower3);
 
 		//draw centre bit of flower (240, 61, 41) always as yellow
 		CRGB flowerCentre0 = CRGB(240, 161, 41);
@@ -1283,7 +1284,7 @@ public:
 		uint8_t topX = x + tulipTopOffsetX;
 		uint8_t topY = y + tulipTopOffsetY;
 		//hue = myMap(GuiVars1, 0, 2, 0, 360);
-		CRGB::rotateCalculate(hue);
+		gfx.rotateCalculate(hue);
 		if (frame == 0) {
 			//base
 			gfx.putPixel(baseX + 4, baseY + 7, CRGB(30, 157, 6));
@@ -1301,15 +1302,15 @@ public:
 			//gfx.putPixel(baseX + 5, baseY + 8, CRGB(25, 124, 5));
 			
 			//flower
-			gfx.putPixel(baseX + 4, baseY + 6, CRGB(246,189,251).rotate());
+			gfx.putPixel(baseX + 4, baseY + 6, gfx.rotate(CRGB(246, 189, 251)));
 		}
 		else if (frame == 2) {
 			//extra offset as saving space (cutting top part of base out)
 			const uint8_t additOffsetY = 5;
 			drawRGBBitmap24bit(baseX, baseY + additOffsetY, tulip_base2_8_5_24bit, 8, 5);
-			gfx.putPixel(baseX + 4, baseY + 4, CRGB(212, 124, 230).rotate());
-			gfx.putPixel(baseX + 4, baseY + 3, CRGB(243, 186, 251).rotate());
-			gfx.putPixel(baseX + 3, baseY + 4, CRGB(243, 186, 251).rotate());
+			gfx.putPixel(baseX + 4, baseY + 4, gfx.rotate(CRGB(212, 124, 230)));
+			gfx.putPixel(baseX + 4, baseY + 3, gfx.rotate(CRGB(243, 186, 251)));
+			gfx.putPixel(baseX + 3, baseY + 4, gfx.rotate(CRGB(243, 186, 251)));
 
 		}
 		else if (frame == 3) {
