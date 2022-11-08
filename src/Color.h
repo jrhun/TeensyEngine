@@ -603,7 +603,8 @@ struct CRGB {
 	//	out.b = CLAMP(in.r * matrix[2][0] + in.g * matrix[2][1] + in.b * matrix[2][2], 0, 255);
 	//	return out;
 	//}
-	inline CRGB rotate(const float hue) {
+	inline CRGB rotate() {
+		//call calculate rotate first
 		CRGB out; 
 		CRGB in = CRGB(r, g, b);
 		out.r = CLAMP(in.r * matrix[0][0] + in.g * matrix[0][1] + in.b * matrix[0][2], 0, 255);
