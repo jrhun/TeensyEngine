@@ -48,8 +48,8 @@ public:
 	PatternAudio1		audio1;
 	PatternRowThenCol	rowThenCol;
 	PatternBlank		blank;
-	PatternBeachWaves	beachWaves;
-	PatternBeachWaves2	beachWaves2;
+	PatternBeachWaves	beachWaves; //fine 
+	PatternBeachWaves2	beachWaves2; //issue - seems to be with blur2d
 	PatternCube			cube3d;
 	PatternDualWaves	dualWaves;
 	PatternFish			fish;
@@ -58,8 +58,8 @@ public:
 	PatternFountain		particleFountain;
 
 	PatternNoise1		noise1;
-	PatternParametric	parametric;
-	PatternParametric2	parametricSpiral;
+	PatternParametric	parametric; //issue
+	PatternParametric2	parametricSpiral; //issue
 	ParticleSystemWater	particlesWater;
 	PatternPurpleRain	purpleRain;
 	PatternRain			rain;
@@ -71,43 +71,44 @@ public:
 	PatternSuperShape	superShape;
 	PatternVWaves		verticalWaves;
 	PatternWireFrame	wireFrame;
-	PatternWheelBlur	wheelBlur;
-	PatternWheelPart	wheelParticle;
+	PatternWheelBlur	wheelBlur; //issue
+	PatternWheelPart	wheelParticle; //issue
 	PatternWorld		world;
 	PatternWorld2		worldNoWater;
 	PatternMario		mario; 
 	PatternEyes			eyes; 
 	PatternFlowers		flowers;
+	PatternTest			test;
 	
 
 
 	// add pattern members to pattern list
 	static const uint8_t numPatterns = 30;
     _Pattern *patternList[numPatterns] = {	
-		
+//		&test,
 		&blank,
 		&audio1,
 		&fireworks,
 		&fish,
 		&particlesWater,
-		&dualWaves,
+		&dualWaves, //issue
 		&purpleRain,
 		&rain, 
-		&wheelParticle,
-		&wheelBlur,
+		&wheelParticle,	//issue
+		&wheelBlur, //issue
 		&SpinningParticles,
 		
 		&noise1,
 		&verticalWaves,
-		&beachWaves2,
-		&beachWaves,
+		&beachWaves2,//issue
+		&beachWaves, //issue
 		&rowThenCol,
 		&solid,
 		&sparks,
 		
 		&parametricSpiral,
 		&parametric,
-		&spiral,
+		&spiral, //issue
 
 		&particleFountain,
 		&fire, 
@@ -117,7 +118,7 @@ public:
 		&eyes,
 		&flowers,
 		
-		&wireFrame,
+		&wireFrame, //issue intermittently 
 		&cube3d,
 		
 		//&raymarcher,

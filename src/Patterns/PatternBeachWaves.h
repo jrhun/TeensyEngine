@@ -62,7 +62,7 @@ public:
 
 		if (!_Pattern::useCustomEffect) {
 			gfx.fade(5);// ledControl.fade();
-			gfx.blur(176);
+			gfx.blur(172);
 		}
 		//
 		static uint16_t offset = 0;
@@ -118,7 +118,7 @@ public:
 
 		if (!_Pattern::useCustomEffect) {
 			gfx.fade(10);// ledControl.fade();
-			gfx.blur(175);
+			gfx.blur(172);
 		}
 		//
 		uint8_t amplitude1 = 8;

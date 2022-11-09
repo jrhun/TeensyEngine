@@ -9,7 +9,7 @@ public:
 	uint8_t drawFrame() {
 		if (!_Pattern::useCustomEffect) {
 			int beat = beatsin8(2, 80, 224);
-			int beat2 = beatsin8(2, 224, 80);
+			int beat2 = beatsin8(2, 200, 80);
 			gfx.fade(beat);
 			gfx.blur(beat2);
 		}

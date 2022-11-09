@@ -191,7 +191,7 @@ public:
 		if (!_Pattern::useCustomEffect) {
 
 			gfx.fade(64);
-			//gfx.blur(177);
+			gfx.blur(172);
 		}
 
 		uint8_t scale = 256 / SCREEN_WIDTH;
@@ -477,9 +477,50 @@ void drawBitmap(lv_img_dsc_t *dsc, uint16_t x, int16_t y, bool flip, uint8_t *pa
 //}
 
 
+class PatternTest : public _Pattern {
+public:
+	PatternTest() : _Pattern("Test") {
+		for (uint8_t i = 0; i < numLeds; i++) {
+			leds[i] = CRGB::Black; 
+		}
+	}
+	uint8_t drawFrame() {
+		gfx.clear();
+		fill_rainbow(leds, numLeds, 0, 5);
+		for (uint8_t i = 0; i < numLeds; i++) {
+			if (i % 3 != 0) {
+				leds[i] = CRGB::Black;
+			}
+			
+		}
+
+
+
+
+
+		for (uint8_t i = 0; i < numLeds; i++) {
+			gfx.putPixel((51 + i) % SCREEN_WIDTH, 16, leds[i]);
+		}
+		if (blurOn) {
+			gfx.blur(50);
+		}
+
+		return returnVal;
+	}
+
+	bool blurOn = false;
+	void trigger() {
+		blurOn = !blurOn; 
+	}
+
+	static const uint8_t numLeds = 30;
+	CRGB leds[numLeds];
+};
+
 //https://littlevgl.com/image-to-c-array
 
 
+	
 
 class PatternFish : public _Pattern {
 public:

@@ -1602,63 +1602,63 @@ CHSV* blend(const CHSV* src1, const CHSV* src2, CHSV* dest, uint16_t count, frac
 	return dest;
 }
 
-void blur1d(CRGB* leds, uint16_t numLeds, fract8 blur_amount)
-{
-	uint8_t keep = 255 - blur_amount;
-	uint8_t seep = blur_amount >> 1;
-	CRGB carryover = CRGB::Black;
-	for (uint16_t i = 0; i < numLeds; i++) {
-		CRGB cur = leds[i];
-		CRGB part = cur;
-		part.nscale8(seep);
-		cur.nscale8(keep);
-		cur += carryover;
-		if (i) leds[i - 1] += part;
-		leds[i] = cur;
-		carryover = part;
-	}
-}
+//void blur1d(CRGB* leds, uint16_t numLeds, fract8 blur_amount)
+//{
+//	uint8_t keep = 255 - blur_amount;
+//	uint8_t seep = blur_amount >> 1;
+//	CRGB carryover = CRGB::Black;
+//	for (uint16_t i = 0; i < numLeds; i++) {
+//		CRGB cur = leds[i];
+//		CRGB part = cur;
+//		part.nscale8(seep);
+//		cur.nscale8(keep);
+//		cur += carryover;
+//		if (i) leds[i - 1] += part;
+//		leds[i] = cur;
+//		carryover = part;
+//	}
+//}
 
 
 
 // blurRows: perform a blur1d on every row of a rectangular matrix
-void blurRows(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	for (uint8_t row = 0; row < height; row++) {
-		CRGB* rowbase = leds + (row * width);
-		blur1d(rowbase, width, blur_amount);
-	}
-}
-
-// blurColumns: perform a blur1d on each column of a rectangular matrix
-void blurColumns(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	auto XY = [](uint8_t x, uint8_t y, uint8_t width) {
-		return x + y * width;
-	};
-	// blur columns
-	uint8_t keep = 255 - blur_amount;
-	uint8_t seep = blur_amount >> 1;
-	for (uint8_t col = 0; col < width; col++) {
-		CRGB carryover = CRGB::Black;
-		for (uint8_t i = 0; i < height; i++) {
-			CRGB cur = leds[XY(col, i, width)];
-			CRGB part = cur;
-			part.nscale8(seep);
-			cur.nscale8(keep);
-			cur += carryover;
-			if (i) leds[XY(col, i - 1, width)] += part;
-			leds[XY(col, i, width)] = cur;
-			carryover = part;
-		}
-	}
-}
-
-void blur2d(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	blurRows(leds, width, height, blur_amount);
-	blurColumns(leds, width, height, blur_amount);
-}
+//void blurRows(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	for (uint8_t row = 0; row < height; row++) {
+//		CRGB* rowbase = leds + (row * width);
+//		blur1d(rowbase, width, blur_amount);
+//	}
+//}
+//
+//// blurColumns: perform a blur1d on each column of a rectangular matrix
+//void blurColumns(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	auto XY = [](uint8_t x, uint8_t y, uint8_t width) {
+//		return x + y * width;
+//	};
+//	// blur columns
+//	uint8_t keep = 255 - blur_amount;
+//	uint8_t seep = blur_amount >> 1;
+//	for (uint8_t col = 0; col < width; col++) {
+//		CRGB carryover = CRGB::Black;
+//		for (uint8_t i = 0; i < height; i++) {
+//			CRGB cur = leds[XY(col, i, width)];
+//			CRGB part = cur;
+//			part.nscale8(seep);
+//			cur.nscale8(keep);
+//			cur += carryover;
+//			if (i) leds[XY(col, i - 1, width)] += part;
+//			leds[XY(col, i, width)] = cur;
+//			carryover = part;
+//		}
+//	}
+//}
+//
+//void blur2d(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	blurRows(leds, width, height, blur_amount);
+//	blurColumns(leds, width, height, blur_amount);
+//}
 
 
 uint8_t applyGamma_video( uint8_t brightness, float gamma);

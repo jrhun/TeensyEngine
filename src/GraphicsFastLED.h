@@ -27,6 +27,7 @@ uint16_t XY(uint8_t x, uint8_t y) {
 		  31      91
 		  30      90
 	*/
+	return 0;
 
 	if ((x >= SCREEN_WIDTH) || (y >= SCREEN_HEIGHT))
 		return LAST_VISIBLE_LED + 1;
@@ -112,7 +113,7 @@ public:
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
 				uint8_t x = i * 1 + 0, y = (j * 1 + 0) * SCREEN_WIDTH;
-				ledsRaw[XY(i, j)] = leds[(i)+(j)* SCREEN_WIDTH];
+				ledsRaw[this->XY(i, j)] = leds[(i)+(j)* SCREEN_WIDTH];
 			}
 		}
 	}
@@ -142,9 +143,9 @@ public:
 		dr = c0.r - c1.r;
 		dg = c0.g - c1.g;
 		db = c0.b - c1.b;
-		ledsRaw[XY(x, y)].r = c1.r + (dr * opacity) / 255;
-		ledsRaw[XY(x, y)].g = c1.g + (dg * opacity) / 255;
-		ledsRaw[XY(x, y)].b = c1.b + (db * opacity) / 255;
+		ledsRaw[this->XY(x, y)].r = c1.r + (dr * opacity) / 255;
+		ledsRaw[this->XY(x, y)].g = c1.g + (dg * opacity) / 255;
+		ledsRaw[this->XY(x, y)].b = c1.b + (db * opacity) / 255;
 
 		//ledsRaw[XY(x, y)] = c;
 		//ledRef->drawPixel(x, y, c);
@@ -168,7 +169,7 @@ public:
 
 	// }
 
-	static uint16_t XY(uint8_t x, uint8_t y) {
+	uint16_t XY(uint8_t x, uint8_t y) {
 		/*//leds are mapped serpentine with 2 offset with 30 leds in each row e.g.
 		  0       60
 		  1       61

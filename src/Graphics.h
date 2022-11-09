@@ -66,7 +66,9 @@ public:
 	}
 
 	void blur(uint8_t amount) {
-		blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, amount);
+		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, amount);
+		blurRows(amount); 
+		blurColumns(amount); 
 	}
 
 	uint16_t myXY(int16_t x, int16_t y) {
@@ -95,6 +97,65 @@ public:
 			}
 		}
 	}
+
+	void blur1d(CRGB* leds, uint16_t numLeds, fract8 blur_amount)
+	{
+		//wrap around 
+		uint8_t keep = 255 - blur_amount;
+		uint8_t seep = blur_amount >> 1;
+		CRGB carryover = CRGB::Black;
+		for (uint16_t i = 0; i <= numLeds; i++) {
+			CRGB cur;
+			if (i == numLeds)
+				cur = leds[0];
+			else
+				cur = leds[i];
+			CRGB part = cur;
+			part.nscale8(seep);
+			cur.nscale8(keep);
+			cur += carryover;
+			if (i) leds[i - 1] += part;
+			if (i == 0) {
+				leds[numLeds - 1] += part;
+			}
+			if (i == numLeds)
+				leds[0] = cur;
+			else
+				leds[i] = cur;
+			carryover = part;
+		}
+	}
+
+	void blurRows(fract8 blur_amount)
+	{
+		for (uint8_t row = 0; row < SCREEN_HEIGHT; row++) {
+			CRGB* rowbase = leds + (row * SCREEN_WIDTH);
+			blur1d(rowbase, SCREEN_WIDTH, blur_amount);
+		}
+	}
+	void blurColumns(fract8 blur_amount)
+	{
+		auto XY = [](uint8_t x, uint8_t y, uint8_t width) {
+			return x + y * width;
+		};
+		// blur columns
+		uint8_t keep = 255 - blur_amount;
+		uint8_t seep = blur_amount >> 1;
+		for (uint8_t col = 0; col < SCREEN_WIDTH; col++) {
+			CRGB carryover = CRGB::Black;
+			for (uint8_t i = 0; i < SCREEN_HEIGHT; i++) {
+				CRGB cur = leds[XY(col, i, SCREEN_WIDTH)];
+				CRGB part = cur;
+				part.nscale8(seep);
+				cur.nscale8(keep);
+				cur += carryover;
+				if (i) leds[XY(col, i - 1, SCREEN_WIDTH)] += part;
+				leds[XY(col, i, SCREEN_WIDTH)] = cur;
+				carryover = part;
+			}
+		}
+	}
+
 
 	virtual void shiftRawX(int8_t amount) {}
 
