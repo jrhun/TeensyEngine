@@ -567,13 +567,16 @@ public:
 			winkCounter = winkCounterMax;
 		}
 
-		uint8_t x = random8(); 
-		x = ease8InOutCubic(x);
-		x = lerp8by8(x, myMap(irisPosX, -3, 3, 0, 255), 128);
-		x = myMap(x, 0, 255, 0, irisHorizontalMovementMax*2);
-		if (random8(64) == 0) 
-			irisPosX = CLAMP(x - 3, -3, 3);
-		
+		//uint8_t x = random8(); 
+		//x = ease8InOutCubic(x);
+		//x = lerp8by8(x, myMap(irisPosX, -3, 3, 0, 255), 128);
+		//x = myMap(x, 0, 255, 0, irisHorizontalMovementMax*2);
+		if (random8(64) == 0) {
+			uint8_t x = random8(); 
+			x = ease8InOutCubic(x / 2); //0 - 127 clustered around 0
+			x = 127 + (random8(1) == 0) ? x : -x; //0-255 clustered around 127
+			irisPosX = myMap(x, 0, 255, -2, 2);
+		}
 		//irisPosX = myMap(GuiVars1, 0, 2, -irisHorizontalMovementMax, irisHorizontalMovementMax);
 		//irisPosY = myMap(GuiVars2, 0, 2, -irisVerticalMovementMax, irisVerticalMovementMax);
 		if (beat.getType() != beat.OFF) {
@@ -710,8 +713,8 @@ public:
 		raiseEyebrowsCounter = raiseEyebrowsCounterMax;
 	}
 
-	uint8_t leftEyeX = 2; 
-	uint8_t rightEyeX = 15;
+	uint8_t leftEyeX = 3; 
+	uint8_t rightEyeX = 14;
 	uint8_t eyeY = 9; 
 	uint8_t eyeIrisOffestLeftX = 4;
 	uint8_t eyeIrisOffestRightX = 4;
@@ -720,8 +723,8 @@ public:
 	uint8_t eyebrowOffsetX = 0;
 	int8_t eyebrowOffsetY = -3;
 
-	uint8_t mouthOffsetX = 4;
-	uint8_t mouthOffsetY = 11; 
+	uint8_t mouthOffsetX = 3;
+	uint8_t mouthOffsetY = 10; 
 
 	int8_t irisPosX = 0;
 	uint8_t irisHorizontalMovementMax = 3; 
