@@ -79,6 +79,10 @@ void getPitchBasic(){
     fXg = IMU.getAccelY_mss() * alpha + (fXg * (1.0 - alpha));
     fYg = IMU.getAccelZ_mss() * alpha + (fYg * (1.0 - alpha));
     fZg = IMU.getAccelX_mss() * alpha + (fZg * (1.0 - alpha));
+
+    Data::ax = fXg; 
+    Data::ay = fYg; 
+    Data::az = fZg; 
  
     //Roll & Pitch Equations
     // initial pitch negative, roll positive
