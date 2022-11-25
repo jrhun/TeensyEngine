@@ -11,6 +11,7 @@
 #include "PatternCube.h"
 #include "PatternFire.h"
 #include "PatternFireworks.h"
+#include "PatternFluidSim.h"
 #include "PatternNoise.h"
 #include "PatternParametric.h"
 #include "PatternParticleSysOld.h"
@@ -79,13 +80,17 @@ public:
 	PatternEyes			eyes; 
 	PatternFlowers		flowers;
 	PatternTest			test;
+
+	PatternFluidSim		fluidSim; 
 	
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 30;
+	static const uint8_t numPatterns = 31;
     _Pattern *patternList[numPatterns] = {	
 //		&test,
+		&fluidSim,
+
 		&blank,
 		&audio1,
 		&fireworks,
