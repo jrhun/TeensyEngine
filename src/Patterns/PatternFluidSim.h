@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Pattern.h"
+#include "../../data.h"
+#include "Vec2.h"
 
 //sample running http://neuroid.co.uk/lab/fluid/
 //js http://neuroid.co.uk/lab/fluid/fluid.js
@@ -11,6 +13,238 @@
 //only one particle in each spot, no blending for water/sand
 
 
+class _Particle {
+public:
+	_Particle() {}
+	_Particle(const _Particle& rhs) : pos(rhs.pos), vel(rhs.vel), hue(rhs.hue) {}
+	_Particle& operator=(const _Particle& rhs) {
+		pos = rhs.pos; 
+		vel = rhs.vel; 
+		hue = rhs.hue; 
+		return *this;
+	}
+
+	Vec2 pos;
+	Vec2 vel;
+	uint8_t hue;
+};
+
+class PatternFluidSim : public _Pattern {
+public:
+	PatternFluidSim() : _Pattern("Fluid Sim") {
+
+	}
+
+	void start() {
+		parts.clear(); 
+		for (uint8_t x = 0; x < SCREEN_WIDTH; x++) {
+			for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
+				_grid.set(x, y, NULL);
+			}
+		}
+
+
+		//parts.reserve(16 * 8);
+		for (uint8_t i = 0; i < 16; i++) {
+			for (uint8_t j = 0; j < 8; j++) {
+				if (parts.size() > 500) return; 
+				_Particle p;
+				p.pos = Vec2(SCREEN_WIDTH / 2 + i - 8, 16 + j - 4);
+				//p.pos = Vec2(SCREEN_WIDTH / 2 , 16 );
+				p.vel = Vec2(0, 0);
+				p.hue = random8(20);
+				if (_grid.at(p.pos.x, p.pos.y) == NULL) {
+					parts.push_back(p);
+					_grid.set(p.pos.x, p.pos.y, &parts.back());
+				}
+			}
+		}
+	}
+
+	void stop() {
+		parts.clear(); 
+	}
+
+	uint8_t drawFrame() {
+
+		float dt = 0.05;
+		//advect/move particles
+		moveParticles(dt);
+
+		//convert to grid
+
+		//update velocity/add force
+		for (_Particle& p : parts) {
+			p.vel += Vec2(0, 9.8 / 10); 
+		}
+
+		//enforce boundary
+
+		//solve pressures/relaxation
+		for (_Particle& p : parts) {
+			
+		}
+
+		//grid back to particles 
+
+		//draw particles
+		gfx.clear();
+		for (_Particle& p : parts) {
+			gfx.putPixel(p.pos.x, p.pos.y, gfx.getColour(p.hue));
+		}
+		
+		return returnVal;
+	}
+
+	void moveParticles(float dt) {
+		for (_Particle& p : parts) {
+			_Particle newp = p;
+			newp.pos = p.pos + p.vel * dt;
+			constrain(newp); //constrain to boundry and bounce 
+			Vec2 dx = newp.pos - p.pos;
+			int16_t xi1, yi1, xi2, yi2;
+			xi1 = p.pos.x;
+			yi1 = p.pos.y;
+			xi2 = newp.pos.x;
+			yi2 = newp.pos.y;
+			int8_t dxi = xi2 - xi1;
+			int8_t dyi = yi2 - yi1;
+			if (abs(dxi) > 0 || abs(dyi) > 0) {
+				// have moved to new cell, and spot is free
+				if (_grid.at(xi2, yi2) == NULL) {//and spot is free
+					_grid.set(xi1, yi1, NULL);
+					p = newp;
+					_grid.set(xi2, yi2, &p);
+				}
+				else {
+					//spot is taken, check along velocity vector 
+					do {
+						dxi = xi2 - xi1;
+						dyi = yi2 - yi1;
+						
+						if (abs(dx.x) > abs(dx.y)) {
+							if (abs(dyi) > 0) {
+								newp.pos.y += (dyi > 0) ? -1 : 1; //work backwards along y 
+							}
+							else {
+								newp.pos.x += (dxi > 0) ? -1 : 1;
+							}
+						}
+						else {
+							if (abs(dxi) > 0) {
+								newp.pos.x += (dxi  > 0) ? -1 : 1; 
+							}
+							else {
+								newp.pos.y += (dyi > 0) ? -1 : 1;
+							}
+						}
+						if (_grid.at(newp.pos.x, newp.pos.y) == NULL) {
+							// add some velocity to particle we hit
+							//to do
+							_grid.set(p.pos.x, p.pos.y, NULL);
+							//newp.vel.y = newp.vel.y * (newp.pos.y - p.pos.y) * 0.5; //add change to velocity as bounce
+
+							p = newp;
+							_grid.set(p.pos.x, p.pos.y, &p);
+
+						}
+						xi2 = newp.pos.x;
+						yi2 = newp.pos.y;
+					} while (xi1 != xi2 && yi1 != yi2);
+					 
+					//if we get here we've either set a new post or couldn't move
+				}
+			}
+			else {
+				p = newp;
+				//now move water to the sides
+			}
+			
+		}
+	}
+
+	void constrain(_Particle& p) {
+		//constrain vector to boundary
+		Vec2& v = p.pos; 
+		while (v.x > SCREEN_WIDTH) {
+			v.x -= SCREEN_WIDTH; 
+			p.vel.x *= 0.5;
+		}
+		while (v.x < 0) {
+			v.x += SCREEN_WIDTH; 
+			p.vel.x *= 0.5;
+		}
+		if (v.y < 0) {
+			v.y = 0; 
+			p.vel.y *= -0.5; //bounce and dampen
+
+		}
+		else if (v.y > SCREEN_HEIGHT - 1) {
+			v.y = SCREEN_HEIGHT - 1;
+			p.vel.y *= -0.5;
+		}
+	}
+
+
+
+	Vec2 getAccel(uint8_t x) {
+		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
+
+		// for other purusal https://math.stackexchange.com/questions/2586792/3d-point-projection-on-2d-plane-using-normal-vector-and-projection-vector
+		//accelerometer gives us a vector in 3d for current acceleration 
+		//as we have a sphere, we want to convert this to an ax and ay for each point around the sphere
+		//we can do this by finding a plane for each point around the sphere -> simplified to a cylinder i.e ignoring height on sphere, find plane tangential to cylinder
+		//define the x and y directions for this plane as unit vectors
+		//then project the acceleration K onto the X and Y onto the unit vectors 
+		//taking the magnitude of these gives the x and y coordinates i.e. the transformed velocity 
+		Vec3 k = Vec3(Data::ax, Data::ay, Data::az); 
+		float theta = myMap(x, 0, SCREEN_WIDTH, 0, 2 * PI); 
+		Vec3 yVec = Vec3(0, -1, 0); // pointing up
+		Vec3 xVec = Vec3(cos(theta), 0, sin(theta)); // cos(theta) + sin(theta) convinently is unit vector
+		//xVec point straight out from circle currently, cross product with yVec gives the proper vector tangential with circle/cylinder
+		xVec = yVec % xVec;
+		xVec.Normalize();
+		//proj K onto xVec ( dot product of K * X / mag(X) * X
+		xVec = xVec * ((k * xVec) / xVec.Len()); //can simplify as using unit vector... len = 1
+		yVec = yVec * ((k * yVec) / yVec.Len());
+		float fx, fy; 
+		fx = xVec.Len(); 
+		fy = yVec.Len(); 
+		return Vec2(fx, fy); 
+		
+	}
+
+
+
+	struct Grid {
+		_Particle* gridData[SCREEN_WIDTH][SCREEN_HEIGHT];
+
+		_Particle* at(uint8_t x, uint8_t y) {
+			if (x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
+				return gridData[x][y];
+			else
+				return NULL;
+		}
+
+		void set(uint8_t x, uint8_t y, _Particle* p) {
+			if (x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
+				if (p != NULL) {
+					gridData[x][y] = p;
+				}
+				else {
+					gridData[x][y] = NULL;
+				}
+			}
+				
+		}
+	} _grid;
+
+
+
+
+	std::vector<_Particle> parts;
+};
+	
 
 
 //based on https://github.com/mike-rankin/ESP32_CoinCell_Color_TFT/blob/master/Code/colorcoin_test/colorcoin_test.ino
@@ -24,9 +258,9 @@ struct Grain {
 	uint8_t hue;
 };
 
-class PatternFluidSim : public _Pattern {
+class PatternFluidSimSand : public _Pattern {
 public:
-	PatternFluidSim() : _Pattern("Fluid Sim") {
+	PatternFluidSimSand() : _Pattern("Fluid Sim") {
 		clear();
 	}
 
