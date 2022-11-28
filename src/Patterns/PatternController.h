@@ -81,15 +81,16 @@ public:
 	PatternFlowers		flowers;
 	PatternTest			test;
 
-	PatternFluidSim		fluidSim; 
-	
+	PatternSandSim		sandSim;
+	PatternLavaLamp		lavaLamp;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 31;
+	static const uint8_t numPatterns = 32;
     _Pattern *patternList[numPatterns] = {	
 //		&test,
-		&fluidSim,
+		&lavaLamp,
+		&sandSim,
 
 		&blank,
 		&audio1,

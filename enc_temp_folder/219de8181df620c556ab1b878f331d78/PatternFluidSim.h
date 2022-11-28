@@ -89,7 +89,7 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 				  }
 			  }
 		  }
-		  gfx.blur(170);
+		  gfx.blur(myMap(GuiVars4, 0, 2, 0, 255));
 		  
 		  
 		  return returnVal;
