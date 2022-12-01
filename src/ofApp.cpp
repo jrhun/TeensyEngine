@@ -54,11 +54,11 @@ void ofApp::update() {
 	//patterns.beatControl.update();
 	float alpha = 0.02;
 	Data::ax = 0.0 * alpha + Data::ax * (1.0 - alpha);
-	Data::ay = 0.0 * alpha + Data::ay * (1.0 - alpha);
-	Data::az = 9.0 * alpha + Data::az * (1.0 - alpha);
+	Data::ay = 9.0 * alpha + Data::ay * (1.0 - alpha);
+	Data::az = 0.0 * alpha + Data::az * (1.0 - alpha);
 
-	Data::pitch = -(atan2(-Data::ay, Data::az) * 180.0) / PI;
-	Data::roll = -(atan2(Data::ax, sqrt(Data::ay * Data::ay + Data::az * Data::az)) * 180.0) / PI;
+	Data::pitch = -(atan2(-Data::az, Data::ay) * 180.0) / PI;
+	Data::roll = -(atan2(Data::ax, sqrt(Data::az * Data::az + Data::ay * Data::ay)) * 180.0) / PI;
 
 
 }
@@ -129,9 +129,9 @@ void ofApp::keyPressed(int key) {
 	}
 	if (key == 'i') {
 		//impulse 
-		Data::ax += myMap(random8(), 0, 255, -5.0, 5.0); 
-		Data::ay += myMap(random8(), 0, 255, -5.0, 5.0);
-		Data::az += myMap(random8(), 0, 255, -5.0, 5.0);
+		Data::ax += myMap(random8(), 0, 255, -10.0, 10.0); 
+		Data::ay += myMap(random8(), 0, 255, -10.0, 10.0);
+		Data::az += myMap(random8(), 0, 255, -10.0, 10.0);
 
 		Data::pitch = -(atan2(-Data::ay, Data::az) * 180.0) / PI;
 		Data::roll = -(atan2(Data::ax, sqrt(Data::ay * Data::ay + Data::az * Data::az)) * 180.0) / PI;

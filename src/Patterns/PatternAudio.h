@@ -19,8 +19,8 @@ public:
 
 		uint8_t peak = myMap(Data::sampleArray[(Data::sampleCount+ Data::numSamples-1) % Data::numSamples], 0, Data::audioThreshold * 2, 0, SCREEN_HEIGHT - 1, true);
 
-		v[x] = max(peak, random8(1,3));
-		v[(x + SCREEN_WIDTH/2) % SCREEN_WIDTH] = max(peak, random8(1, 3));;
+		v[x] = max(constrain(peak, 0, 16), random8(1,3));
+		v[(x + SCREEN_WIDTH/2) % SCREEN_WIDTH] = max(constrain(peak, 0, 16), random8(1, 3));;
 
 		for (int j = 0; j < SCREEN_WIDTH; j++) {
 			for (int i = 0; i < v[j]; i++) { //v[j] is from 0 to 31

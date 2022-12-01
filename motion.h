@@ -81,8 +81,8 @@ void getPitchBasic(){
     fZg = IMU.getAccelX_mss() * alpha + (fZg * (1.0 - alpha));
 
     Data::ax = fXg; 
-    Data::ay = fYg; 
-    Data::az = fZg; 
+    Data::ay = fZg; 
+    Data::az = fYg; //i dont understand why I had these different here and above, but it currently works and matches pitch/roll
  
     //Roll & Pitch Equations
     // initial pitch negative, roll positive

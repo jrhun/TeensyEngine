@@ -28,6 +28,7 @@ public:
 	Vec2 pos;
 	Vec2 vel;
 	Vec2 acc;
+
 	uint8_t hue;
 };
 
@@ -36,6 +37,9 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 	  class _LavaParticle : public _Particle {
 	  public: 
+		  //heat of particle
+		  //radius of particle
+		  float temp; 
 		  
 	  };
 	  void start() {
@@ -43,6 +47,29 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 	  }
 
 	  _Particle p; 
+
+	  //set up gradient from top to bottom of temperature
+	  //particles gain temperature at the bottom and diffuse that temperature out
+	  //bouyancy according to delta T 
+	  //particles need aspect of surface tension to hold together 
+	  // can provide gentle forces using perlin noise 
+
+	  //between each particle pair
+	  // spring particles apart if distance between them less than 2x radius of particles
+	  //if distance greater than 2x radius but less than gravity radius, attract particles together (estimate surface tension?)
+	  //transfer heat from hotter particle to less hot one, rate 0.045
+
+	  //for each particle
+	  //bounds check - if pos less than particle spring backwards
+
+	  //apply forces
+
+	  //apply heat zone at bottom 0.2
+
+	  //cooling zone at top 0.2
+
+	  //heat loss 0.012
+	  
 
 	  uint8_t drawFrame() {
 		  float dt = 0.1; 
@@ -60,7 +87,8 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 		  //p.acc += projectOntoPlane(Vec3(fx, fy, fz), p.pos.x, p.pos.y);
 
 		  //calculate forces
-		  Vec3 k = Vec3(Data::ax, Data::ay, Data::az);
+
+		  Vec3 k = Vec3(Data::ax, Data::ay, Data::az);		  
 		  p.acc += projectOntoPlane(k, p.pos.x, p.pos.y);
 		  //p.acc += Vec2(0, 9/ 10.0); 
 
@@ -74,22 +102,22 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 
 		  //draw
-		  gfx.clear(); 
-		  CRGB c = CHSV(Data::getHue(), myMap(p.vel.Len(), 0, 5, 255, 128, true), 255);
-		  gfx.putPixel(p.pos.x, p.pos.y, c); 
-		  for (int8_t i = -3; i <= 3; i++) {
-			  for (int8_t j = -3; j <= 3; j++) {
-				  if (i == 0 and j == 0) {
+		  //gfx.clear(); 
+		  //CRGB c = CHSV(Data::getHue(), myMap(p.vel.Len(), 0, 5, 255, 128, true), 255);
+		  //gfx.putPixel(p.pos.x, p.pos.y, c); 
+		  //for (int8_t i = -3; i <= 3; i++) {
+			 // for (int8_t j = -3; j <= 3; j++) {
+				//  if (i == 0 and j == 0) {
 
-				  }
-				  else {
-					  uint8_t v = abs(i) * 32 + abs(j) * 32;
-					  CRGB cc = CHSV(Data::getHue(), 255 - v, 255 - v);
-					  gfx.putPixel(p.pos.x + i, p.pos.y + j, cc);
-				  }
-			  }
-		  }
-		  gfx.blur(170);
+				//  }
+				//  else {
+				//	  uint8_t v = abs(i) * 32 + abs(j) * 32;
+				//	  CRGB cc = CHSV(Data::getHue(), 255 - v, 255 - v);
+				//	  gfx.putPixel(p.pos.x + i, p.pos.y + j, cc);
+				//  }
+			 // }
+		  //}
+		  //gfx.blur(170);
 		  
 		  
 		  return returnVal;
@@ -112,11 +140,13 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 		  }
 	  }
 	  Vec2 projectOntoPlane(Vec3 force, int8_t x, int8_t y = -1) {
+		  //project a force (i.e from accelerometer) onto the sphere on a plane tangential to the sphere at a given x/y coordinates
+		  // if  y isn't provided we use a cylinder instead of sphere
 		  float theta = myMap(x, 0, SCREEN_WIDTH, 0, 2 * PI);
 		  float phi = myMap(y, 0, SCREEN_HEIGHT, PI / 8, 7 * PI / 8); 
 		  Vec3 yVec;
 		  if (y == -1) {
-			  yVec = Vec3(0, 1, 0); // pointing up -> currently modeling cylinder
+			  yVec = Vec3(0, 1, 0); // pointing up -> modeling cylinder
 		  }
 		  else {
 			  //attempting to model sphere, phi angle from y axis, theta angle from x axis towards z axis
@@ -130,8 +160,14 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 		  xVec.Normalize();
 		  return Vec2(force * xVec, force * yVec); //dot product force with each axis
 	  }
-	  std::vector<_Particle> parts;
+
+
+	  std::vector<_LavaParticle> parts;
+	  float heatRate = 0.2; 
+	  float heatTransferRate = 0.045;
+	  float healLoss = 0.012;
 };
+
 
 class PatternSandSim : public _Pattern {
 public:
@@ -688,4 +724,40 @@ public:
 	}
 
 	uint8_t buffer[SCREEN_WIDTH * SCREEN_HEIGHT]; //use bitwise check vs just use as val
+};
+
+#define IX(i,j) ((i) + ((N) * (j)))
+
+class PatternFluidSim2 : public _Pattern {
+public:
+	PatternFluidSim2() : _Pattern("Fluid Sim") {}
+
+	uint8_t drawFrame() {
+
+
+
+
+		return returnVal;
+	}
+
+	void add_source(size_t n, float* x, float* s, float dt) {
+		for (int i = 0; i < n; i++) {
+
+			x[i] += dt * s[i]; 
+		}
+	}
+
+	void advect() {
+
+	}
+	void diffuse() {
+
+	}
+
+
+
+	//arrays
+	static const size_t N = SCREEN_WIDTH * SCREEN_HEIGHT; 
+	Vec2 vel[N], vel_prev[N]; 
+	float dens[N], dens_prev[N]; 
 };
