@@ -298,12 +298,12 @@ namespace Data {
 
 } //end nameSpace Data
 
-float GuiVars1 = 1.0; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
-float GuiVars2 = 0.6;
-float GuiVars3 = 1.25;
-float GuiVars4 = 0.87;
-float GuiVars5 = 1.5;
-float GuiVars6 = 1.2;
+float GuiVars1 = 0.6; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
+float GuiVars2 = 1.0;
+float GuiVars3 = 1;
+float GuiVars4 = 0.1;
+float GuiVars5 = 0.2;
+float GuiVars6 = 1.5;
 
 uint8_t FxFade = 128;
 uint8_t FxBlur = 0;

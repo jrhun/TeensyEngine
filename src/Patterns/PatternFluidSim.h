@@ -40,10 +40,24 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 		  //heat of particle
 		  //radius of particle
 		  float temp; 
+
+
 		  
 	  };
 	  void start() {
-		  p.pos = Vec2(32, 0);
+		  for (int i = 0; i < 70; i++) {
+			  _LavaParticle p;
+			  p.pos = Vec2(random8(0, SCREEN_WIDTH), random8(SCREEN_HEIGHT - 8, SCREEN_HEIGHT));
+			  p.vel = Vec2(0, 0);
+			  p.acc = Vec2(0, 0);
+			  p.temp = 10; 
+			  p.hue = random8(32);
+			  parts.push_back(p);
+
+		  }
+	  }
+	  void stop() {
+		  parts.clear(); 
 	  }
 
 	  _Particle p; 
@@ -73,28 +87,141 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 	  uint8_t drawFrame() {
 		  float dt = 0.1; 
-		  //apply acceleration and move particles
-		  p.vel += p.acc; 
-		  p.pos += p.vel * dt; 
-		  ensureWithinBounds(p);
-		  p.acc *= 0; //reset acceleration
-		  p.vel *= 0.99; //drag 
-		  		  
-		  //float fx, fy, fz; 
-		  //fx = myMap(GuiVars1, 0, 2, -1, 1); 
-		  //fy = myMap(GuiVars2, 0, 2, -1, 1);
-		  //fz = myMap(GuiVars3, 0, 2, -1, 1);
-		  //p.acc += projectOntoPlane(Vec3(fx, fy, fz), p.pos.x, p.pos.y);
+		  //Vec3 k = Vec3(Data::ax, Data::ay, Data::az);		  
+		  //p.acc += projectOntoPlane(k, p.pos.x, p.pos.y);
 
-		  //calculate forces
 
-		  Vec3 k = Vec3(Data::ax, Data::ay, Data::az);		  
-		  p.acc += projectOntoPlane(k, p.pos.x, p.pos.y);
-		  //p.acc += Vec2(0, 9/ 10.0); 
+		  float L; 
+		  float K = 0.8; //spring constant 
+		  float M = 10; 
+		  
+		  float R = 1; //particle radius 
+		  float G = 0.05;
+		  float GG = 0.45; //particle gravity force
+		  float GGrad = 13; //particle gravity radius
+		  float P = 0.02; //sensitivity to temp change
+		  float H = 0.935; //sensitivity to velocity
 
-		  //seperate particles 
+		  P = myMap(GuiVars1, 0, 2, 0.025, 0.1); //temp sens
+		  H = myMap(GuiVars2, 0, 2, 0.1, 1.0); //vel sens
+		  GG = myMap(GuiVars3, 0, 2, 0.1, 2); //particle gravity
 
-		  //
+		  heatTransferRate = myMap(GuiVars4, 0, 2, 0.001, 0.02);
+		  healLoss = myMap(GuiVars5, 0, 2, 0.005, 0.05);
+
+
+		  //GGrad = myMap(GuiVars6, 0, 2, 3, 15);//particle gravity radius 
+		  float f = 0.3;// myMap(GuiVars6, 0, 2, 0.1, 0.5); //random velocity amount
+
+		  //apply forces
+		  Vec2 dif;
+		  for (auto& p : parts) {
+			  for (vector<_LavaParticle>::iterator p2 = std::next(parts.begin()); p2 < parts.end(); p2++) {
+				  dif = p.pos - p2->pos; 
+				  //wrapping
+				  if (dif.x > SCREEN_WIDTH / 2) {
+					  dif.x -= SCREEN_WIDTH;
+				  }
+				  else if (dif.x < -SCREEN_WIDTH / 2) {
+					  dif.x += SCREEN_WIDTH; 
+				  }
+				  L = dif.Len(); 
+				  if (L == 0) continue; 
+				  dif.Normalize();
+				  //spring particles apart if too close
+				  if (L < R * 2) {
+					  float a = (K * (2 * R - L));
+					  p.acc += dif * a; 
+					  p2->acc -= dif * a; 
+
+					  //heat transfer if touching 
+					  if (p.temp < p2->temp) {
+						  p.temp += heatTransferRate;
+						  p2->temp -= heatTransferRate;
+					  }
+					  else {
+						  p.temp -= heatTransferRate;
+						  p2->temp += heatTransferRate;
+					  }
+				  } 
+				  else if (L < R * GGrad) {
+					  float a = GG / (L * L); 
+					  p.acc -= dif * a; 
+					  p2->acc += dif * a; 
+				  }
+
+			  }
+			  if (p.pos.x < R)					p.acc.x += (K * (R - p.pos.x)); 
+			  if (p.pos.x > SCREEN_WIDTH - R)	p.acc.x -= (K * (p.pos.x - SCREEN_WIDTH + R));
+			  if (p.pos.y < R)					p.acc.y += (K * (R - p.pos.y));
+			  if (p.pos.y > SCREEN_HEIGHT - R)	p.acc.y -= (K * (p.pos.y - SCREEN_HEIGHT + R));
+
+			  p.acc += projectOntoPlane(Vec3(Data::ax, Data::ay, Data::az), p.pos.x, p.pos.y) / 20; 
+
+			  p.acc.y += - (P * p.temp);
+			  if (random8(20) == 0) {
+				  p.vel.x += myMap(random8(), 0, 255, -f, f); //-0.5
+			  }
+			  if (p.pos.y > SCREEN_HEIGHT - 3) {
+				  if (p.temp < 120)
+					p.temp += heatRate;
+			  }
+			  else if (p.pos.y < 3) {
+				  if (p.temp > -120)
+					p.temp -= coolRate;
+			  }
+
+		  }
+		  //move and draw
+		  gfx.clear();
+		  for (auto& p : parts) {
+			  
+			  p.vel = (p.vel + p.acc / M)* H;
+			  p.acc *= 0; 
+			  //limit velocity
+			  float v = p.vel.Len(); 
+			  if (v > 1.5) {
+				  p.vel *= 1.5 / v; 
+			  }
+			  else if (v < 0.05) {
+				  p.temp -= healLoss;
+			  }
+			  p.pos += p.vel; 
+			  CRGB c = gfx.getColour(p.hue + myMap(p.temp, -110, 110, 0, 125, true)); 
+			  if (p.temp > 110) {
+				  c = CRGB(255, 255, 0); 
+			  }
+			  else if (p.temp > 60) {
+				  c = CRGB(255, myMap(p.temp, 110, 60, 255, 0), 0); 
+			  }
+			  else if (p.temp > 40) {
+				  c = CRGB(255, 0, myMap(p.temp, 60, 40, 0, 255));
+			  }
+			  else if (p.temp > -40) {
+				  c = CRGB(myMap(p.temp, 40, -40, 255, 0), 0, 255);
+			  }
+			  else if (p.temp > -100) {// < 100
+				  c = CRGB(0, 0, myMap(p.temp, -40, -100, 255, 100));
+			  }
+			  else {
+				  c = CRGB(0, 0, 100);
+			  }
+			  //CRGB c = CHSV(myMap(p.temp, -120, 120, 120, 0, true), 255, 255);
+			  uint8_t rr = 1; 
+			  for (int8_t i = -rr; i <= rr; i++) {
+				  for (int8_t j = -rr; j <= rr; j++) {
+					  
+					  gfx.blendPixel(int8_t(p.pos.x + i + SCREEN_WIDTH) % SCREEN_WIDTH, p.pos.y + j, c, 128);
+				  }
+			  }
+			  //gfx.blendPixel(p.pos.x	, p.pos.y, c, 128); 
+			  //gfx.blendPixel(p.pos.x + 1, p.pos.y	 , c, 128);
+			  //gfx.blendPixel(p.pos.x	, p.pos.y + 1, c, 128);
+			  //gfx.blendPixel(p.pos.x - 1, p.pos.y	 , c, 128);
+			  //gfx.blendPixel(p.pos.x	, p.pos.y - 1, c, 128);
+
+		  }
+		  gfx.blur(170);
 
 
 
@@ -102,7 +229,8 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 
 		  //draw
-		  //gfx.clear(); 
+		  
+		  
 		  //CRGB c = CHSV(Data::getHue(), myMap(p.vel.Len(), 0, 5, 255, 128, true), 255);
 		  //gfx.putPixel(p.pos.x, p.pos.y, c); 
 		  //for (int8_t i = -3; i <= 3; i++) {
@@ -161,11 +289,12 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 		  return Vec2(force * xVec, force * yVec); //dot product force with each axis
 	  }
 
-
+	  static const uint16_t nParticles = 200;
 	  std::vector<_LavaParticle> parts;
 	  float heatRate = 0.2; 
-	  float heatTransferRate = 0.045;
-	  float healLoss = 0.012;
+	  float heatTransferRate = 0.02;
+	  float healLoss = 0.03;
+	  float coolRate = 0.2;
 };
 
 
@@ -728,9 +857,9 @@ public:
 
 #define IX(i,j) ((i) + ((N) * (j)))
 
-class PatternFluidSim2 : public _Pattern {
+class PatternFluidSim3 : public _Pattern {
 public:
-	PatternFluidSim2() : _Pattern("Fluid Sim") {}
+	PatternFluidSim3() : _Pattern("Fluid Sim") {}
 
 	uint8_t drawFrame() {
 
