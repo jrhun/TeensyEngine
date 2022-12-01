@@ -36,16 +36,15 @@ class PatternLavaLamp : public _Pattern {
 public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 	  class _LavaParticle : public _Particle {
-	  public: 
+	  public:
 		  //heat of particle
 		  //radius of particle
-		  float temp; 
+		  float temp;
 
-
-		  
 	  };
+
 	  void start() {
-		  for (int i = 0; i < 70; i++) {
+		  for (int i = 0; i < 90; i++) {
 			  _LavaParticle p;
 			  p.pos = Vec2(random8(0, SCREEN_WIDTH), random8(SCREEN_HEIGHT - 8, SCREEN_HEIGHT));
 			  p.vel = Vec2(0, 0);
@@ -56,6 +55,7 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 		  }
 	  }
+
 	  void stop() {
 		  parts.clear(); 
 	  }
@@ -76,180 +76,176 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 	  //for each particle
 	  //bounds check - if pos less than particle spring backwards
 
-	  //apply forces
+//apply forces
 
-	  //apply heat zone at bottom 0.2
+//apply heat zone at bottom 0.2
 
-	  //cooling zone at top 0.2
+//cooling zone at top 0.2
 
-	  //heat loss 0.012
-	  
-
-	  uint8_t drawFrame() {
-		  float dt = 0.1; 
-		  //Vec3 k = Vec3(Data::ax, Data::ay, Data::az);		  
-		  //p.acc += projectOntoPlane(k, p.pos.x, p.pos.y);
+//heat loss 0.012
 
 
-		  float L; 
-		  float K = 0.8; //spring constant 
-		  float M = 10; 
-		  
-		  float R = 1; //particle radius 
-		  float G = 0.05;
-		  float GG = 0.45; //particle gravity force
-		  float GGrad = 13; //particle gravity radius
-		  float P = 0.02; //sensitivity to temp change
-		  float H = 0.935; //sensitivity to velocity
-
-		  P = myMap(GuiVars1, 0, 2, 0.025, 0.1); //temp sens
-		  H = myMap(GuiVars2, 0, 2, 0.1, 1.0); //vel sens
-		  GG = myMap(GuiVars3, 0, 2, 0.1, 2); //particle gravity
-
-		  heatTransferRate = myMap(GuiVars4, 0, 2, 0.001, 0.02);
-		  healLoss = myMap(GuiVars5, 0, 2, 0.005, 0.05);
+uint8_t drawFrame() {
+	float dt = 0.1;
+	//Vec3 k = Vec3(Data::ax, Data::ay, Data::az);		  
+	//p.acc += projectOntoPlane(k, p.pos.x, p.pos.y);
 
 
-		  //GGrad = myMap(GuiVars6, 0, 2, 3, 15);//particle gravity radius 
-		  float f = 0.3;// myMap(GuiVars6, 0, 2, 0.1, 0.5); //random velocity amount
+	float L;
+	float K = 3; //spring constant 
+	float M = 10;
 
-		  //apply forces
-		  Vec2 dif;
-		  for (auto& p : parts) {
-			  for (vector<_LavaParticle>::iterator p2 = std::next(parts.begin()); p2 < parts.end(); p2++) {
-				  dif = p.pos - p2->pos; 
-				  //wrapping
-				  if (dif.x > SCREEN_WIDTH / 2) {
-					  dif.x -= SCREEN_WIDTH;
-				  }
-				  else if (dif.x < -SCREEN_WIDTH / 2) {
-					  dif.x += SCREEN_WIDTH; 
-				  }
-				  L = dif.Len(); 
-				  if (L == 0) continue; 
-				  dif.Normalize();
-				  //spring particles apart if too close
-				  if (L < R * 2) {
-					  float a = (K * (2 * R - L));
-					  p.acc += dif * a; 
-					  p2->acc -= dif * a; 
+	float R = 1; //particle radius 
+	float G = 0.05;
+	float GG = 0.45; //particle gravity force
+	float GGrad = 2; //particle gravity radius
+	float P = 0.02; //sensitivity to temp change
+	float H = 0.935; //sensitivity to velocity
 
-					  //heat transfer if touching 
-					  if (p.temp < p2->temp) {
-						  p.temp += heatTransferRate;
-						  p2->temp -= heatTransferRate;
-					  }
-					  else {
-						  p.temp -= heatTransferRate;
-						  p2->temp += heatTransferRate;
-					  }
-				  } 
-				  else if (L < R * GGrad) {
-					  float a = GG / (L * L); 
-					  p.acc -= dif * a; 
-					  p2->acc += dif * a; 
-				  }
+	float heatRate = 0.4;
+	float heatTransferRate = 0.045;
+	float healLoss = 0.03;
+	float coolRate = 0.2;
 
-			  }
-			  if (p.pos.x < R)					p.acc.x += (K * (R - p.pos.x)); 
-			  if (p.pos.x > SCREEN_WIDTH - R)	p.acc.x -= (K * (p.pos.x - SCREEN_WIDTH + R));
-			  if (p.pos.y < R)					p.acc.y += (K * (R - p.pos.y));
-			  if (p.pos.y > SCREEN_HEIGHT - R)	p.acc.y -= (K * (p.pos.y - SCREEN_HEIGHT + R));
+	//P = myMap(GuiVars1, 0, 2, 0.025, 0.1); //temp sens
+	H = myMap(GuiVars2, 0, 2, 0.1, 1.0); //vel sens
+	GG = myMap(GuiVars3, 0, 2, 0.1, 2); //particle gravity
 
-			  p.acc += projectOntoPlane(Vec3(Data::ax, Data::ay, Data::az), p.pos.x, p.pos.y) / 20; 
+	heatTransferRate = myMap(GuiVars4, 0, 2, 0.001, 0.02);
+	healLoss = myMap(GuiVars5, 0, 2, 0.005, 0.05);
 
-			  p.acc.y += - (P * p.temp);
-			  if (random8(20) == 0) {
-				  p.vel.x += myMap(random8(), 0, 255, -f, f); //-0.5
-			  }
-			  if (p.pos.y > SCREEN_HEIGHT - 3) {
-				  if (p.temp < 120)
+
+	//GGrad = myMap(GuiVars6, 0, 2, 3, 15);//particle gravity radius 
+	float f = 0.3;// myMap(GuiVars6, 0, 2, 0.1, 0.5); //random velocity amount
+	static uint8_t xOffset = 0;
+	static uint8_t xCount = 0;
+	if (++xCount == 15) {
+		xCount = 0;
+		xOffset = (xOffset + 1) % SCREEN_WIDTH;
+	}
+	//apply forces
+	Vec2 dif;
+	for (auto& p : parts) {
+		for (vector<_LavaParticle>::iterator p2 = std::next(parts.begin()); p2 < parts.end(); p2++) {
+			dif = p.pos - p2->pos;
+			//wrapping
+			if (dif.x > SCREEN_WIDTH / 2) {
+				dif.x -= SCREEN_WIDTH;
+			}
+			else if (dif.x < -SCREEN_WIDTH / 2) {
+				dif.x += SCREEN_WIDTH;
+			}
+			L = dif.Len();
+			if (L == 0) continue;
+			dif.Normalize();
+			//spring particles apart if too close
+			if (L < R * 2) {
+				float a = (K * (2 * R - L));
+				p.acc += dif * a;
+				p2->acc -= dif * a;
+
+				//heat transfer if touching 
+				if (p.temp < p2->temp) {
+					p.temp += heatTransferRate;
+					p2->temp -= heatTransferRate;
+				}
+				else {
+					p.temp -= heatTransferRate;
+					p2->temp += heatTransferRate;
+				}
+			}
+			else if (L < R * GGrad) {
+				float a = GG / (L * L);
+				p.acc -= dif * a;
+				p2->acc += dif * a;
+			}
+
+		}
+
+
+		if (p.pos.x < R)					p.acc.x += (K * (R - p.pos.x));
+		if (p.pos.x > SCREEN_WIDTH - R)	p.acc.x -= (K * (p.pos.x - SCREEN_WIDTH + R));
+		if (p.pos.y < R)					p.acc.y += (K * (R - p.pos.y));
+		if (p.pos.y > SCREEN_HEIGHT - R)	p.acc.y -= (K * (p.pos.y - SCREEN_HEIGHT + R));
+
+		p.acc += projectOntoPlane(Vec3(Data::ax, Data::ay, Data::az), p.pos.x, p.pos.y) / 10;
+
+		p.acc.y += -(P * p.temp);
+		if (random8(20) == 0) {
+			p.vel.x += myMap(random8(), 0, 255, -f, f); //-0.5
+		}
+
+		if (p.pos.y > SCREEN_HEIGHT - 10) {
+			if (xOffset > SCREEN_WIDTH - 16) {
+				if (p.pos.x > xOffset or (p.pos.x < (xOffset + 16 - SCREEN_WIDTH))) {
 					p.temp += heatRate;
-			  }
-			  else if (p.pos.y < 3) {
-				  if (p.temp > -120)
-					p.temp -= coolRate;
-			  }
+				}
+			}
+			else {
+				if ((p.pos.x > (xOffset)) and (p.pos.x < (xOffset + 16))) {
+					p.temp += heatRate;
+				}
+			}
 
-		  }
+		}
+		if (p.pos.y < 10) {
+			p.temp -= coolRate;
+		}
+	}
 		  //move and draw
-		  gfx.clear();
-		  for (auto& p : parts) {
+		gfx.clear();
+		for (auto& p : parts) {
 			  
-			  p.vel = (p.vel + p.acc / M)* H;
-			  p.acc *= 0; 
-			  //limit velocity
-			  float v = p.vel.Len(); 
-			  if (v > 1.5) {
-				  p.vel *= 1.5 / v; 
-			  }
-			  else if (v < 0.05) {
-				  p.temp -= healLoss;
-			  }
-			  p.pos += p.vel; 
-			  CRGB c = gfx.getColour(p.hue + myMap(p.temp, -110, 110, 0, 125, true)); 
-			  if (p.temp > 110) {
-				  c = CRGB(255, 255, 0); 
-			  }
-			  else if (p.temp > 60) {
-				  c = CRGB(255, myMap(p.temp, 110, 60, 255, 0), 0); 
-			  }
-			  else if (p.temp > 40) {
-				  c = CRGB(255, 0, myMap(p.temp, 60, 40, 0, 255));
-			  }
-			  else if (p.temp > -40) {
-				  c = CRGB(myMap(p.temp, 40, -40, 255, 0), 0, 255);
-			  }
-			  else if (p.temp > -100) {// < 100
-				  c = CRGB(0, 0, myMap(p.temp, -40, -100, 255, 100));
-			  }
-			  else {
-				  c = CRGB(0, 0, 100);
-			  }
-			  //CRGB c = CHSV(myMap(p.temp, -120, 120, 120, 0, true), 255, 255);
-			  uint8_t rr = 1; 
-			  for (int8_t i = -rr; i <= rr; i++) {
-				  for (int8_t j = -rr; j <= rr; j++) {
+			p.vel = (p.vel + p.acc / M)* H;
+			p.acc *= 0; 
+			//limit velocity
+			float v = p.vel.Len(); 
+			if (v > 1.0) {
+				p.vel *= 1.0 / v; 
+			}
+			else if (v < 0.05) {
+				p.temp -= healLoss;
+			}
+			p.pos += p.vel; 
+			CRGB c = gfx.getColour(myMap(p.temp , -30, 30, 0, 64, true) + p.pos.x / 3);
+			//if (p.temp > 50) {
+				// c = CRGB(255, 255, 0); 
+			//}
+			//else if (p.temp > 30) {
+				// c = CRGB(255, myMap(p.temp, 50, 30, 255, 0), 0); 
+			//}
+			//else if (p.temp > 20) {
+				// c = CRGB(255, 0, myMap(p.temp, 30, 20, 0, 255));
+			//}
+			//else if (p.temp > -20) {
+				// c = CRGB(myMap(p.temp, 20, -20, 255, 0), 0, 255);
+			//}
+			//else if (p.temp > -40) {// < 100
+				// c = CRGB(0, 0, myMap(p.temp, -20, -40, 255, 100));
+			//}
+			//else {
+				// c = CRGB(0, 0, 100);
+			//}
+			//CRGB c = CHSV(myMap(p.temp, -120, 120, 120, 0, true), 255, 255);
+			uint8_t rr = 2; 
+			for (int8_t i = -rr; i <= rr; i++) {
+				for (int8_t j = -rr; j <= rr; j++) {
 					  
-					  gfx.blendPixel(int8_t(p.pos.x + i + SCREEN_WIDTH) % SCREEN_WIDTH, p.pos.y + j, c, 128);
-				  }
-			  }
-			  //gfx.blendPixel(p.pos.x	, p.pos.y, c, 128); 
-			  //gfx.blendPixel(p.pos.x + 1, p.pos.y	 , c, 128);
-			  //gfx.blendPixel(p.pos.x	, p.pos.y + 1, c, 128);
-			  //gfx.blendPixel(p.pos.x - 1, p.pos.y	 , c, 128);
-			  //gfx.blendPixel(p.pos.x	, p.pos.y - 1, c, 128);
+					gfx.blendPixel(int8_t(p.pos.x + i + SCREEN_WIDTH) % SCREEN_WIDTH, p.pos.y + j, c, 128);
+				}
+			}
+			//gfx.blendPixel(p.pos.x	, p.pos.y, c, 128); 
+			//gfx.blendPixel(p.pos.x + 1, p.pos.y	 , c, 128);
+			//gfx.blendPixel(p.pos.x	, p.pos.y + 1, c, 128);
+			//gfx.blendPixel(p.pos.x - 1, p.pos.y	 , c, 128);
+			//gfx.blendPixel(p.pos.x	, p.pos.y - 1, c, 128);
 
-		  }
-		  gfx.blur(170);
-
-
-
-
-
-
-		  //draw
+		}
+		gfx.blur(170);	  
+		gfx.drawLine(xOffset, SCREEN_HEIGHT - 1, xOffset + 16, SCREEN_HEIGHT - 1, CRGB::White);
 		  
-		  
-		  //CRGB c = CHSV(Data::getHue(), myMap(p.vel.Len(), 0, 5, 255, 128, true), 255);
-		  //gfx.putPixel(p.pos.x, p.pos.y, c); 
-		  //for (int8_t i = -3; i <= 3; i++) {
-			 // for (int8_t j = -3; j <= 3; j++) {
-				//  if (i == 0 and j == 0) {
-
-				//  }
-				//  else {
-				//	  uint8_t v = abs(i) * 32 + abs(j) * 32;
-				//	  CRGB cc = CHSV(Data::getHue(), 255 - v, 255 - v);
-				//	  gfx.putPixel(p.pos.x + i, p.pos.y + j, cc);
-				//  }
-			 // }
-		  //}
-		  //gfx.blur(170);
-		  
-		  
-		  return returnVal;
-	  }
+		return returnVal;
+	}
 
 	  void ensureWithinBounds(_Particle& x) {
 		  if (x.pos.y < 0) {
@@ -291,10 +287,7 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 
 	  static const uint16_t nParticles = 200;
 	  std::vector<_LavaParticle> parts;
-	  float heatRate = 0.2; 
-	  float heatTransferRate = 0.02;
-	  float healLoss = 0.03;
-	  float coolRate = 0.2;
+
 };
 
 
