@@ -44,7 +44,7 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 	  };
 
 	  void start() {
-		  for (int i = 0; i < 90; i++) {
+		  for (int i = 0; i < 100; i++) {
 			  _LavaParticle p;
 			  p.pos = Vec2(random8(0, SCREEN_WIDTH), random8(SCREEN_HEIGHT - 8, SCREEN_HEIGHT));
 			  p.vel = Vec2(0, 0);
@@ -95,24 +95,24 @@ uint8_t drawFrame() {
 	float K = 3; //spring constant 
 	float M = 10;
 
-	float R = 1; //particle radius 
+	float R = 1.2; //particle radius 
 	float G = 0.05;
-	float GG = 0.45; //particle gravity force
-	float GGrad = 2; //particle gravity radius
-	float P = 0.02; //sensitivity to temp change
-	float H = 0.935; //sensitivity to velocity
+	float GG = 1.5; //particle gravity force
+	float GGrad = 2.5; //particle gravity radius
+	float P = 0.03; //sensitivity to temp change
+	float H = 0.535; //sensitivity to velocity
 
-	float heatRate = 0.4;
-	float heatTransferRate = 0.045;
-	float healLoss = 0.03;
-	float coolRate = 0.2;
+	float heatRate = 0.3;
+	float heatTransferRate = 0.010;
+	float healLoss = 0.02;
+	float coolRate = 0.1;
 
 	//P = myMap(GuiVars1, 0, 2, 0.025, 0.1); //temp sens
-	H = myMap(GuiVars2, 0, 2, 0.1, 1.0); //vel sens
-	GG = myMap(GuiVars3, 0, 2, 0.1, 2); //particle gravity
+	//H = myMap(GuiVars2, 0, 2, 0.1, 1.0); //vel sens
+	//GG = myMap(GuiVars3, 0, 2, 0.1, 2); //particle gravity
 
-	heatTransferRate = myMap(GuiVars4, 0, 2, 0.001, 0.02);
-	healLoss = myMap(GuiVars5, 0, 2, 0.005, 0.05);
+	//heatTransferRate = myMap(GuiVars4, 0, 2, 0.001, 0.02);
+	//healLoss = myMap(GuiVars5, 0, 2, 0.005, 0.05);
 
 
 	//GGrad = myMap(GuiVars6, 0, 2, 3, 15);//particle gravity radius 
@@ -126,8 +126,8 @@ uint8_t drawFrame() {
 	//apply forces
 	Vec2 dif;
 	for (auto& p : parts) {
-		for (vector<_LavaParticle>::iterator p2 = std::next(parts.begin()); p2 < parts.end(); p2++) {
-			dif = p.pos - p2->pos;
+		for (auto& p2 : parts) {
+			dif = p.pos - p2.pos;
 			//wrapping
 			if (dif.x > SCREEN_WIDTH / 2) {
 				dif.x -= SCREEN_WIDTH;
@@ -142,22 +142,22 @@ uint8_t drawFrame() {
 			if (L < R * 2) {
 				float a = (K * (2 * R - L));
 				p.acc += dif * a;
-				p2->acc -= dif * a;
+				p2.acc -= dif * a;
 
 				//heat transfer if touching 
-				if (p.temp < p2->temp) {
+				if (p.temp < p2.temp) {
 					p.temp += heatTransferRate;
-					p2->temp -= heatTransferRate;
+					p2.temp -= heatTransferRate;
 				}
 				else {
 					p.temp -= heatTransferRate;
-					p2->temp += heatTransferRate;
+					p2.temp += heatTransferRate;
 				}
 			}
 			else if (L < R * GGrad) {
 				float a = GG / (L * L);
 				p.acc -= dif * a;
-				p2->acc += dif * a;
+				p2.acc += dif * a;
 			}
 
 		}
@@ -168,7 +168,7 @@ uint8_t drawFrame() {
 		if (p.pos.y < R)					p.acc.y += (K * (R - p.pos.y));
 		if (p.pos.y > SCREEN_HEIGHT - R)	p.acc.y -= (K * (p.pos.y - SCREEN_HEIGHT + R));
 
-		p.acc += projectOntoPlane(Vec3(Data::ax, Data::ay, Data::az), p.pos.x, p.pos.y) / 10;
+		p.acc += projectOntoPlane(Vec3(Data::ax, Data::ay, Data::az), p.pos.x, p.pos.y) / 5;
 
 		p.acc.y += -(P * p.temp);
 		if (random8(20) == 0) {
@@ -200,14 +200,22 @@ uint8_t drawFrame() {
 			p.acc *= 0; 
 			//limit velocity
 			float v = p.vel.Len(); 
-			if (v > 1.0) {
-				p.vel *= 1.0 / v; 
+			if (v > 0.8) {
+				p.vel *= 0.8 / v; 
 			}
 			else if (v < 0.05) {
 				p.temp -= healLoss;
 			}
 			p.pos += p.vel; 
-			CRGB c = gfx.getColour(myMap(p.temp , -30, 30, 0, 64, true) + p.pos.x / 3);
+			CRGB c; 
+			if (Data::paletteIndex == 0) {
+				uint8_t hue = 0; // myMap(p.temp, -30, 30, 0, 64, true);
+				hue += uint16_t((p.pos.x) + (p.pos.y) +  Data::getHue()) % 255;
+				c = CHSV( hue, myMap(p.temp, -10, 30,  64, 255, true), 255);
+			}
+			else {
+				c = gfx.getColour(myMap(p.temp, -30, 30, 0, 255, true) );
+			}
 			//if (p.temp > 50) {
 				// c = CRGB(255, 255, 0); 
 			//}
@@ -227,14 +235,14 @@ uint8_t drawFrame() {
 				// c = CRGB(0, 0, 100);
 			//}
 			//CRGB c = CHSV(myMap(p.temp, -120, 120, 120, 0, true), 255, 255);
-			uint8_t rr = 2; 
+			uint8_t rr = 1; 
 			for (int8_t i = -rr; i <= rr; i++) {
 				for (int8_t j = -rr; j <= rr; j++) {
 					  
 					gfx.blendPixel(int8_t(p.pos.x + i + SCREEN_WIDTH) % SCREEN_WIDTH, p.pos.y + j, c, 128);
 				}
 			}
-			//gfx.blendPixel(p.pos.x	, p.pos.y, c, 128); 
+			//gfx.putPixel(p.pos.x	, p.pos.y, c); 
 			//gfx.blendPixel(p.pos.x + 1, p.pos.y	 , c, 128);
 			//gfx.blendPixel(p.pos.x	, p.pos.y + 1, c, 128);
 			//gfx.blendPixel(p.pos.x - 1, p.pos.y	 , c, 128);
@@ -242,7 +250,7 @@ uint8_t drawFrame() {
 
 		}
 		gfx.blur(170);	  
-		gfx.drawLine(xOffset, SCREEN_HEIGHT - 1, xOffset + 16, SCREEN_HEIGHT - 1, CRGB::White);
+		//gfx.drawLine(xOffset, SCREEN_HEIGHT - 1, xOffset + 16, SCREEN_HEIGHT - 1, CHSV(0, 129, 255));
 		  
 		return returnVal;
 	}
