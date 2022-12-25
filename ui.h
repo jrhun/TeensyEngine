@@ -1,12 +1,14 @@
 #include <SPI.h>
 #include <Encoder.h> // paul strofen library
 
+#include "headbands.h"
+
 #include "data.h"
-#include "ledControl.h"
+//#include "ledControl.h"
 #include "src\Patterns\PatternController.h"
 
 // Use hardware SPI
-#if 0
+#if defined(ESP32)
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite sText = TFT_eSprite(&tft);
@@ -16,195 +18,507 @@ TFT_eSprite sText = TFT_eSprite(&tft);
 #define bodyFont  &FreeSans12pt7b
 // for changing values, use font 4
 // digital clock like font is 7
+#define TFT_BACKGROUND  0x2967
+#define TFT_TEXT        0xE719
+
+#else //teensy 
+
+#include "SPI.h"
+//#include "ILI9341_t3.h"
+//#include "font_Arial.h"
+
+//#include "SPI.h"
+#include "ILI9341_t3n.h"
+#include "ili9341_t3n_font_Arial.h"
+#include "ili9341_t3n_font_ArialBold.h"
+ILI9341_t3n tft = ILI9341_t3n(TFT_CS, TFT_DC, TFT_RST);
+
+#define TFT_MOSI    11
+#define TFT_SCLK    13
+#define TFT_MISO    12
+
 
 #define TFT_BACKGROUND  0x2967
 #define TFT_TEXT        0xE719
-#define TFT_FPS         5
+//ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST);
+
+
+
+
 
 #endif
 
+
+#define TFT_FPS         5
 bool updateDisplay = true;
 bool displayFPS = true;
 
-
+#include "src\Menu.h"
 
 // ENCODER & Buttons
 Encoder encoder(EN_A_PIN, EN_B_PIN);
 
-unsigned long lastDebounceTime = 0;
 const uint8_t debounceDelay = 20;
 const uint16_t  holdDelay = 800;
-bool lastPinState = true; // input pullup
-bool buttonState = true;
+const uint8_t numButtons = 5;
+unsigned long lastDebounceTime[numButtons] = {0, 0, 0, 0, 0};
+bool buttonState[numButtons] = {true, true, true, true, true};
+bool lastPinState[numButtons] = {true, true, true, true, true}; // input pullup
+enum {JOY_CENTRE, JOY_UP, JOY_LEFT, JOY_DOWN, JOY_RIGHT};
+uint8_t buttonPins[numButtons] = {JOY_CENTRE_PIN, JOY_UP_PIN, JOY_LEFT_PIN, JOY_DOWN_PIN, JOY_RIGHT_PIN};
 
 void inc() {
-  patterns.inc();
+  //  patterns.inc();
+  menu.inc();
   updateDisplay = true;
 }
 
 void dec() {
-  patterns.dec();
+  //  patterns.dec();
+  menu.dec();
   updateDisplay = true;
 }
-
-void shortPress() {
-
+void centre(bool p) {
+  menu.press();
+}
+void up(bool p) {
+  menu.up();
+}
+void left(bool p) {
+  menu.left();
+}
+void down(bool p) {
+  menu.down();
+}
+void right(bool p) {
+  menu.right();
 }
 
-void longPress() {
+typedef void (*buttonFn) (bool p);
+buttonFn buttonActions[numButtons] = {
+  &centre, &up, &left, &down, &right
+};
 
-}
 
-#if 0
+
+// Main UI Functions
 // Display functions
 void drawBattery() {
 
 }
 
-void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
+//#include "src\palettes.h"
+
+//void drawPalette(uint8_t x, uint8_t y, CRGBPalette16 &palette) {
+void drawPalette(uint8_t paletteIndex) {
   //draws a rectangle filled with current palette with arrow highlighting current hue
   // TL = top left
   // BR = bottom right
   // 0,0 is top left
-  const uint8_t h = 30;
-  const uint8_t w = 220; // 240 - w / 2
-  const uint8_t xStart = (240 - w) / 2;
-  for (uint8_t i = xStart; i < xStart + w; i++) {
+  const uint8_t h = 16;
+  const uint8_t w = 255; // 240 - w / 2
+//  const uint8_t xStart = (240 - w) / 2;
+
+//  uint8_t currentHue = (Data::getHue() + 128) % 255; // current hue centered in middle
+  uint8_t currentHue = 0;
+  CRGBPalette16 p;
+  if (paletteIndex == 0)
+    p = RainbowColors_p;
+  else 
+    p = gGradientPalettes[paletteIndex-1];
+  for (uint8_t i = 0; i < w; i++) {
     //center current hue in middle
-    CRGB c = ColorFromPalette(palette, i + 100);
-    tft.drawFastVLine(i, y, h, tft.color565(c.r, c.g, c.b));
+    
+    CRGB c = ColorFromPalette(p, currentHue);
+    currentHue++;
+    tft.drawFastHLine(224, 60+i, 16, tft.color565(c.r, c.g, c.b));
   }
-  tft.drawRoundRect(x - 10, y, 20, h, 5, TFT_WHITE);
+  //  tft.drawRoundRect(x - 10, y, 20, h, 5, TFT_WHITE);
 }
 
 void tftDisplayFPS() {
-  tft.setCursor(180, 300, 1);
+  tft.setCursor(180, 310);
   tft.setTextSize(1);
-  tft.setTextColor(TFT_TEXT, TFT_BACKGROUND);
+  tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
   char p[10];
-  sprintf(p, "FPS: %3d", FastLED.getFPS());
+  sprintf(p, "FPS:%3d", FastLED.getFPS());
   tft.print(p);
 }
 
-#endif
 
 
+void tftDisplayVoltsAmps() {
+  static unsigned lastUpdate = 0;
+  static uint8_t lastValue = 0;
+  const uint8_t numVals = 10;
+  static float volts[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  static float voltsSum = 0.0f;
+  static float amps[numVals] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  static float ampsSum = 0.0f;
+
+//
+
+  if (lastUpdate + 100 < millis()) {
+    //update due 
+    lastUpdate = millis();
+    //run code below
+  } else {
+    return;
+  }
+
+  float v = adc->adc0->analogRead(VOLTS_IN_PIN);
+//  Serial.print("\nVolt raw: ");
+//  Serial.print(v);
+  v = v*3.3/adc->adc0->getMaxValue();
+
+  
+//  const float VREF = 3.292f; //value of 3.292f gives vmax 4095
+//  const uint16_t VMAX = 4095;
+//  v = (v * VREF) / VMAX;
+//  Serial.print("\tcalc: ");
+//  Serial.print(v, DEC);
+  // I think R1 is 508k, R2 96k...
+  // this means voltage of 16.49v becomes 2.62v (, 12.34 becomes 1.96v, 12v -> 1.907v
+  // these values should be 3251 raw, and 2432 raw respectively
+  // converting from divider is v out = v in * 0.159 -> v in = v out / 0.159
+  //new value 0.0922
+  float vv = v / 0.0922f;
+//  v = map(v, 0.22f, 0.85f, 4.32f, 16.47f); // but lets just use measured values for rough estimate
+//  Serial.print("\tmap: ");
+//  Serial.print(v);
+//  Serial.print("\tdivided: ");  
+//  Serial.print(vv);
+  v = vv;
+  
+  int16_t ampsRaw = adc->adc0->analogRead(AMP_IN_PIN); //  ampsRaw -= 3107; // 0 amp center is 3107 measured (3110 calculated 2.5V)
+  float a = ampsRaw*3.3/adc->adc0->getMaxValue();
+  // amps measured in volts where 100mv = 1a 
+//  Serial.print("\nAmp raw: ");
+//  Serial.print(ampsRaw);
+//  Serial.print("\tAmps volt: ");
+//  Serial.print(a, DEC);
+//  Serial.print("Map: ");
+  float aa = (a - 2.5) / 0.1f; //gives us AMPS
+//  Serial.print(aa, DEC);
+//  a = map(ampsRaw, 3169, 3347, 580, 2050);
+//    a /= 1000.0f;
+//  Serial.println(a);
+  a = aa;
 
 
+  voltsSum -= volts[lastValue];
+  voltsSum += v;
+  volts[lastValue] = v;
 
-// Main UI Functions
+  ampsSum -= amps[lastValue];
+  ampsSum += a;
+  amps[lastValue] = a;
+
+  lastValue = (lastValue + 1) % numVals;
+
+  float voltsAvg = voltsSum / numVals;
+  float ampsAvg = ampsSum / numVals;
+
+  tft.setTextSize(1);
+  tft.setCursor(180, 8);
+  tft.setTextColor(TFT_TEXT, ILI9341_BLACK);
+  char t[12];
+  sprintf(t, "V: %.2f", voltsAvg);
+  tft.print(t);
+
+  
+
+  tft.setCursor(180, 16);
+  sprintf(t, "A: %.2fA", ampsAvg);
+  tft.print(t);
+}
 
 void uiLoop() {
+  unsigned long now = millis();
 
   //encoder handle
   int8_t newPos = encoder.read();
-  if (newPos >= + 4) {
+  cli();
+  if (newPos > 0) {
+
     while (newPos >= 4) {
       inc();
       newPos -= 4;
     }
+    //    newPos = 0;
     encoder.write(newPos);
-  } else if (newPos <= -4) {
+  } else if (newPos < 0) {
     while (newPos <= -4) {
       dec();
       newPos += 4;
     }
+    //    newPos = 0;
     encoder.write(newPos);
   }
+  sei();
 
   // button press
-  uint8_t reading = digitalRead(JOY_CENTRE_PIN);
-  if (reading != lastPinState) {
-    lastDebounceTime = millis(); //debounce or input detected
-  }
-  lastPinState = reading;
-  if ( millis() - lastDebounceTime > debounceDelay) {
-    if (reading != buttonState) {
-      buttonState = reading;
-      if (reading == LOW) // input pull up
-        shortPress();
+
+  for (uint8_t i = 0; i < numButtons; i++) {
+    uint8_t reading = digitalRead(buttonPins[i]);
+    if (reading != lastPinState[i]) {
+      lastDebounceTime[i] = now; //debounce or input detected
     }
-    if ( (reading == LOW) and (millis() - lastDebounceTime) > holdDelay) {
-      longPress();
-      lastDebounceTime = millis();
+    lastPinState[i] = reading;
+    if ( now - lastDebounceTime[i] > debounceDelay) {
+      if (reading != buttonState[i]) {
+        buttonState[i] = reading;
+        if (reading == LOW) {// input pull up
+          buttonActions[i](false);//shortPress();
+          updateDisplay = true;
+          //          Serial.print("Press: ");
+          //          Serial.println(i);
+        }
+      }
+      if ( (reading == LOW) and (now - lastDebounceTime[i]) > holdDelay) {
+        buttonActions[i](true);// true for longPress();
+        lastDebounceTime[i] = now;
+      }
     }
   }
 
 
 
   // display handle
-  #if 0
   static unsigned long lastTFTUpdate = 0;
-  if (millis() - lastTFTUpdate > (1000 / TFT_FPS)) {
-    lastTFTUpdate = millis();
+  if (now - lastTFTUpdate > (1000 / 10)) {
+    lastTFTUpdate = now;
     // fast text updates only!
-  }
-
-  if (updateDisplay) {
-    updateDisplay = false;
+    tft.useFrameBuffer(false);
     
-    sText.setColorDepth(1);
-    sText.createSprite(240, 320);
-    sText.fillSprite(TFT_BLACK);// grey fill
+    tftDisplayVoltsAmps();
+    //FPS
+    if (displayFPS) {tftDisplayFPS();}
 
-    // print title
-    sText.setCursor(2, 0, 1);
-    sText.setTextSize(3);
-    sText.setTextColor(TFT_TEXT, TFT_BLACK);
-    sText.println("Radience");
-    sText.drawFastHLine(0, 30, tft.width(), TFT_TEXT);
+#if 1
+    if (updateDisplay) {
+      updateDisplay = false;
 
-    //print body
-    sText.setCursor(2, 40, 1);
-    sText.setTextSize(2);
-    sText.print("Current pattern\n> ");
-    sText.println(patterns.getCurrentPatternName());
+      //    tft.fillScreen(ILI9341_BLACK);
+      tft.useFrameBuffer(true);
+      // print title
+      const uint8_t headingOffset = 2;
+      tft.setCursor(0, headingOffset);
+      tft.setTextSize(3);
+      tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
+      tft.println("Radience");
+      //const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
+      const uint8_t headingBottom = tft.getTextSizeY()*8 + headingOffset;
+      tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
+
+      //print page name
+      tft.setCursor(2, headingBottom + 6);
+      tft.setTextSize(2);
+      //tft.fillRect(0, headingBottom + 4, tft.width(), tft.fontCapHeight() + 2, ILI9341_BLACK);
+      tft.fillRect(0, headingBottom + 4, tft.width(), tft.getTextSizeY()*8 + 2, ILI9341_BLACK);      
+      //    tft.print("Current pattern\n> ");
+      tft.println(menu.currentPage()->getName());
+      for (uint8_t i = 0; i < menu.numPages; i++) {
+        const uint8_t xPos = tft.width() - 52;
+        const uint8_t yPos = headingBottom + 2 + 2 + 2;
+        if (i == menu.currentPageIndex) {
+          //tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT);
+          tft.fillRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY()*8, 2, TFT_TEXT);
+        }
+        else {
+          //tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.fontCapHeight(), 2, TFT_TEXT - 0x0841);
+          tft.drawRoundRect(xPos + i * 10, yPos, 8, tft.getTextSizeY()*8, 2, TFT_TEXT - 0x0841);
+        }
+      }
+      //tft.drawFastHLine(0, headingBottom + tft.fontCapHeight() + 9, tft.width(), TFT_TEXT);
+      tft.drawFastHLine(0, headingBottom + tft.getTextSizeY()*8 + 9, tft.width(), TFT_TEXT);
 
 
+      //Print body
+      //const uint8_t bodyY = headingBottom + tft.fontCapHeight() + 12;
+      const uint8_t bodyY = headingBottom + tft.getTextSizeY()*8 + 12;
+      tft.setCursor(0, bodyY);
 
-    sText.setBitmapColor(TFT_TEXT, TFT_BACKGROUND);
-    sText.pushSprite(0, 0);
-    sText.deleteSprite();
+      tft.fillRect(0, bodyY, tft.width(), tft.height() - bodyY, ILI9341_BLACK);
+      tft.println(menu.currentPage()->getPageData());
+      //    String body = menu.currentPage()->getPageData();
+      //    uint8_t index = 0;
+      //    String temp = "";
+      //    for (int i = 0; i < body.length(); i++) {
+      //      char c = body.charAt(i);
+      //      if (c == '\n') {
+      //        tft.println(temp);
+      //        temp = "";
+      //      } else {
+      //        if (c == '\t'){
+      //          temp += " ";
+      //          }
+      //        else {
+      //          temp += c;
+      //        }
+      //      }
+      //    }
 
-        //FPS
-    if (displayFPS) {
-      tftDisplayFPS();
+      
+//      if (menu.currentPageIndex == 1) {
+        //colour, display palette
+//        drawPalette(0, 300, gfx.currentPalette);
+//      }
+
+//      tftDisplayVoltsAmps();
+//      if (displayFPS) tftDisplayFPS();
+      tft.updateScreenAsync(false);
     }
-    
-  }
-  #endif
-
-  //backlight
-  //  ledcWrite(0, backlightLevel); // chanel 0
-}
-
-#if 0
-// TODO: put uiLoop onto low priority thread on core 1 while main runs on core 0
-TaskHandle_t uiTaskHandle;
-
-void uiTask(void * parameter) {
-  for (;;) {
-    uiLoop();
-  }
-}
-
 #endif
+  }
+}
+
+
+
+
+// SAVING AND STORING SETTINGS
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#include <EEPROM.h>
+
+void saveSettings() {
+  uint8_t address = 0;
+  EEPROM.write(address++, *Data::brightness_t);
+  EEPROM.write(address++, *Data::triggerType_t);
+  EEPROM.write(address++, *Data::backlight_t);
+}
+
+void loadSettings() {
+  uint8_t address = 0;
+  *Data::brightness_t = EEPROM.read(address++);
+  *Data::triggerType_t = EEPROM.read(address++);
+  *Data::backlight_t = EEPROM.read(address++);
+}
+
+#else
+void saveSettings();
+void loadSettings();
+#endif
+
+void updateSettings() {
+  FastLED.setBrightness(*Data::brightness_t);
+  analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4);
+}
+
 void uiSetup() {
 
-  #if 0
+  // voltsin 20/A6, AmpIn 21/A7 - both can use either ADC
+  pinMode(VOLTS_IN_PIN, INPUT);
+  pinMode(AMP_IN_PIN, INPUT);
+  adc->adc0->setReference(ADC_REFERENCE::REF_3V3);
+  adc->adc0->setAveraging(16); // set number of averages
+  adc->adc0->setResolution(16); // set bits of resolution
+  adc->adc0->recalibrate();
+  adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED); // change the conversion speed
+  adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED ); // change the sampling speed
+
+  pinMode(TFT_BACKLIGHT, OUTPUT);
+  digitalWrite(TFT_BACKLIGHT, LOW);
+
   tft.begin();
+  //  tft.setFont(Arial_24_Bold);
   tft.setRotation(2);
+  tft.fillScreen(ILI9341_BLACK);// grey fill
 
-  tft.fillScreen(TFT_BACKGROUND);// grey fill
-  #endif
-
+  // turn up screen brightness
+  uint16_t i = 0;
+  while (i <= *Data::backlight_t) {
+    analogWrite( TFT_BACKLIGHT, gamma6[i] * 4 );
+    i += 4;
+    delay(5);
+  }
+  analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4 );
 
   //buttons
-  pinMode(JOY_CENTRE_PIN, INPUT_PULLUP);
-  pinMode(JOY_UP_PIN,     INPUT_PULLUP);
-  pinMode(JOY_LEFT_PIN,   INPUT_PULLUP);
-  pinMode(JOY_DOWN_PIN,   INPUT_PULLUP);
-  pinMode(JOY_RIGHT_PIN,  INPUT_PULLUP);
+  for (uint8_t i = 0; i < numButtons; i++) {
+    pinMode(buttonPins[i], INPUT_PULLUP);
+  }
+
+  encoder.write(0);
+
+
+
+
+  // setup callbacks
+  currentPattern_t.setCallback([]() {
+    patterns.set(*currentPattern_t);
+  });
+
+  paletteIndex_t.setCallback([]() {
+    gfx.setPalette(*paletteIndex_t);
+  });
+
+  
+
+  gfx.currentPalette = RainbowColors_p;
+  gfx.targetPalette = RainbowColors_p;
+
+  Data::brightness_t.setCallback([]() {
+    FastLED.setBrightness(*Data::brightness_t);
+  });
+  Data::backlight_t.setCallback([]()  {
+    analogWrite( TFT_BACKLIGHT, gamma6[*Data::backlight_t] * 4);
+  });
+
+  menu.Colour.PaletteList.setCallback([](uint8_t i) {
+    if (i <= paletteIndex_t.max)
+      drawPalette(i);
+  });
+
+  menu.Settings.Dither.setCallback([]() {
+    FastLED.setDither(Data::dither);
+  });
+  
+  menu.Settings.Save.setCallback([]() {
+//    Serial.print("Saved settings. Brightness: ");
+//    Serial.println(*Data::brightness_t);
+    saveSettings();
+    updateSettings();
+  });
+
+  menu.Settings.Load.setCallback([]() {
+    loadSettings();
+//    Serial.print("Loaded settings. Brightness: ");
+//    Serial.print(*Data::brightness_t);
+    updateSettings();
+  });
+
+  setupRadio();
+  menu.Headbands.Palette.setCallback([]() {
+    sendClientUpdate(PALETTE);
+  });
+
+  menu.Headbands.Pattern.setCallback([]() {
+    sendClientUpdate(SETTINGS);
+  });
+
+  //  Data::brightnessHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::fadeHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::speedHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+  //
+  //  Data::hueDelayHb_t.setCallback([]() {
+  //    sendClientUpdate(SETTINGS);
+  //  });
+
+  menu.Headbands.Sync.setCallback([]() {
+    sendClientUpdate(UPDATE);
+  });
+
+  menu.Headbands.Settings.setCallback([]() {
+    sendClientUpdate(SETTINGS);
+  });
 
   //  xTaskCreatePinnedToCore(uiTask, "UITask", 4096, NULL, 2, &uiTaskHandle, 1);
 

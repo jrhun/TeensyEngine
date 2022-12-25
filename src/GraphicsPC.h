@@ -6,7 +6,7 @@
 #include "Color.h"
 
 #include "../data.h"
-CRGB leds[SCREEN_HEIGHT * SCREEN_WIDTH];
+//CRGB leds[SCREEN_HEIGHT * SCREEN_WIDTH];
 
 float rgb2luma(Vec3 rgb) {
 	return sqrt(rgb * Vec3(0.299, 0.587, 0.114)); // dot
@@ -27,7 +27,8 @@ public:
 
 	void putPixel(int x, int y, unsigned char h) {
 		CRGB col;
-		col.setHSV(h, 255, 255);
+		//col.setHSV(h, 255, 255);
+		col = getColour(h, 255);
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
 			leds[x + y * SCREEN_WIDTH] = col;
 		}
@@ -39,18 +40,49 @@ public:
 		}
 	}
 
-	void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+	void putPixelDirect(int x, int y, CRGB c0, uint8_t opacity = 255) {
 		if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
-			if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
-				//leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
-				leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
-			}
-			else
-				putPixel(x, y, c);
+			//alpha blending
+			CRGB c1 = leds[x + y * SCREEN_WIDTH];
+			CRGB out;
+			int16_t dr, dg, db;
+			dr = c0.r - c1.r;
+			dg = c0.g - c1.g;
+			db = c0.b - c1.b;
+			out.r = c1.r + (dr * opacity) / 255;
+			out.g = c1.g + (dg * opacity) / 255;
+			out.b = c1.b + (db * opacity) / 255;
+			ofColor col;
+			col.set(out.r, out.g, out.b);
+			ofSetColor(col);
+			ofDrawRectangle(x*scale, y*scale, scale, scale);
 		}
 	}
 
-	void show() {
+	void shiftRawX(int8_t amount) {
+		
+	}
+
+	//void fill(CRGB c) {
+	//	for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+	//		leds[i] = c;
+	//	}
+	//}
+
+	//void blendPixel(int x, int y, CRGB c, uint8_t a=128) {
+	//	if (x >= 0 and x < SCREEN_WIDTH and y >= 0 and y < SCREEN_HEIGHT) {
+	//		if (leds[(x + y * SCREEN_WIDTH)]) {// only blend if pixel is already lit
+	//			leds[(x + y * SCREEN_WIDTH)] = nblend(leds[(x + y * SCREEN_WIDTH)], c, a);
+	//			//leds[(x + y * SCREEN_WIDTH)] = blendlab(leds[(x + y * SCREEN_WIDTH)], c);
+	//		}
+	//		else
+	//			putPixel(x, y, c);
+	//	}
+	//}
+
+
+
+	void update() {
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
 				CRGB c0, c1, c2, c3;// c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15;
@@ -97,32 +129,37 @@ public:
 				c.set(buf.r, buf.g, buf.b);
 				ofSetColor(c);
 				ofDrawRectangle(i*scale, j*scale, scale, scale);*/
-			}
-		}
-		hue++;
-	}
-	void clear() {
-		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			for (int j = 0; j < SCREEN_HEIGHT; j++) {
-				leds[i + j * SCREEN_WIDTH] = CRGB::Black;
-			}
-		}
-	}
-	void fade(uint8_t a = 128) {
-		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			for (int j = 0; j < SCREEN_HEIGHT; j++) {
-				leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
+				
+				
 			}
 		}
 	}
 
-	CRGB getColour(uint8_t offset = 0) {
-		uint8_t h = (Data::getHue() + offset) % 256;
-		return CHSV(h, 255, 255);
-	}
+	void show() {}
+
+	//void clear() {
+	//	for (int i = 0; i < SCREEN_WIDTH; i++) {
+	//		for (int j = 0; j < SCREEN_HEIGHT; j++) {
+	//			leds[i + j * SCREEN_WIDTH] = CRGB::Black;
+	//		}
+	//	}
+	//}
+	//void fade(uint8_t a = 128) {
+	//	for (int i = 0; i < SCREEN_WIDTH; i++) {
+	//		for (int j = 0; j < SCREEN_HEIGHT; j++) {
+	//			leds[i + j * SCREEN_WIDTH].fadeToBlackBy(a);
+	//		}
+	//	}
+	//}
+
+	//CRGB getColour(uint8_t offset = 0) {
+	//	uint8_t h = (Data::getHue() + offset) % 256;
+
+	//	return CHSV(h, 255, 255);
+	//}
 
 
-	int scale = 8;
+	int scale = 16;
 	uint8_t hue = 0;
 	/*CRGB leds[SCREEN_WIDTH * SCREEN_HEIGHT];*/
 };

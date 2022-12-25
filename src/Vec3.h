@@ -37,9 +37,22 @@ public:
 	_Vec3&	Normalize()
 	{
 		const T length = Len();
-		x /= length;
-		y /= length;
-		z /= length;
+		if (length != 0) {
+			x /= length;
+			y /= length;
+			z /= length;
+		}
+		return *this;
+	}
+	_Vec3&	Limit(T l)
+	{
+		const T length = Len();
+		if (length > l) {
+			x /= length;
+			y /= length;
+			z /= length;
+			*this *= l;
+		}
 		return *this;
 	}
 	_Vec3&	Clamp()
@@ -214,7 +227,7 @@ Vec3&	cos(Vec3 &v)
 }
 
 
-Vec3& rgb2lab(Vec3 rgb) {
+Vec3 rgb2lab(Vec3 rgb) {
 	float r, g, b, x, y, z;
 	r = rgb.x / 255.0f;
 	g = rgb.y / 255.0f;
@@ -237,15 +250,19 @@ Vec3& rgb2lab(Vec3 rgb) {
 }
 
 
-Vec3& lab2rgb(Vec3 lab) {
-	float y = (lab.x + 16.0f) / 116.0f,
-		x = lab.y / 500.0f + y,
-		z = y - lab.z / 200.0f,
-		r, g, b;
+Vec3& lab2rgb(Vec3& lab) {
+	float y = (lab.x + 16.0f) / 116.0f;
+	float x = lab.y / 500.0f + y;
+	float z = y - lab.z / 200.0f;
+	float r, g, b;
 
-	x = 0.95047f * ((x * x * x > 0.008856f) ? x * x * x : (x - 16.0f / 116.0f) / 7.787f);
-	y = 1.00000f * ((y * y * y > 0.008856f) ? y * y * y : (y - 16.0f / 116.0f) / 7.787f);
-	z = 1.08883f * ((z * z * z > 0.008856f) ? z * z * z : (z - 16.0f / 116.0f) / 7.787f);
+	float x3 = x * x*x;
+	float y3 = y * y*y;
+	float z3 = z * z*z;
+
+	x = 0.95047f * ((x3 > 0.008856f) ? x3 : (x - 16.0f / 116.0f) / 7.787f);
+	y = 1.00000f * ((y3 > 0.008856f) ? y3 : (y - 16.0f / 116.0f) / 7.787f);
+	z = 1.08883f * ((z3 > 0.008856f) ? z3 : (z - 16.0f / 116.0f) / 7.787f);
 
 	r = x * 3.2406f + y * -1.5372f + z * -0.4986f;
 	g = x * -0.9689f + y * 1.8758f + z * 0.0415f;
@@ -255,12 +272,13 @@ Vec3& lab2rgb(Vec3 lab) {
 	g = (g > 0.0031308) ? (1.055 * pow(g, 1 / 2.4) - 0.055) : 12.92 * g;
 	b = (b > 0.0031308) ? (1.055 * pow(b, 1 / 2.4) - 0.055) : 12.92 * b;
 
-	return Vec3(max(0.0f, min(1.0f, r)) * 255,
-		max(0.0f, min(1.0f, g)) * 255,
-		max(0.0f, min(1.0f, b)) * 255 );
+	lab.x = max(0.0f, min(1.0f, r)) * 255;
+	lab.y = max(0.0f, min(1.0f, g)) * 255;
+	lab.z = max(0.0f, min(1.0f, b)) * 255;
+	return lab;
 }
 
-Vec3& lab2lch(Vec3 lab) {
+Vec3& lab2lch(Vec3& lab) {
 	float l = lab.x,
 		a = lab.y,
 		b = lab.z,
@@ -274,29 +292,35 @@ Vec3& lab2lch(Vec3 lab) {
 	else if (h >= 360) {
 		h -= 360;
 	}
-	return Vec3( l,c,h );
+	lab.x = l;
+	lab.y = c;
+	lab.z = h;
+	return lab;
 }
 
-Vec3& lch2lab(Vec3 lch) {
+Vec3& lch2lab(Vec3& lch) {
 	float l = lch.x,
 		c = lch.y,
-		h = lch.z * PI / 180.0f,
+		h = (lch.z * PI) / 180.0f,
 		a, b;
 	a = c * cos(h);
 	b = c * sin(h);
-	return Vec3( l,a,b );
-}
-
-
-
-Vec3& rgb2lch(Vec3 rgb) {
-	Vec3 lab = rgb2lab(rgb);
-	Vec3 lch = lab2lch(lab);
+	lch.x = l;
+	lch.y = a;
+	lch.z = b;
 	return lch;
 }
 
-Vec3& lch2rgb(Vec3 lch) {
-	Vec3 lab = lch2lab(lch);
-	Vec3 rgb = lab2rgb(lab);
+
+
+Vec3& rgb2lch(Vec3& rgb) {
+	rgb = rgb2lab(rgb);
+	rgb = lab2lch(rgb);
 	return rgb;
+}
+
+Vec3& lch2rgb(Vec3& lch) {
+	lch = lch2lab(lch);
+	lch = lab2rgb(lch);
+	return lch;
 }

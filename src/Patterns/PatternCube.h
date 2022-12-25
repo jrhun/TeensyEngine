@@ -12,10 +12,10 @@ public:
 
 	uint8_t drawFrame() {
 
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(128);
 		}
-		//blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, GuiVars1 * 127.0);
+		//gfx.blur(GuiVars1 * 127.0);
 
 		engine.resetZ();
 

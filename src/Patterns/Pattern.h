@@ -9,9 +9,10 @@
 
 #if defined(ESP32) || defined(CORE_TEENSY)
 #include "FastLED.h"
-#include "../../ledControl.h"
+//#include "../../ledControl.h"
 #include "../GraphicsFastLED.h"
-GraphicsFastLED gfx(&ledControl);
+//GraphicsFastLED gfx(&ledControl);
+GraphicsFastLED gfx;
 #define returnVal 10
 #else 
 #include "FastLED_PC.h"
@@ -24,12 +25,15 @@ GraphicsPC gfx;
 Engine engine(gfx);
 
 
+#include "../Palettes.h"
 #include "../Effects.h"
 #include "../Particle.h"
 #include "../Noise.h"
 
 #include "../VariableControl.h"
 
+
+//https://github.com/pixelmatix/aurora/blob/master/Effects.h
 
 
 
@@ -54,9 +58,14 @@ Engine engine(gfx);
 class _Pattern {
 public:
 	_Pattern() {}
-	_Pattern(const char* name) : name(name) {}
+	_Pattern(const char* name) : name(name) {
+		Data::triggerType_t.setCallback([] {
+			beat.setType(*Data::triggerType_t);
+		});
+	}
 
 	virtual uint8_t drawFrame() {
+		updateVars();
 		return 0;
 	}
 
@@ -71,23 +80,62 @@ public:
 
 
 
+	static const uint8_t maxVars = 6;
+	
+	uint8_t numVars = 0;
+	uint8_t getNumVars() {
+		return numVars;
+	}
 
-	//uint8_t numVars = 0;
-	//uint8_t getNumVars() {
-	//	return numVars;
-	//}
+	VariableReference *vars[maxVars];
 
-	//char* getVarName(uint8_t i) {
-	//	if (i >= 0 and i < getNumVars()) {
-	//		return 
-	//	}
-	//}
+	void updateVars() {
+		//for (uint8_t i = 0; i < getNumVars(); i++) {
+		//	vars[i]->update();
+		//}
+		beat.update();
+	}
 
-	static bool useDefaultEffect;
+	virtual void trigger() {
+		beat.sync();
+	}
 
-	static uint8_t beat;
 
+	VariableReference *getVar(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i];
+		}
+		return nullptr;
+	}
+
+	String getVarName(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i]->getName() + ": ";
+		} 
+		return "";
+	}
+
+	String getVarValue(uint8_t i) {
+		if (i >= 0 and i < getNumVars()) {
+			return vars[i]->getValue();
+		}
+		return "";
+	}
+
+	static bool useCustomEffect;
+
+	static VariableOscilate beat; //use *beat to access the val directly
+
+	static uint8_t blurFx;
+	static uint8_t fadeFx;
+	static uint8_t spiralFx;
+	static uint8_t glitterFx;
 };
 
-bool _Pattern::useDefaultEffect = true;
-uint8_t _Pattern::beat = 0;
+VariableOscilate _Pattern::beat = VariableOscilate();
+bool _Pattern::useCustomEffect = false;
+uint8_t _Pattern::blurFx = 10;
+uint8_t _Pattern::fadeFx = 10;
+uint8_t _Pattern::spiralFx = 0;
+uint8_t _Pattern::glitterFx = 10;
+

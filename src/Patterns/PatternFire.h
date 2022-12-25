@@ -2,6 +2,9 @@
 
 #include "Pattern.h"
 
+//alternative fire https://web.archive.org/web/20160418004150/http://freespace.virgin.net/hugo.elias/models/m_fire.htm
+// warp map https://web.archive.org/web/20160418004149/http://freespace.virgin.net/hugo.elias/graphics/x_warp.htm
+
 class PatternFire : public _Pattern {
 public:
 	PatternFire()
@@ -48,10 +51,27 @@ public:
 
 
 	uint8_t drawFrame() {
+		_Pattern::drawFrame();
 		// set cooling to ~125 and then oscilate sparking from 10-255 in time with the music
   // sparking base of 80 works well as a default too
 		uint8_t COOLING = 125; // higher = shorter flames
-		const uint8_t SPARKING = 80; // higher = moer roaring, lower = flickery
+		uint8_t SPARKING = 80; // higher = moer roaring, lower = flickery
+
+		//COOLING = myMap(*beat, 0, 255, GuiVars1 * 128, GuiVars2 * 128);
+		//COOLING = GuiVars1 * 128; 
+		//SPARKING = myMap(*beat, 0, 255, GuiVars3 * 128, GuiVars4 * 128);
+
+		if (beat.getType() != beat.OFF) {
+			if (beat.getType() == beat.TRIGGER) {
+				COOLING = myMap(*beat, 0, 255, 150, 90);
+				SPARKING = myMap(*beat, 0, 255, 50, 150);
+			}
+			else {
+				COOLING = myMap(*beat, 0, 255, 170, 100);
+				SPARKING = myMap(*beat, 0, 255, 30, 150);
+			}
+		}
+
 		static byte heat[SCREEN_WIDTH][SCREEN_HEIGHT];// use noise array to save ram
 
 		//static uint16_t offset = 0;
@@ -84,7 +104,11 @@ public:
 		}
 
 		//offset++;
+#if defined(ESP32) || defined(CORE_TEENSY)
 		return 15;
+#else 
+		return returnVal;
+#endif
 	}
 
 };

@@ -586,6 +586,8 @@ struct CRGB {
 		}
 	}
 
+	
+
 	/// Predefined RGB colors
 	typedef enum {
 		AliceBlue = 0xF0F8FF,
@@ -747,6 +749,8 @@ struct CRGB {
 
 	} HTMLColorCode;
 };
+
+
 
 
 inline  bool operator== (const CRGB& lhs, const CRGB& rhs)
@@ -1598,63 +1602,63 @@ CHSV* blend(const CHSV* src1, const CHSV* src2, CHSV* dest, uint16_t count, frac
 	return dest;
 }
 
-void blur1d(CRGB* leds, uint16_t numLeds, fract8 blur_amount)
-{
-	uint8_t keep = 255 - blur_amount;
-	uint8_t seep = blur_amount >> 1;
-	CRGB carryover = CRGB::Black;
-	for (uint16_t i = 0; i < numLeds; i++) {
-		CRGB cur = leds[i];
-		CRGB part = cur;
-		part.nscale8(seep);
-		cur.nscale8(keep);
-		cur += carryover;
-		if (i) leds[i - 1] += part;
-		leds[i] = cur;
-		carryover = part;
-	}
-}
+//void blur1d(CRGB* leds, uint16_t numLeds, fract8 blur_amount)
+//{
+//	uint8_t keep = 255 - blur_amount;
+//	uint8_t seep = blur_amount >> 1;
+//	CRGB carryover = CRGB::Black;
+//	for (uint16_t i = 0; i < numLeds; i++) {
+//		CRGB cur = leds[i];
+//		CRGB part = cur;
+//		part.nscale8(seep);
+//		cur.nscale8(keep);
+//		cur += carryover;
+//		if (i) leds[i - 1] += part;
+//		leds[i] = cur;
+//		carryover = part;
+//	}
+//}
 
 
 
 // blurRows: perform a blur1d on every row of a rectangular matrix
-void blurRows(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	for (uint8_t row = 0; row < height; row++) {
-		CRGB* rowbase = leds + (row * width);
-		blur1d(rowbase, width, blur_amount);
-	}
-}
-
-// blurColumns: perform a blur1d on each column of a rectangular matrix
-void blurColumns(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	auto XY = [](uint8_t x, uint8_t y, uint8_t width) {
-		return x + y * width;
-	};
-	// blur columns
-	uint8_t keep = 255 - blur_amount;
-	uint8_t seep = blur_amount >> 1;
-	for (uint8_t col = 0; col < width; col++) {
-		CRGB carryover = CRGB::Black;
-		for (uint8_t i = 0; i < height; i++) {
-			CRGB cur = leds[XY(col, i, width)];
-			CRGB part = cur;
-			part.nscale8(seep);
-			cur.nscale8(keep);
-			cur += carryover;
-			if (i) leds[XY(col, i - 1, width)] += part;
-			leds[XY(col, i, width)] = cur;
-			carryover = part;
-		}
-	}
-}
-
-void blur2d(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
-{
-	blurRows(leds, width, height, blur_amount);
-	blurColumns(leds, width, height, blur_amount);
-}
+//void blurRows(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	for (uint8_t row = 0; row < height; row++) {
+//		CRGB* rowbase = leds + (row * width);
+//		blur1d(rowbase, width, blur_amount);
+//	}
+//}
+//
+//// blurColumns: perform a blur1d on each column of a rectangular matrix
+//void blurColumns(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	auto XY = [](uint8_t x, uint8_t y, uint8_t width) {
+//		return x + y * width;
+//	};
+//	// blur columns
+//	uint8_t keep = 255 - blur_amount;
+//	uint8_t seep = blur_amount >> 1;
+//	for (uint8_t col = 0; col < width; col++) {
+//		CRGB carryover = CRGB::Black;
+//		for (uint8_t i = 0; i < height; i++) {
+//			CRGB cur = leds[XY(col, i, width)];
+//			CRGB part = cur;
+//			part.nscale8(seep);
+//			cur.nscale8(keep);
+//			cur += carryover;
+//			if (i) leds[XY(col, i - 1, width)] += part;
+//			leds[XY(col, i, width)] = cur;
+//			carryover = part;
+//		}
+//	}
+//}
+//
+//void blur2d(CRGB* leds, uint8_t width, uint8_t height, fract8 blur_amount)
+//{
+//	blurRows(leds, width, height, blur_amount);
+//	blurColumns(leds, width, height, blur_amount);
+//}
 
 
 uint8_t applyGamma_video( uint8_t brightness, float gamma);
@@ -4053,21 +4057,99 @@ void UpscalePalette(const class CHSVPalette32& srcpal32, class CHSVPalette256& d
 }
 
 
-Vec3& toVec(CRGB c) {
-	return Vec3(c.r, c.g, c.b);
+const TProgmemRGBPalette16 RainbowColors_p FL_PROGMEM =
+{
+	0xFF0000, 0xD52A00, 0xAB5500, 0xAB7F00,
+	0xABAB00, 0x56D500, 0x00FF00, 0x00D52A,
+	0x00AB55, 0x0056AA, 0x0000FF, 0x2A00D5,
+	0x5500AB, 0x7F0081, 0xAB0055, 0xD5002B
+};
+
+void nblendPaletteTowardPalette(CRGBPalette16& current, CRGBPalette16& target, uint8_t maxChanges)
+{
+	uint8_t* p1;
+	uint8_t* p2;
+	uint8_t  changes = 0;
+
+	p1 = (uint8_t*)current.entries;
+	p2 = (uint8_t*)target.entries;
+
+	const uint8_t totalChannels = sizeof(CRGBPalette16);
+	for (uint8_t i = 0; i < totalChannels; i++) {
+		// if the values are equal, no changes are needed
+		if (p1[i] == p2[i]) { continue; }
+
+		// if the current value is less than the target, increase it by one
+		if (p1[i] < p2[i]) { p1[i]++; changes++; }
+
+		// if the current value is greater than the target,
+		// increase it by one (or two if it's still greater).
+		if (p1[i] > p2[i]) {
+			p1[i]--; changes++;
+			if (p1[i] > p2[i]) { p1[i]--; }
+		}
+
+		// if we've hit the maximum number of changes, exit
+		if (changes >= maxChanges) { break; }
+	}
 }
 
-CRGB& toCRGB(Vec3 v) {
-	return CRGB(v.x, v.y, v.z);
-}
+typedef enum {
+	/// @name Black-body radiation light sources
+	/// Black-body radiation light sources emit a (relatively) continuous
+	/// spectrum, and can be described as having a Kelvin 'temperature'
+	///@{
+	/// 1900 Kelvin
+	Candle = 0xFF9329 /* 1900 K, 255, 147, 41 */,
+	/// 2600 Kelvin
+	Tungsten40W = 0xFFC58F /* 2600 K, 255, 197, 143 */,
+	/// 2850 Kelvin
+	Tungsten100W = 0xFFD6AA /* 2850 K, 255, 214, 170 */,
+	/// 3200 Kelvin
+	Halogen = 0xFFF1E0 /* 3200 K, 255, 241, 224 */,
+	/// 5200 Kelvin
+	CarbonArc = 0xFFFAF4 /* 5200 K, 255, 250, 244 */,
+	/// 5400 Kelvin
+	HighNoonSun = 0xFFFFFB /* 5400 K, 255, 255, 251 */,
+	/// 6000 Kelvin
+	DirectSunlight = 0xFFFFFF /* 6000 K, 255, 255, 255 */,
+	/// 7000 Kelvin
+	OvercastSky = 0xC9E2FF /* 7000 K, 201, 226, 255 */,
+	/// 20000 Kelvin
+	ClearBlueSky = 0x409CFF /* 20000 K, 64, 156, 255 */,
+	///@}
+
+	/// @name Gaseous light sources
+	/// Gaseous light sources emit discrete spectral bands, and while we can
+	/// approximate their aggregate hue with RGB values, they don't actually
+	/// have a proper Kelvin temperature.
+	///@{
+	WarmFluorescent = 0xFFF4E5 /* 0 K, 255, 244, 229 */,
+	StandardFluorescent = 0xF4FFFA /* 0 K, 244, 255, 250 */,
+	CoolWhiteFluorescent = 0xD4EBFF /* 0 K, 212, 235, 255 */,
+	FullSpectrumFluorescent = 0xFFF4F2 /* 0 K, 255, 244, 242 */,
+	GrowLightFluorescent = 0xFFEFF7 /* 0 K, 255, 239, 247 */,
+	BlackLightFluorescent = 0xA700FF /* 0 K, 167, 0, 255 */,
+	MercuryVapor = 0xD8F7FF /* 0 K, 216, 247, 255 */,
+	SodiumVapor = 0xFFD1B2 /* 0 K, 255, 209, 178 */,
+	MetalHalide = 0xF2FCFF /* 0 K, 242, 252, 255 */,
+	HighPressureSodium = 0xFFB74C /* 0 K, 255, 183, 76 */,
+	///@}
+
+	/// Uncorrected temperature 0xFFFFFF
+	UncorrectedTemperature = 0xFFFFFF
+} ColorTemperature;
 
 
 
 
 
-#endif
 
-CRGB& blendrgb(CRGB c1, CRGB c2) {
+
+
+
+
+CRGB blendrgb(CRGB c1, CRGB c2) {
 	Vec3 v1(c1.r, c1.g, c1.b);
 	Vec3 v2(c2.r, c2.g, c2.b);
 
@@ -4080,7 +4162,7 @@ CRGB& blendrgb(CRGB c1, CRGB c2) {
 	return CRGB(v1.x, v1.y, v1.z);
 }
 
-CRGB& blendlch(CRGB c1, CRGB c2) {
+CRGB blendlch(CRGB c1, CRGB c2) {
 	Vec3 lch1 = rgb2lch(Vec3(c1.r, c1.g, c1.b));
 	Vec3 lch2 = rgb2lch(Vec3(c2.r, c2.g, c2.b));
 
@@ -4108,7 +4190,7 @@ CRGB& blendlch(CRGB c1, CRGB c2) {
 	return CRGB(lch1.x, lch1.y, lch1.z);
 }
 
-CRGB& blendlab(CRGB c1, CRGB c2) {
+CRGB blendlab(CRGB c1, CRGB c2) {
 	Vec3 lch1 = rgb2lab(Vec3(c1.r, c1.g, c1.b));
 	Vec3 lch2 = rgb2lab(Vec3(c2.r, c2.g, c2.b));
 
@@ -4121,6 +4203,16 @@ CRGB& blendlab(CRGB c1, CRGB c2) {
 	return CRGB(lch1.x, lch1.y, lch1.z);
 }
 
+
+#endif
+
+Vec3 toVec(CRGB c) {
+	return Vec3(c.r, c.g, c.b);
+}
+
+CRGB toCRGB(Vec3 v) {
+	return CRGB(v.x, v.y, v.z);
+}
 
 //class Colour {
 //public:

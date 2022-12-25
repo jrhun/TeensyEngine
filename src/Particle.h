@@ -5,6 +5,8 @@
 #include "Color.h"
 #include <vector>
 
+//https://www.bfilipek.com/2014/04/flexible-particle-system-container-2.html
+
 class Particle {
 public:
 	Particle() {}
@@ -16,22 +18,26 @@ public:
 	//	alpha(0.0f),
 	//	col(0, 0, 0)
 	//{}
-	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha), col(p.col), hue(p.hue), mass(p.mass) {}
+	Particle(const Particle &p) : pos(p.pos), vel(p.vel), acc(p.acc), alpha(p.alpha) { hue = p.hue; mass = p.mass; col = p.col; } // col(p.col), hue(p.hue), mass(p.mass)
 
 	void applyForce(Vec3 &force) {
 		acc += force;// (force / mass);
 	}
 
-	void update() {
+	void update(bool limit = false) {
 		vel += acc;
 		pos += vel;
 		acc *= 0;
 
-		if (pos.y >= 1.5f) {
+		//limit vel
+		
+		if (limit) {
+			if (pos.y >= 1.5f) {
 			pos.y = 1.5f;
 			//vel.y = 0;
 			vel.y = -vel.y * 0.5;
 			vel *= 0.9;
+			}
 		}
 
 		//if (pos.y <= 0 || pos.y >= SCREEN_HEIGHT)
@@ -54,6 +60,12 @@ public:
 	float alpha = 0;
 	CRGB col = CRGB::Black;
 	uint8_t hue = 0;
+
+	static float distance(Particle p1, Particle p2) {
+		Vec3 d = p2.pos - p1.pos;
+		float d1 = d * d;
+		return sqrt(d1);
+	}
 };
 
 constexpr int maxParticles = 500;
@@ -64,7 +76,7 @@ std::vector<Particle> particles;
 
 class ParticleSystem {
 public:
-	ParticleSystem() {
+	ParticleSystem() : limit(false){
 		//if (!initalised) {
 		//	initalised = true;
 		//	init();
@@ -176,7 +188,7 @@ public:
 			rotateY += TWO_PI;
 		auto end = std::remove_if(particles.begin(), particles.end(), [this, m](Particle &p) {
 			// update particle
-			p.update();
+			p.update(limit);
 			
 			// render particle
 			Vec3 pos = p.pos;// *m;
@@ -185,7 +197,11 @@ public:
 			engine.sst.TransformSphere(pos);
 			//gfx.putPixel(pos.x, pos.y, p.col.nscale8_video(p.alpha));
 			float dis = myMap(p.pos.Len(), 2, 4, 255, 128, true);
-			CRGB c = CHSV(p.hue, dis, constrain(p.alpha, 0, 255));
+			CRGB c;
+			if (Data::paletteIndex == 0)
+				c = CHSV(p.hue + Data::getHue(), dis, constrain(p.alpha, 0, 255));
+			else
+				c = gfx.getColour(p.hue, constrain(p.alpha * 1.5f, 0, 255));
 			gfx.drawPointDepth(pos, c);
 			//gfx.drawPointDepth(pos, p.col.nscale8_video(myMap(constrain(p.alpha, 0, 255), 0, 255, 64, 255)));
 
@@ -201,6 +217,8 @@ public:
 	}
 
 
+	bool limit;
+
 
 	static void init() {
 		//particles.reserve(maxParticles);
@@ -210,3 +228,4 @@ public:
 };
 
 //bool ParticleSystem::initalised = false;
+

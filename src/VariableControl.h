@@ -5,12 +5,6 @@
 // Takes a reference to a value and implements an interface for changing it within defined min and max + deltas
 // Also provides a way to oscilate and change that value
 
-class Oscilate {
-public:
-	Oscilate() {}
-
-
-};
 
 /*
 template<class TYPE>
@@ -18,7 +12,7 @@ class VariableControl {
 public:
 	VariableControl() {}
 	VariableControl(TYPE &v, char* name, TYPE min, TYPE max, TYPE delta) :
-		var(v), name(name), min(min), max(max), 
+		var(v), name(name), min(min), max(max),
 		delta(delta), diff(max-min) {
 		//variables.push_back(this);
 	}
@@ -126,78 +120,225 @@ void VariableControl<bool>::update() {}
 
 
 
-template<class TYPE>
-class VariableContainer {
+
+//typedef VariableReference<float>		FloatReference;
+//typedef VariableReference<int>			IntReference;
+//typedef VariableReference<unsigned int> uIntReference;
+//typedef VariableReference<int8_t>		Int8Reference;
+//typedef VariableReference<uint8_t>		uInt8Reference;
+
+//https://github.com/dxinteractive/ArduinoTapTempo/blob/master/src/ArduinoTapTempo.h
+// BPM control
+
+class VariableOscilate {
 public:
-	VariableContainer() : min(0), max(0), wrap(true) {}
-	VariableContainer(const char* name, TYPE &t, TYPE min, TYPE max, bool wrap = false) : name(name), d(t), min(min), max(max), wrap(wrap) {}
+	typedef uint8_t type;
+	VariableOscilate() : var(0), min(0), max(255) {}
+	VariableOscilate(type min, type max) : var(0), min(min), max(max) {
 
-	const char* name;
-	const char* getName() {
-		return name;
 	}
 
-	TYPE &d;
-	TYPE min;
-	TYPE max;
-	bool wrap;
+	enum { RAMP = 0, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, AUDIO, AUDIO_AVG, OFF };
 
-	void inc(TYPE amount = 1) {
-		d += amount;
-		if (d > max) {
-			if (wrap) 	d -= max;
-			else 		d = max;
+
+	const char* getTriggerName(uint8_t i) {
+		const char* triggerTypeName[VariableOscilate::OFF + 1]{
+			"Ramp", "Inverse Ramp", "Triangle", "Square", "Sine", "Trigger", "Gate", "Audio", "Audio Avg", "Off"
+		};
+		if (i <= OFF) {
+			return triggerTypeName[i];
+		}
+		return "";
+	}
+
+
+
+	void trigger(uint16_t d = 200) {
+		triggerActive = true;
+		triggerStart = GET_MILLIS();
+		triggerDuration = 200;
+		//oscType = TRIGGER;
+		var = max;
+	}
+
+	void setType(uint8_t i) {
+		if (i <= OFF) {
+			oscType = i;
+		}
+	}
+  
+  uint8_t getType() {
+    return oscType;
+  }
+  uint8_t numTypes() {
+    return OFF +1;
+  }
+
+	void setBPM(accum88 b) {
+		bpm = b;
+	}
+	accum88 getBPM() {
+		return bpm;
+	}
+
+	void update() {
+
+		smoothTimebase = 0.8 * smoothTimebase + 0.2 * timebase;
+
+		unsigned long now = GET_MILLIS() - timebase;
+
+		accum88 b = bpm;
+		if (halfBPM)	b /= 2;
+		if (quaterBPM)	b /= 4;
+
+		if (triggerActive and var > min) {
+			var = myMap(now - triggerStart, 0, triggerDuration, max, min, true);
+			var = gamma6[var / 4];
+		}
+		else { triggerActive = false; var = min; }
+
+
+		switch (oscType) {
+		case RAMP:
+			/* Ramp	/|/|/|			*/
+			var = (((now * (b) * 280) >> 16) >> 8);
+			break;
+		case INVERSE_RAMP:
+			/* Inverse ramp |\|\|\	*/
+			var = 255 - (((now * (b) * 280) >> 16) >> 8);
+			break;
+		case TRIANGLE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			if (var > 128)
+				var /= 2;
+			else if (var <= 128)
+				var = 256 - (var * 2);
+			break;
+		case SQUARE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			var += 128;
+			if (var > 128)
+				var = 255;
+			else var = 0;
+			break;
+		case SIN:
+			var = sin8(((now * (b) * 280) >> 16) >> 8);
+			break;
+		case TRIGGER:
+			// Trigger decay handled above
+			break;
+		case GATE:
+			var = (((now * (b) * 280) >> 16) >> 8);
+			var += 128;
+			if (var > 128)
+				trigger();
+			break;
+		case AUDIO:
+			//var = myMap(Data::samplePeak, 0, 1024, 0, 255, true);
+			if (Data::samplePeak) {
+				trigger();
+				Data::samplePeak = 0;
+			}
+			break;
+		case AUDIO_AVG:
+			var = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2, 0, 255, true);
+			//if (Data::samplePeak)
+			//	trigger();
+			break;
+		case OFF:
+		default:
+			break;
 		}
 	}
 
-	void dec(TYPE amount = 1) {
-		if (d - amount < min) {
-			if (wrap) 	d = d - amount + max; // works for both signed/unsigned + floats
-			else		d = min;
-		}
-		else			d -= amount;
+
+	//static std::vector<VariableOscilate*> activeOscilaters;
+
+	type& operator* () {
+		return var;
 	}
 
-	void oscilate();
-	void trigger();
+	bool halfBPM = false;
+	bool quaterBPM = false;
+
+	void sync() {
+		if (oscType == TRIGGER) {
+			trigger();
+		}
+		else {
+			unsigned long now = GET_MILLIS();
+
+			timebase = now;
+
+			uint16_t tpt = 0; // average time per tap
+
+			if (prevBeat) {
+				if (now - prevBeat > 4000) {// four second timeout, reset count and sum
+					nBeats = 0;
+					sum = 0;
+				}
+				else {
+					nBeats++;
+					sum += 15360000L / (now - prevBeat); // 60,000 / 500ms = 120 BPM
+					tpt = sum / nBeats; //BPM * 256
+					bpm = tpt;
+					bpmVal = bpm >> 8;
+				}
+			}
+			prevBeat = now;
+		}
+	}
+
+	uint8_t bpmVal = 120;
+
+private:
+	type var;
+	type min;
+	type max;
+
+	uint16_t triggerDuration = 200;
+	unsigned long triggerStart = 0;
+	bool triggerActive = false;
+
+	accum88 bpm = (120 << 8);
+	uint8_t oscType = OFF;
+
+	unsigned long timebase = 0;
+	unsigned long smoothTimebase = 0;
+
+	// from https://learn.adafruit.com/tap-tempo-trinket/code
+  // can update with https://github.com/dxinteractive/ArduinoTapTempo/blob/master/src/ArduinoTapTempo.cpp
+	unsigned long
+		prevBeat = 0L, // Time of last button tap
+		sum = 0L; // Cumulative time of all beats
+	uint16_t
+		nBeats = 0;  // Number of beats counted
 
 
 
 };
 
-typedef VariableContainer<float>		FloatContainer;
-typedef VariableContainer<int>			IntContainer;
-typedef VariableContainer<unsigned int> uIntContainer;
-typedef VariableContainer<int8_t>		Int8Container;
-typedef VariableContainer<uint8_t>		uInt8Container;
 
+/*
 
-
-
-
-
-template<class T>
+//template<class T>
 class VariableControl {
+	typedef uint8_t T;
 public:
-	VariableControl();
+	VariableControl() {}
 
-	VariableControl(VariableContainer<T> &var) : var(var), min(var.min), max(var.max) {
+	VariableControl(T &var) : var(var), min(0), max(255) {
 		delta = max - min;
 		triggerEnd = min;
 	}
 
-	VariableControl(VariableContainer<T> &var, T _min, T _max) : var(var), min(_min), max(_max) {
-		if (_min < var.min)
-			min = var.min;
-		if (_max > var.max)
-			max = var.max;
+	VariableControl(T &var, T _min, T _max) : var(var), min(_min), max(_max) {
 		delta = max - min;
 		triggerEnd = min;
 	}
-
-
 
 	unsigned long lastUpdate;
+
 	void update() {
 		unsigned long now = GET_MILLIS();
 		if ((oscilateOn || rampOn || triggerOn) and (now - lastUpdate > interval)) {
@@ -205,39 +346,39 @@ public:
 			lastUpdate = now;
 
 			if (oscilateOn) {
-				static bool dirUp = true;
-				bool w = var.wrap;
-				var.wrap = false;
-				if (dirUp) {
-					var.inc();
-					if (var.d >= max)
-						dirUp = false;
-				}
-				else {
-					var.dec();
-					if (var.d <= min)
-						dirUp = true;
-				}
+				//static bool dirUp = true;
+				//bool w = var.wrap;
+				//var.wrap = false;
+				//if (dirUp) {
+				//	var.inc();
+				//	if (var.d >= max)
+				//		dirUp = false;
+				//}
+				//else {
+				//	var.dec();
+				//	if (var.d <= min)
+				//		dirUp = true;
+				//}
 
-				var.wrap = w;
+				//var.wrap = w;
 			}
 
 			else if (rampOn) {
-				bool w = var.wrap;
-				var.wrap = true;
-				var.inc();
-				var.wrap = w;
+				//bool w = var.wrap;
+				//var.wrap = true;
+				//var.inc();
+				//var.wrap = w;
 			}
 
 			else if (triggerOn) {
-				bool w = var.wrap;
-				var.wrap = false;
-				var.dec();
-				if (var.d <= triggerEnd) {
-					triggerOn = false;
-					var.d = triggerEnd;
-				}
-				var.wrap = w;
+				//bool w = var.wrap;
+				//var.wrap = false;
+				//var.dec();
+				//if (var.d <= triggerEnd) {
+				//	triggerOn = false;
+				//	var.d = triggerEnd;
+				//}
+				//var.wrap = w;
 			}
 		}
 	}
@@ -245,7 +386,7 @@ public:
 
 
 	void oscilate(accum88 BPM) {
-		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600 
+		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600
 		interval = period / (delta * 2.0f);  // then interval = 3
 		oscilateOn = true;
 		rampOn = false;
@@ -253,7 +394,7 @@ public:
 	}
 
 	void ramp(accum88 BPM) {
-		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600 
+		float period = (60000.0f / (BPM / 256.0f)); // e.g. BPM = 100, delta is 100, period = 600
 		interval = period / float(delta);  // then interval = 3
 		rampOn = true;
 		oscilateOn = false;
@@ -278,7 +419,7 @@ public:
 	}
 
 private:
-	VariableContainer<T> &var;
+	VariableReference &var;
 	T min;
 	T max;
 	T delta;
@@ -289,3 +430,4 @@ private:
 	bool triggerOn = false;
 	float interval = 10;
 };
+*/

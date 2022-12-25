@@ -5,13 +5,18 @@
 
 // include all patterns
 #include "Pattern.h"
+#include "PatternAudio.h"
 #include "PatternBasic.h"
 #include "PatternBeachWaves.h"
 #include "PatternCube.h"
 #include "PatternFire.h"
+#include "PatternFireworks.h"
+#include "PatternFluidSim.h"
 #include "PatternNoise.h"
 #include "PatternParametric.h"
+#include "PatternParticleSysOld.h"
 #include "PatternPictures.h"
+#include "PatternPurpleRain.h"
 #include "PatternRaymarcher.h"
 #include "PatternSpiral.h"
 #include "PatternSuperShape.h"
@@ -35,57 +40,97 @@
 
 class PatternController {
 public:
-	PatternController() {}
+	PatternController() { gfx.setPalette(0); }
 
 	//variables
-	uInt8Container beatRef{ "Beat", _Pattern::beat, 0, 255, true };
-	VariableControl<uint8_t> beatControl{ beatRef };
+	//uInt8Reference beatRef{ "Beat", _Pattern::beat, 0, 255, true };
 
 	//add patterns as members here
+	PatternAudio1		audio1;
 	PatternRowThenCol	rowThenCol;
-	PatternBeachWaves	beachWaves;
-	PatternBeachWaves2	beachWaves2;
+	PatternBlank		blank;
+	PatternBeachWaves	beachWaves; //fine 
+	PatternBeachWaves2	beachWaves2; //issue - seems to be with blur2d
 	PatternCube			cube3d;
+	PatternDualWaves	dualWaves;
+	PatternFish			fish;
 	PatternFire			fire;
+	PatternFireworks	fireworks;
+	PatternFountain		particleFountain;
+
 	PatternNoise1		noise1;
-	PatternParametric	parametric;
-	PatternParametric2	parametricSpiral;
+	PatternParametric	parametric; //issue
+	PatternParametric2	parametricSpiral; //issue
+	ParticleSystemWater	particlesWater;
+	PatternPurpleRain	purpleRain;
+	PatternRain			rain;
 	PatternRaymarcher	raymarcher;
+	PatternSolid		solid;
 	PatternSparks		sparks;
+	PatternSpinningParticles	SpinningParticles;
 	PatternSpiral		spiral;
 	PatternSuperShape	superShape;
 	PatternVWaves		verticalWaves;
 	PatternWireFrame	wireFrame;
-	PatternWheelBlur	wheelBlur;
-	PatternWheelPart	wheelParticles;
+	PatternWheelBlur	wheelBlur; //issue
+	PatternWheelPart	wheelParticle; //issue
 	PatternWorld		world;
+	PatternWorld2		worldNoWater;
+	PatternMario		mario; 
+	PatternEyes			eyes; 
+	PatternFlowers		flowers;
+	PatternTest			test;
+
+	PatternSandSim		sandSim;
+	PatternLavaLamp		lavaLamp;
+	PatternCheckerBoard	checkers;
 
 
 	// add pattern members to pattern list
-	static const uint8_t numPatterns = 16;
-    _Pattern *patternList[numPatterns] = {
-		&verticalWaves,
+	static const uint8_t numPatterns = 32;
+    _Pattern *patternList[numPatterns] = {	
+//		&test,
+		//&checkers,
+
+		&blank,
+		&audio1,
+		&fireworks,
+		&fish,
+		&particlesWater,
+		&dualWaves, //issue
+		&purpleRain,
+		&rain, 
+		&wheelParticle,	//issue
+		&wheelBlur, //issue
+		&SpinningParticles,
+		
 		&noise1,
-		&parametricSpiral,
-		
-		&sparks,
-		//&superShape,
+		&verticalWaves,
+		&beachWaves2,//issue
+		&beachWaves, //issue
 		&rowThenCol,
-		&raymarcher,
-		&world,
+		&solid,
+		&sparks,
 		
-		&wheelParticles,
-		&fire, 
-		&beachWaves2,
-		
-		&wheelBlur,
+		&parametricSpiral,
 		&parametric,
-		&spiral,
-		&wireFrame,
+		&spiral, //issue
+
+		&particleFountain,
+		&fire, 
+		&world,
+		&worldNoWater,
+		&mario,
+		&eyes,
+		&flowers,
+		&lavaLamp,
+		&sandSim,
+		
+		&wireFrame, //issue intermittently 
 		&cube3d,
-		&beachWaves
 		
-		
+		//&raymarcher,
+		//&superShape
 	};
 
 	const char* getCurrentPatternName() {
@@ -121,11 +166,18 @@ public:
 
 	unsigned long nextUpdate = 0;
 	unsigned long nextHueUpdate = 0;
+	unsigned long nextCursorUpdate = 0;
+	unsigned long nextPaletteUpdate = 0;
+	uint8_t cursorPos = SCREEN_WIDTH;
+
+	uint8_t blinkTimer = 0;
+
+
+	void blinkText() {
+		blinkTimer = 64;
+	}
 
 	void run() {
-		
-		
-
 		if (nextUpdate == 0) {
 			getCurrentPattern()->start();// initial
 		}
@@ -134,38 +186,112 @@ public:
 		if (now > nextUpdate) {
 			//        audio.readAudio();
 			
+			gfx.updatePalette();
 
-			nextUpdate = getCurrentPattern()->drawFrame() + now;
 
-			//        memcpy(&scratchArray[0], &leds[0], NUM_LEDS * sizeof(leds[0]));
-			//        leds.displayText();
-			//        memcpy(&leds[0], &scratchArray[0], NUM_LEDS * sizeof(leds[0]));
-#if defined(ARDUINO)
-			FastLED.setBrightness(Data::brightness);
-			//FastLED.show();
-#else 
-			//gfx.show();
-#endif
-			gfx.show();
-			if (!_Pattern::useDefaultEffect) {
-				if (FxFade)
-					gfx.fade(FxFade);
-				if (FxBlur)
-					blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, FxBlur);
-				if (FxSpiral)
-					SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
-				if (FxNoiseSmear)
-					standardNoiseSmearing();
+			//add effects to previous frame
+			if (_Pattern::useCustomEffect) {
+				if (_Pattern::fadeFx)
+					gfx.fade(_Pattern::fadeFx);
+				if (_Pattern::blurFx)
+					gfx.blur(_Pattern::blurFx);
+				if (_Pattern::spiralFx)
+					gfx.spiral(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, _Pattern::spiralFx);
+				//	SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
+				//if (FxNoiseSmear)
+				//	standardNoiseSmearing();
 			}
 
+			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
+
+			
+
+			gfx.update(); ////copys from gfx led buffer to FastLED/screen buffer
+
+			//text
+			if (Data::textOn or blinkTimer) {
+				uint8_t oldOpacity = gfx.textOpacity;
+
+				if (blinkTimer) {
+					gfx.textOpacity = decayData[blinkTimer];
+					blinkTimer--;
+				}
+
+				gfx.setCursor(cursorPos, 12);
+				
+				String text;
+				if (Data::textIndex == Data::customIndex1) {
+					text = Data::custom1;
+				}
+				else if (Data::textIndex == Data::customIndex2) {
+					text = Data::custom2;
+				}
+				else {text = Data::textOptions[Data::textIndex];}
+				gfx.print(text);
+
+				gfx.textOpacity = oldOpacity;
+			}
+			
+			if (_Pattern::useCustomEffect and _Pattern::glitterFx) {
+			//can put in sampleavg here
+				const uint8_t num = 40;
+				static uint16_t glitter[num];
+				static uint8_t glitterVal[num];
+				static uint8_t lastGlitterPos = 0;
+				if (random8() < _Pattern::glitterFx * 10) {
+				uint8_t x,y;
+				x = random8(SCREEN_WIDTH);
+				y = random8(SCREEN_HEIGHT);
+					gfx.putPixelDirect(x, y, CRGB::White);
+					glitter[lastGlitterPos] = x << 8 | y;
+					glitterVal[lastGlitterPos] = 63;
+					lastGlitterPos = (lastGlitterPos + 1) % num;
+				}
+				uint8_t count = 0;
+				for (uint8_t i = 0; i < num; i++) {
+					if (glitterVal[i]) {
+						count++;
+						glitterVal[i]--;
+						if (glitterVal[i] < 32) {
+							glitterVal[i] = 0;
+							continue;
+						}
+						CRGB c;
+						
+						uint8_t v = gamma6[glitterVal[i]];
+						c.r = v;
+						c.g = v;
+						c.b = v;
+						gfx.putPixelDirect(uint8_t(glitter[i] >> 8), uint8_t(glitter[i]), c);
+					}
+				}
+			}
+
+			gfx.show();
+
 		}
-		if (now - nextHueUpdate > 1000 / 60) {
+		if (Data::hueChange and (now - nextHueUpdate > (1000 / Data::hueSpeed)) ) {
 			nextHueUpdate = now;
 			Data::incHue();
+		}
+
+		if (now - nextCursorUpdate > 1000 / gfx.textSpeed) {
+			nextCursorUpdate = now;
+			cursorPos = (cursorPos - 1 + SCREEN_WIDTH) % SCREEN_WIDTH;
+		}
+		
+		if (Data::changePaletteDelay and (now - nextPaletteUpdate > (1000 * Data::changePaletteDelay))) {
+			nextPaletteUpdate = now;
+			gfx.setPalette(random8(gGradientPaletteCount));
 		}
 
 	}
 };
 
+
+
 PatternController patterns;
+
+VariableReference currentPattern_t{	"Current pattern", &Data::currentPattern, 0, 0, patterns.numPatterns };
+
 

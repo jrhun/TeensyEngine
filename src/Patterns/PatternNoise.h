@@ -18,10 +18,20 @@ class PatternNoise1 : public _Pattern {
 public:
 	PatternNoise1() : _Pattern("Noise1") {}
 
+	uint8_t oldBrightness = 0;
 
+	void start() {
+		oldBrightness = Data::brightness;
+		Data::brightness /= 2;
+	}
+
+	void stop() {
+		Data::brightness = oldBrightness;
+	}
 
 	uint8_t drawFrame() {
 		noise.fillNoise();
+
 
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
 			for (int j = 0; j < SCREEN_HEIGHT; j++) {
@@ -47,7 +57,8 @@ public:
 				}
 
 				//CRGB color = ColorFromPalette(Black_White_gp, index, bri);
-				CRGB color = CHSV(index, 255, bri);
+				CRGB color = gfx.getColour(index + Data::getHue(), bri);
+				//CRGB color = CHSV(index, 255, bri);
 
 
 				gfx.putPixel(i,j, color);

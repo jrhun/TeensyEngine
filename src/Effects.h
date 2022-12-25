@@ -19,20 +19,68 @@ void SpiralStream(int x, int y, int r, byte dimm) {
 
 	for (int d = r; d >= 0; d--) { // from the outside to the inside
 		for (int i = x - d; i <= x + d; i++) {
-			leds[_XY(i, y - d)] += leds[_XY(i + 1, y - d)]; // lowest row to the right
-			leds[_XY(i, y - d)].nscale8(dimm);
+			gfx.leds[_XY(i % SCREEN_WIDTH, y - d)] += gfx.leds[_XY((i + 1 )% SCREEN_WIDTH, y - d)]; // lowest row to the right
+			gfx.leds[_XY(i, y - d)].nscale8(dimm);
 		}
 		for (int i = y - d; i <= y + d; i++) {
-			leds[_XY(x + d, i)] += leds[_XY(x + d, i + 1)]; // right colum up
-			leds[_XY(x + d, i)].nscale8(dimm);
+			gfx.leds[_XY((x + d) % SCREEN_WIDTH, i)] += gfx.leds[_XY((x + d) % SCREEN_WIDTH, i + 1)]; // right colum up
+			gfx.leds[_XY((x + d) % SCREEN_WIDTH, i)].nscale8(dimm);
 		}
 		for (int i = x + d; i >= x - d; i--) {
-			leds[_XY(i, y + d)] += leds[_XY(i - 1, y + d)]; // upper row to the left
-			leds[_XY(i, y + d)].nscale8(dimm);
+			gfx.leds[_XY(i% SCREEN_WIDTH, y + d)] += gfx.leds[_XY((i - 1) % SCREEN_WIDTH, y + d)]; // upper row to the left
+			gfx.leds[_XY(i% SCREEN_WIDTH, y + d)].nscale8(dimm);
 		}
 		for (int i = y + d; i >= y - d; i--) {
-			leds[_XY(x - d, i)] += leds[_XY(x - d, i - 1)]; // left colum down
-			leds[_XY(x - d, i)].nscale8(dimm);
+			gfx.leds[_XY((x - d) % SCREEN_WIDTH, i)] += gfx.leds[_XY((x - d) % SCREEN_WIDTH, i - 1)]; // left colum down
+			gfx.leds[_XY((x - d) % SCREEN_WIDTH, i)].nscale8(dimm);
+		}
+	}
+}
+
+void shiftX(int8_t amount) {
+	//sift to left 
+	// if amount = 5
+	// then column 0 becomes 5, colum 0-5 becomes column 0
+	// 
+	if (amount == 0) return;
+	amount %= SCREEN_WIDTH;
+
+	if (amount > SCREEN_WIDTH / 2)
+		amount = amount - SCREEN_WIDTH;
+
+	CRGB temp[SCREEN_HEIGHT];
+	if (amount % 2) { //odd number
+		for (int y = 0; y < SCREEN_HEIGHT; y++) {
+			temp[y] = gfx.leds[_XY(0, y)];
+		}
+		uint8_t x = 0;
+		for (int i = 0; i < SCREEN_WIDTH-1; i++) {
+			for (int j = 0; j < SCREEN_HEIGHT; j++) {
+				gfx.leds[_XY(x, j)] = gfx.leds[_XY((x + amount + SCREEN_WIDTH) % SCREEN_WIDTH, j)];
+			}
+			x = (x + amount + SCREEN_WIDTH) % SCREEN_WIDTH;
+		}
+		for (int y = 0; y < SCREEN_HEIGHT; y++) {
+			gfx.leds[_XY((x) % SCREEN_WIDTH, y)] = temp[y];
+		}
+	}
+	else {
+		uint8_t inner = SCREEN_WIDTH / amount;
+		uint8_t outer = amount;
+		for (uint8_t outI = 0; outI < outer; outI++) {
+			for (int y = 0; y < SCREEN_HEIGHT; y++) {
+				temp[y] = gfx.leds[_XY(outI, y)];
+			}
+			uint8_t x = 0;
+			for (uint8_t inI = 0; inI < inner - 1; inI++) {
+				for (int j = 0; j < SCREEN_HEIGHT; j++) {
+					gfx.leds[_XY(outI + x, j)] = gfx.leds[_XY((outI + x + amount + SCREEN_WIDTH) % SCREEN_WIDTH  , j)];
+				}
+				x = (x + amount + SCREEN_WIDTH) % SCREEN_WIDTH;
+			}
+			for (int y = 0; y < SCREEN_HEIGHT; y++) {
+				gfx.leds[_XY(outI + x, y)] = temp[y];
+			}
 		}
 	}
 }
@@ -41,17 +89,17 @@ void MoveX(byte delta) {
 	CRGB leds2[SCREEN_HEIGHT * SCREEN_WIDTH];
 	for (int y = 0; y < SCREEN_HEIGHT; y++) {
 		for (int x = 0; x < SCREEN_WIDTH - delta; x++) {
-			leds2[_XY(x, y)] = leds[_XY(x + delta, y)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x + delta, y)];
 		}
 		for (int x = SCREEN_WIDTH - delta; x < SCREEN_WIDTH; x++) {
-			leds2[_XY(x, y)] = leds[_XY(x + delta - SCREEN_WIDTH, y)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x + delta - SCREEN_WIDTH, y)];
 		}
 	}
 
 	// write back to leds
 	for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 		for (uint8_t x = 0; x < SCREEN_WIDTH; x++) {
-			leds[_XY(x, y)] = leds2[_XY(x, y)];
+			gfx.leds[_XY(x, y)] = leds2[_XY(x, y)];
 		}
 	}
 }
@@ -60,17 +108,17 @@ void MoveY(byte delta) {
 	CRGB leds2[SCREEN_HEIGHT * SCREEN_WIDTH];
 	for (int x = 0; x < SCREEN_WIDTH; x++) {
 		for (int y = 0; y < SCREEN_HEIGHT - delta; y++) {
-			leds2[_XY(x, y)] = leds[_XY(x, y + delta)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x, y + delta)];
 		}
 		for (int y = SCREEN_HEIGHT - delta; y < SCREEN_HEIGHT; y++) {
-			leds2[_XY(x, y)] = leds[_XY(x, y + delta - SCREEN_HEIGHT)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x, y + delta - SCREEN_HEIGHT)];
 		}
 	}
 
 	// write back to leds
 	for (uint8_t y = 0; y < SCREEN_HEIGHT; y++) {
 		for (uint8_t x = 0; x < SCREEN_WIDTH; x++) {
-			leds[_XY(x, y)] = leds2[_XY(x, y)];
+			gfx.leds[_XY(x, y)] = leds2[_XY(x, y)];
 		}
 	}
 }
@@ -83,10 +131,10 @@ void MoveFractionalNoiseX(byte amt = 16) {
 		byte delta = 31 - (amount / 256);
 
 		for (int x = 0; x < SCREEN_WIDTH - delta; x++) {
-			leds2[_XY(x, y)] = leds[_XY(x + delta, y)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x + delta, y)];
 		}
 		for (int x = SCREEN_WIDTH - delta; x < SCREEN_WIDTH; x++) {
-			leds2[_XY(x, y)] = leds[_XY(x + delta - SCREEN_WIDTH, y)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x + delta - SCREEN_WIDTH, y)];
 		}
 	}
 
@@ -106,7 +154,7 @@ void MoveFractionalNoiseX(byte amt = 16) {
 			PixelA %= 255 - fractions;
 			PixelB %= fractions;
 
-			leds[_XY(x, y)] = PixelA + PixelB;
+			gfx.leds[_XY(x, y)] = PixelA + PixelB;
 		}
 
 		PixelA = leds2[_XY(0, y)];
@@ -115,7 +163,7 @@ void MoveFractionalNoiseX(byte amt = 16) {
 		PixelA %= 255 - fractions;
 		PixelB %= fractions;
 
-		leds[_XY(0, y)] = PixelA + PixelB;
+		gfx.leds[_XY(0, y)] = PixelA + PixelB;
 	}
 }
 
@@ -127,10 +175,10 @@ void MoveFractionalNoiseY(byte amt = 16) {
 		byte delta = 31 - (amount / 256);
 
 		for (int y = 0; y < SCREEN_WIDTH - delta; y++) {
-			leds2[_XY(x, y)] = leds[_XY(x, y + delta)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x, y + delta)];
 		}
 		for (int y = SCREEN_WIDTH - delta; y < SCREEN_WIDTH; y++) {
-			leds2[_XY(x, y)] = leds[_XY(x, y + delta - SCREEN_WIDTH)];
+			leds2[_XY(x, y)] = gfx.leds[_XY(x, y + delta - SCREEN_WIDTH)];
 		}
 	}
 
@@ -150,7 +198,7 @@ void MoveFractionalNoiseY(byte amt = 16) {
 			PixelA %= 255 - fractions;
 			PixelB %= fractions;
 
-			leds[_XY(x, y)] = PixelA + PixelB;
+			gfx.leds[_XY(x, y)] = PixelA + PixelB;
 		}
 
 		PixelA = leds2[_XY(x, 0)];
@@ -159,7 +207,7 @@ void MoveFractionalNoiseY(byte amt = 16) {
 		PixelA %= 255 - fractions;
 		PixelB %= fractions;
 
-		leds[_XY(x, 0)] = PixelA + PixelB;
+		gfx.leds[_XY(x, 0)] = PixelA + PixelB;
 	}
 }
 
@@ -202,7 +250,7 @@ inline void TextureBlock(int xo, int yo)
 	//float a, b, c, d;
 	CRGB *Tptr;
 
-	Tptr = &(leds[xi + (yi * SCREEN_WIDTH)]);
+	Tptr = &(gfx.leds[xi + (yi * SCREEN_WIDTH)]);
 
 	VLDx = (offset[xo][yo + 1].xint - offset[xo][yo].xint) / 16;
 	VRDx = (offset[xo + 1][yo + 1].xint - offset[xo + 1][yo].xint) / 16;
@@ -223,7 +271,7 @@ inline void TextureBlock(int xo, int yo)
 
 		for (x = xi; x < (xi + 16); x++)
 		{
-			*Tptr++ = leds[int(tx) + SCREEN_WIDTH * int(ty)];
+			*Tptr++ = gfx.leds[int(tx) + SCREEN_WIDTH * int(ty)];
 			tx += HDx;
 			ty += HDy;
 		}
@@ -237,7 +285,7 @@ inline void TextureBlock(int xo, int yo)
 	}
 }
 
-
+/*
 void flowMap() {
 
 
@@ -355,7 +403,7 @@ void flowMap() {
 	}
 
 }
-
+*/
 
 void rotateCW(float angle) {
 

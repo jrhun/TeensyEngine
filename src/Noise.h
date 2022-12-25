@@ -5,7 +5,7 @@
 #include "../data.h"
 
 
-
+//https://gist.github.com/KdotJPG/b1270127455a94ac5d19
 
 enum noiseType_t { perlin, randomFill, spherical, cylindrical, fourDimensional };
 
@@ -48,26 +48,28 @@ public:
 		return 0;
 	}
 
-	uint16_t xOffset;
-	uint16_t yOffset;
-	uint16_t zOffset;
+	uint32_t xOffset;
+	uint32_t yOffset;
+	uint32_t zOffset;
 	uint16_t xScale;
 	uint16_t yScale;
 
-	uint16_t speed = 32;
+	uint16_t speed = 12;
 
 	uint8_t noise[SCREEN_WIDTH][SCREEN_WIDTH];
 
-	uint8_t noiseSmoothing = 240;
+	uint8_t noiseSmoothing = 100;
 
 private:
 	void fillNoise8bit() {
+		static uint8_t x = 0, y = 0, z = 0;
 		for (int i = 0; i < SCREEN_WIDTH; i++) {
-			int ioffset = xScale * i;
+			uint32_t ioffset = xScale * i;
 			for (int j = 0; j < SCREEN_WIDTH; j++) {
-				int joffset = yScale * j;
+				uint32_t joffset = yScale * j;
 
 				uint8_t data = inoise16(xOffset + ioffset, yOffset + joffset, zOffset) >> 8;
+				//uint8_t data = inoise8(xOffset + 20 * i, yOffset + 20 * j, zOffset);
 
 				// The range of the inoise8 function is roughly 16-238.
 				// These two operations expand those values out to roughly 0..255
@@ -83,9 +85,12 @@ private:
 				noise[i][j] = data;
 			}
 		}
-		xOffset += speed / 16; // keep interesting by changing x/y offsets
-		yOffset += speed / 30;
-		zOffset += speed;
+		//x++;
+		//y--;
+		//z++;
+		xOffset += (speed << 8 / 15) ; // keep interesting by changing x/y offsets
+		yOffset += (speed << 8 / 28);
+		zOffset += speed << 7;
 	}
 
 	//returns x y z for a given theta phi at radius r
@@ -169,7 +174,7 @@ private:
 				uint8_t steps = (256 / SCREEN_HEIGHT); // = 8 for 32, or 4 for 64
 				// increase steps slightly for phi so we don't have all leads at the top lighting together
 				// of note maybe we should only do +/-90 deg as with the world map to avoid warping at high lattitudes
-				uint8_t steps2 = 3;
+				//uint8_t steps2 = 3;
 				uint8_t lon = steps * j;
 				uint8_t lat = steps * i / 2;
 

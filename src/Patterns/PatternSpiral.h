@@ -88,7 +88,12 @@ public:
 		// manage the Oszillators
 		UpdateTimers();
 
-		
+		if (!_Pattern::useCustomEffect) {
+			//SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
+			//// increase the contrast
+			//SpiralStream(3 * SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2, GuiVars1 * 127);
+			gfx.fade(7);
+		}
 
 		//shift right 
 		//CRGB column[SCREEN_HEIGHT];
@@ -104,27 +109,35 @@ public:
 		//	leds[0 + i * SCREEN_WIDTH] = column[i];
 		//}
 
+		if (!_Pattern::useCustomEffect) {
+			gfx.fade(7);
+		}
+
 		// draw just a line defined by 5 oszillators
 		//CRGB col = CHSV(multiTimer[2].count, 255, 255);
+		uint8_t x1 = multiTimer[3].count + (inc / 4) % SCREEN_WIDTH;
+		uint8_t x2 = multiTimer[0].count + (inc / 4) % SCREEN_WIDTH;
+		uint8_t y1 = multiTimer[4].count;
+		uint8_t y2 = multiTimer[1].count;
 		gfx.drawLine(
-			multiTimer[3].count,
-			multiTimer[4].count,
-			multiTimer[0].count,
-			multiTimer[1].count,
+			x1,
+			y1,
+			x2,
+			y2,
 			multiTimer[2].count,
-			multiTimer[2].count+64);
+			multiTimer[2].count + 64);
 
-		float length = beatsin8(5, 10, 20);
-		if (random8(0, 150) == 0) {
-			dir = -dir;
-		}
-		angle += dir * (beatsin8(20, 2, 3) / 30.0);
-		a.x = length * cos(angle) / 2 + SCREEN_WIDTH / 2 + xOffset;
-		a.y = length * sin(angle) / 2 + SCREEN_HEIGHT / 2;
-		b.x = -length * cos(angle) / 2 + SCREEN_WIDTH / 2 + xOffset;
-		b.y = -length * sin(angle) / 2 + SCREEN_HEIGHT / 2;
+		//float length = beatsin8(5, 10, 20);
+		//if (random8(0, 150) == 0) {
+		//	dir = -dir;
+		//}
+		//angle += dir * (beatsin8(20, 2, 3) / 30.0);
+		//a.x = length * cos(angle) / 2 + SCREEN_WIDTH / 2 + xOffset;
+		//a.y = length * sin(angle) / 2 + SCREEN_HEIGHT / 2;
+		//b.x = -length * cos(angle) / 2 + SCREEN_WIDTH / 2 + xOffset;
+		//b.y = -length * sin(angle) / 2 + SCREEN_HEIGHT / 2;
 
-		Vec3 offset(multiTimer[3].count, multiTimer[4].count, 0);
+		//Vec3 offset(multiTimer[3].count, multiTimer[4].count, 0);
 		//engine.sst.Transform(a);
 		//engine.sst.Transform(b);
 		//gfx.drawLine(a.x, a.y+beatsin8(10,0,10)-5, b.x, b.y + beatsin8(10, 0, 10)-5, 0, length * 4);
@@ -136,20 +149,36 @@ public:
 		// center x, y, radius, scale color down
 		// --> affects always a square with an odd length
 
-		
-		if (_Pattern::useDefaultEffect) {
-			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 128);
+
+		//if (!_Pattern::useCustomEffect) {
+			SpiralStream(SCREEN_WIDTH, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 124);
+			SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 124);
+			SpiralStream(0, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, 124);
 			// increase the contrast
-			gfx.fade(5);
-		}
-		//SpiralStream(3*SCREEN_WIDTH/4, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2, GuiVars1 * 127);
+			//gfx.fade(7);
+			gfx.drawLine(
+				x1,
+				y1,
+				x2,
+				y2,
+				multiTimer[2].count,
+				multiTimer[2].count + 64);
+
+			SpiralStream(x1, y1, SCREEN_HEIGHT / 3, 120);
+			SpiralStream(x2, y2, SCREEN_HEIGHT / 3, 120);
+		//}
+
+
 
 		// why not several times?!
-		//SpiralStream(16, 6, 6, GuiVars2 * 127);
-		//SpiralStream(10, 24, 10, GuiVars3 * 127);
+		//SpiralStream(16, 6, 6, 127);
+		//SpiralStream(10, 24, 10, 127);
 
+		inc = (inc + 1) % SCREEN_WIDTH * 8;
+		//inc++;
+		//shiftX(inc);
 
-		xOffset += beatsin8(30, 1 , 10) / 10.0;
+		xOffset += beatsin8(30, 1, 10) / 10.0;
 		//angle += 0.1;
 		if (angle > TWO_PI)
 			angle -= TWO_PI;
@@ -165,5 +194,6 @@ public:
 	Vec3 b = Vec3(0, 0, 255);
 	float angle = 0;
 	float xOffset = 0;
+	uint16_t inc = 0;
 	int dir = 1;
 };

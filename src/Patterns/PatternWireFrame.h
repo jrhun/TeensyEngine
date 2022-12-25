@@ -7,11 +7,11 @@ public:
 	PatternWireFrame() : _Pattern("Wireframe") {}
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			int beat = beatsin8(2, 80, 224);
-			int beat2 = beatsin8(2, 224, 80);
+			int beat2 = beatsin8(2, 200, 80);
 			gfx.fade(beat);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, beat2);
+			gfx.blur(beat2);
 		}
 		gfx.resetZ();
 		auto lines1 = cube.getLines(2.0f);

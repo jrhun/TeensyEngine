@@ -16,9 +16,9 @@ public:
 
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(30);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			gfx.blur(90);
 		}
 		gfx.resetZ();
 		const int maxI = 100;
@@ -32,18 +32,24 @@ public:
 			//c2.nscale8_video(min(i * 4, 255));
 			drawLine(t, i / 1, i / 1 + 32, min(i * 12, 255));
 		}
-		offset += 0.05;
+		offset += 0.1;
 
-		centerA.x = 2.5 * cos(angle + PI);
-		centerA.z = 2.5 * sin(angle + PI);
+		float radius = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2, 2.5, 1.8, true);
 
-		centerB.x = 2.5 * cos(angle + PI + PI);
-		centerB.z = 2.5 * sin(angle + PI + PI);
+		centerA.x = radius * cos(angle + PI);
+		centerA.z = radius * sin(angle + PI);
+
+		centerB.x = radius * cos(angle + PI + PI);
+		centerB.z = radius * sin(angle + PI + PI);
 
 		angle += 0.005;
 		if (angle >= TWO_PI)
 			angle -= TWO_PI;
+#if defined(ESP32) || defined(CORE_TEENSY)
+		return (1000/60);
+#else 
 		return returnVal;
+#endif
 	}
 
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {
@@ -87,9 +93,9 @@ public:
 
 
 	uint8_t drawFrame() {
-		if (_Pattern::useDefaultEffect) {
+		if (!_Pattern::useCustomEffect) {
 			gfx.fade(30);
-			blur2d(leds, SCREEN_WIDTH, SCREEN_HEIGHT, 90);
+			gfx.blur(90);
 		}
 
 		gfx.resetZ();
@@ -104,11 +110,13 @@ public:
 
 		offset += 0.05;
 
-		centerA.x = 2.5 * cos(angle + PI);
-		centerA.z = 2.5 * sin(angle + PI);
+		float radius = myMap(Data::sampleAvg, 0, Data::audioThreshold * 2, 2.5, 1.8, true);
 
-		centerB.x = 2.5 * cos(angle + PI + PI);
-		centerB.z = 2.5 * sin(angle + PI + PI);
+		centerA.x = radius * cos(angle + PI);
+		centerA.z = radius * sin(angle + PI);
+
+		centerB.x = radius * cos(angle + PI + PI);
+		centerB.z = radius * sin(angle + PI + PI);
 
 		angle += 0.005;
 		if (angle >= TWO_PI)
@@ -118,9 +126,10 @@ public:
 	}
 
 	void drawLine(float t, uint8_t hue1, uint8_t hue2, uint8_t fade) {
+		//https://math.stackexchange.com/questions/324527/do-these-equations-create-a-helix-wrapped-into-a-torus
 		float fa = 2.5;
 		float fb = 1.4;
-		float k = 0.05;
+		//float k = 0.05;
 		float u = 2*t;
 		float v = t*.75;
 		float x1 = (fa + fb * cos(u)) * cos(v);
