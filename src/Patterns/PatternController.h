@@ -83,14 +83,14 @@ public:
 
 	PatternSandSim		sandSim;
 	PatternLavaLamp		lavaLamp;
+	PatternCheckerBoard	checkers;
 
 
 	// add pattern members to pattern list
 	static const uint8_t numPatterns = 32;
     _Pattern *patternList[numPatterns] = {	
 //		&test,
-		&lavaLamp,
-		&sandSim,
+		//&checkers,
 
 		&blank,
 		&audio1,
@@ -123,6 +123,8 @@ public:
 		&mario,
 		&eyes,
 		&flowers,
+		&lavaLamp,
+		&sandSim,
 		
 		&wireFrame, //issue intermittently 
 		&cube3d,

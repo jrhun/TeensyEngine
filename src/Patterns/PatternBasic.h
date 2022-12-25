@@ -519,7 +519,16 @@ public:
 
 //https://littlevgl.com/image-to-c-array
 
+class PatternCheckerBoard : public _Pattern {
+public:
+	PatternCheckerBoard() : _Pattern("Checkers") {
+	}
 
+	uint8_t drawFrame() {
+
+		return returnVal;
+	}
+};
 	
 
 class PatternFish : public _Pattern {

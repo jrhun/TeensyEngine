@@ -83,6 +83,7 @@ public: PatternLavaLamp() : _Pattern("Lava Lamp") {}
 //cooling zone at top 0.2
 
 //heat loss 0.012
+	  //adapted from https://github.com/JRButler/Digital-lava-lamp/blob/master/blobbyLamp/blobbyLamp.pde
 
 
 uint8_t drawFrame() {
@@ -555,8 +556,12 @@ public:
 
 	std::vector<_Particle> parts;
 };
-	
+//i like the look of this method below but too difficult to implement	
+//https://doc.magnum.graphics/magnum/examples-fluidsimulation2d.html
 
+//another APIC 2d implementation 
+//https://github.com/nepluno/apic2d/blob/master/apic2d/fluidsim.h
+//https://sci-hub.se/https://doi.org/10.1145/2766996
 
 //based on https://github.com/mike-rankin/ESP32_CoinCell_Color_TFT/blob/master/Code/colorcoin_test/colorcoin_test.ino
 //also dislike this method... 
