@@ -1,7 +1,9 @@
 # TeensyEngine
 
-TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*, including a version that runs using OpenFrameworks for testing and development.
-Included in this repository is a description of both the software features, and the hardware including the MCAD/ECAD designs.
+TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*. 
+
+Included in this repository is a description of both the hardware and software features, including my MCAD/ECAD designs for everything.
+It includes an emulator that's using OpenFrameworks for display and UI to allow easy testing and development.
 
 ## Contents 
 
@@ -12,9 +14,9 @@ Included in this repository is a description of both the software features, and 
 - [Credit](#credit)
 
 ## About
-I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball, then hooked them all up to a Teensy. Shockingly, it worked really well. 
+I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball, then hooked them all up to a Teensy. Shockingly, it worked quite well. 
 This has been a multiyear endevour that I've slowly added more and more features to.
-It's the 4th iteration of the hardware including LEDs and controller/batery box. 
+It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - how far this project has come!
 
 Just a heads up - I'm a completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that but overall I've been very pleased with the outcome! 
 I will glady take any suggestions or tips to improve my work, please comment any suggestions!
@@ -58,8 +60,36 @@ The benefit of the two power supplies is efficiency and stability - it avoids th
 
 ## Software
 The software include a basic emulator that runs the same UI and pattern software using Openframeworks to display the LEDs. 
+I've tried to organise the UI controls into roughly similar groups.
+#### Pattern controls
+- Select desired patterns from the list of patterns
+- Change overall brightness
+- Select a tempo + tap tempo
+- Change the tempo oscillator for adding differing motion to patterns
+- Trigger ability to change a patterns settings (e.g. scroll through different settings for a pattern without making a complete new one)
+#### Colour controls
+- Change current pallete with a palette preview option
+- Blend amount when changing palletes over - quick or slow blend
+- Change how fast colours from a palette are cycled through
+#### Text/Fx controls
+- Add transparent or opaque text over any pattern, or just blink text 
+- Text scroll speed
+- Select the text from a list or enter custom text (12 char max only!)
+- Global blur/fade/glitter effects
+#### Wireless controlls
+- Control the wireless headbands I made using NRF24L01 communication
+- Change the pattern/colour/brightness of headbands in range
+#### General settings
+- LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
 
-#### Controls
+
+### PC Emulator 
+#### Requirements 
+Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
+Visual Studio 2019 was used for compiling.
+At one point I had it cross compiling on mac, but I haven't checked that in a while!
+
+The emulator has keyboard controls for the UI:
 - WASD: joystick up/left/down/right
 - Q/E: encoder rotate clockwise/counterclockwise
 - F: joystick press 
