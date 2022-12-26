@@ -83,11 +83,12 @@ I've tried to organise the UI controls into roughly similar groups.
 - LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
 
 
-### PC Emulator 
+## PC Emulator 
 #### Requirements 
 Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
+
 Visual Studio 2019 was used for compiling.
-At one point I had it cross compiling on mac, but I haven't checked that in a while!
+At one point I had it cross compiling on mac, but I haven't checked if that still works in awhile.
 
 The emulator has keyboard controls for the UI:
 - WASD: joystick up/left/down/right
