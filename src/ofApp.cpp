@@ -143,6 +143,9 @@ void ofApp::keyPressed(int key) {
 	if (key == '5') _Pattern::beat.setType(4);
 	if (key == '6') _Pattern::beat.setType(5);
 	if (key == '7') _Pattern::beat.setType(6);
+	if (key == '8') _Pattern::beat.setType(7);
+	if (key == '9') _Pattern::beat.setType(8);
+	if (key == '0') _Pattern::beat.setType(9);
 
 	if (key == OF_KEY_HOME) Data::pitch+= 5;
 	if (key == OF_KEY_END) Data::pitch -= 5;

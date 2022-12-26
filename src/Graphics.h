@@ -221,6 +221,7 @@ public:
 	//}
 
 	void drawLineDepth(Vec3 &v0, Vec3 &v1, CRGB c) {
+		//solid colour
 		int16_t x0 = v0.x;
 
 		int16_t y0 = v0.y;
@@ -271,6 +272,7 @@ public:
 		}
 	}
 	void drawLineDepth(Vec3 &v0, Vec3 &v1, uint16_t hue1, uint16_t hue2, uint8_t fade=255) {
+		//draws a line in the colour of hue1 to hue2
 		int16_t x0 = v0.x;
 		int16_t y0 = v0.y;
 		int16_t z0 = v0.z;
@@ -553,6 +555,7 @@ public:
 	}
 
 	void resetZ() {
+		//must be called when drawing with depth for proper occlusion
 		for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
 			zBuffer[i] = 0;// std::numeric_limits<float>::infinity();
 		}

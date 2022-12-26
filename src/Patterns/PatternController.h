@@ -49,8 +49,8 @@ public:
 	PatternAudio1		audio1;
 	PatternRowThenCol	rowThenCol;
 	PatternBlank		blank;
-	PatternBeachWaves	beachWaves; //fine 
-	PatternBeachWaves2	beachWaves2; //issue - seems to be with blur2d
+	PatternBeachWaves	beachWaves; 
+	PatternBeachWaves2	beachWaves2; 
 	PatternCube			cube3d;
 	PatternDualWaves	dualWaves;
 	PatternFish			fish;
@@ -59,8 +59,8 @@ public:
 	PatternFountain		particleFountain;
 
 	PatternNoise1		noise1;
-	PatternParametric	parametric; //issue
-	PatternParametric2	parametricSpiral; //issue
+	PatternParametric	parametric; 
+	PatternParametric2	parametricSpiral;
 	ParticleSystemWater	particlesWater;
 	PatternPurpleRain	purpleRain;
 	PatternRain			rain;
@@ -72,8 +72,8 @@ public:
 	PatternSuperShape	superShape;
 	PatternVWaves		verticalWaves;
 	PatternWireFrame	wireFrame;
-	PatternWheelBlur	wheelBlur; //issue
-	PatternWheelPart	wheelParticle; //issue
+	PatternWheelBlur	wheelBlur; 
+	PatternWheelPart	wheelParticle; 
 	PatternWorld		world;
 	PatternWorld2		worldNoWater;
 	PatternMario		mario; 
@@ -97,24 +97,24 @@ public:
 		&fireworks,
 		&fish,
 		&particlesWater,
-		&dualWaves, //issue
+		&dualWaves,
 		&purpleRain,
 		&rain, 
-		&wheelParticle,	//issue
-		&wheelBlur, //issue
+		&wheelParticle,	
+		&wheelBlur, 
 		&SpinningParticles,
 		
 		&noise1,
 		&verticalWaves,
-		&beachWaves2,//issue
-		&beachWaves, //issue
+		&beachWaves2,
+		&beachWaves, 
 		&rowThenCol,
 		&solid,
 		&sparks,
 		
 		&parametricSpiral,
 		&parametric,
-		&spiral, //issue
+		&spiral, 
 
 		&particleFountain,
 		&fire, 
@@ -126,7 +126,7 @@ public:
 		&lavaLamp,
 		&sandSim,
 		
-		&wireFrame, //issue intermittently 
+		&wireFrame,  
 		&cube3d,
 		
 		//&raymarcher,
@@ -171,22 +171,22 @@ public:
 	uint8_t cursorPos = SCREEN_WIDTH;
 
 	uint8_t blinkTimer = 0;
-
+	uint8_t blinkTimerMax = 120;
 
 	void blinkText() {
-		blinkTimer = 64;
+		blinkTimer = blinkTimerMax;
 	}
 
 	void run() {
 		if (nextUpdate == 0) {
-			getCurrentPattern()->start();// initial
+			getCurrentPattern()->start();// initial pattern/just started
 		}
 
 		unsigned long now = GET_MILLIS();
 		if (now > nextUpdate) {
-			//        audio.readAudio();
+			//        audio.readAudio();  //now updated in seperate audio.h and stored in data.h
 			
-			gfx.updatePalette();
+			gfx.updatePalette(); //if we changed palette blend towards the new one
 
 
 			//add effects to previous frame
@@ -197,23 +197,25 @@ public:
 					gfx.blur(_Pattern::blurFx);
 				if (_Pattern::spiralFx)
 					gfx.spiral(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, _Pattern::spiralFx);
-				//	SpiralStream(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, FxSpiral);
 				//if (FxNoiseSmear)
 				//	standardNoiseSmearing();
 			}
 
-			nextUpdate = getCurrentPattern()->drawFrame() + now; //runs on gfx led buffer
+			nextUpdate = getCurrentPattern()->drawFrame() + now; //draw frame runs on gfx led buffer
 
 			
-
-			gfx.update(); ////copys from gfx led buffer to FastLED/screen buffer
+			//copys from gfx led buffer to FastLED/screen buffer for double buffering
+			//this way we can add text over the top, but still run blur/fade effects on the patterns seperately
+			gfx.update(); 
 
 			//text
 			if (Data::textOn or blinkTimer) {
 				uint8_t oldOpacity = gfx.textOpacity;
 
 				if (blinkTimer) {
-					gfx.textOpacity = decayData[blinkTimer];
+					uint8_t t = myMap(blinkTimer, 0, blinkTimerMax, 0, 64, true); 
+					t = CLAMP(t, 0, 64); //ensure clamp as otherwise memory out of bounds
+					gfx.textOpacity = decayData[t];
 					blinkTimer--;
 				}
 
@@ -233,7 +235,8 @@ public:
 			}
 			
 			if (_Pattern::useCustomEffect and _Pattern::glitterFx) {
-			//can put in sampleavg here
+			//can put in sampleavg here to respond to sound??
+			//this edits the screen buffer so isn't affected by blur/fade effects
 				const uint8_t num = 40;
 				static uint16_t glitter[num];
 				static uint8_t glitterVal[num];
@@ -267,7 +270,7 @@ public:
 				}
 			}
 
-			gfx.show();
+			gfx.show(); //push the update out to led (on PC doesn't do much)
 
 		}
 		if (Data::hueChange and (now - nextHueUpdate > (1000 / Data::hueSpeed)) ) {

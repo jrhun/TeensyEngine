@@ -298,13 +298,14 @@ namespace Data {
 
 } //end nameSpace Data
 
+
+//temp vars for checking out different settings 
 float GuiVars1 = 0.6; //1.6, 0.6 1.25, 0.87, 1.25, 1.15
 float GuiVars2 = 1.0;
 float GuiVars3 = 1;
 float GuiVars4 = 0.1;
 float GuiVars5 = 0.2;
 float GuiVars6 = 1.5;
-
 uint8_t FxFade = 128;
 uint8_t FxBlur = 0;
 uint8_t FxSpiral = 0;
@@ -333,7 +334,7 @@ bool buttons[NUM_BUTTONS] = { 0, 1, 1, 1, 0, 0 }; // gamma, dither, on
 
 
 
-
+//gamma LUT
 static const uint8_t PROGMEM
 gamma5[] = {
   0x00, 0x01, 0x02, 0x03, 0x05, 0x07, 0x09, 0x0b,
@@ -352,6 +353,7 @@ gamma6[] = {
   0x91, 0x97, 0x9d, 0xa4, 0xab, 0xb2, 0xb9, 0xc0,
   0xc7, 0xcf, 0xd6, 0xde, 0xe6, 0xee, 0xf7, 0xff
 };
+
 
 static const uint8_t PROGMEM
 decayData[] = {

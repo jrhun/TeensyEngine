@@ -13,7 +13,7 @@ extern float GuiVars6;
 class PatternParametric : public _Pattern {
 public:
 	PatternParametric() : _Pattern("Parametric Lines") {}
-
+	//draws parametric lines in the xyz space and rotates them around the sphere
 
 	uint8_t drawFrame() {
 		if (!_Pattern::useCustomEffect) {
@@ -21,7 +21,7 @@ public:
 			gfx.blur(90);
 		}
 		gfx.resetZ();
-		const int maxI = 100;
+		const int maxI = 100; //draw 100 lines
 		float step = (PI) / (maxI - 1);
 		m = Mat3::RotationY(angle)  * Mat3::RotationX(angle);
 		for (int i = 0; i < maxI; i++) {
@@ -56,10 +56,10 @@ public:
 		//Vec3 a(sin(t) * GuiVars1, cos(t / 2) * GuiVars2, cos(t) * GuiVars3); // 1.6/0.6/1.25
 		//Vec3 b(sin(t) * GuiVars4, sin(t / 2) * GuiVars5, cos(t) * GuiVars6); // 0.87/1.25/1.15
 
-		Vec3 a(sin(t) * 1.6, cos(t / 2) * 0.6, cos(t) * 1.25); // 1.6/0.6/1.25
+		Vec3 a(sin(t) * 1.6, cos(t / 2) * 0.6, cos(t) * 1.25); // favourite coefficients: 1.6/0.6/1.25
 		Vec3 b(sin(t) * 0.87, sin(t / 2) * 1.25, cos(t) * 1.15); // 0.87/1.25/1.15
 
-		a = a * m;
+		a = a * m; //rotate around sphere
 		b = b * m;
 
 		//a /= 4;
@@ -68,7 +68,7 @@ public:
 		//b.z += 2;
 		Vec3 aa = a + centerA;
 		Vec3 ba = b + centerA;
-		engine.sst.TransformSphere(aa);
+		engine.sst.TransformSphere(aa); //lines are drawn in 3d space around a centre point, project lines onto a sphere
 		engine.sst.TransformSphere(ba);
 		//gfx.drawLineDepth(aa, ba, c);
 
