@@ -306,7 +306,7 @@ void uiLoop() {
       tft.setCursor(0, headingOffset);
       tft.setTextSize(3);
       tft.setTextColor(TFT_TEXT);//TFT_BACKGROUND);
-      tft.println("Radience");
+      tft.println("Radiance"); // my name for the project, others call it "The Orb"
       //const uint8_t headingBottom = tft.fontCapHeight() + headingOffset;
       const uint8_t headingBottom = tft.getTextSizeY()*8 + headingOffset;
       tft.drawFastHLine(0, headingBottom + 2, tft.width(), TFT_TEXT);
