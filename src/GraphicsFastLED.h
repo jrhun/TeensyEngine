@@ -18,6 +18,7 @@ CRGBArray < SCREEN_WIDTH * SCREEN_HEIGHT > ledsRaw;
 
 uint16_t XY(uint8_t x, uint8_t y) {
 	/*//leds are mapped serpentine with 2 offset with 30 leds in each row e.g.
+	
 	  0       60
 	  1       61
 	  2   59  62  119
@@ -92,7 +93,7 @@ public:
 		FastLED.addLeds<WS2812B, 25, GRB>(ledsRaw, 5 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalSMD5050);
 		FastLED.addLeds<WS2812B, 33, GRB>(ledsRaw, 6 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalSMD5050);
 		FastLED.addLeds<WS2812B, 32, GRB>(ledsRaw, 7 * NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalSMD5050);
-		// teensy 4.x
+		// teensy 4.x, allows DMA output, uses predefined pins though 
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__) 
 		FastLED.addLeds<NUM_STRIPS, WS2812B, 19, GRB>(ledsRaw, NUM_LEDS_PER_STRIP).setCorrection(TypicalSMD5050);
 #endif 
