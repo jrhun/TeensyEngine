@@ -23,27 +23,46 @@ You can see how the leds interfere which each other at the top - it's wasted res
 ### Building the LED holders. 
 One of the 8 sections printed. ![Scaffolding](V4-scaffolding1.PNG)
 
-You can *just* see how the leds are offset from each other to make space at the top/bottom. ![Scaffolding](V4-scaffolding2.PNG)
+You can *just* see how the leds are offset from each other to make space at the top/bottom. These are SK6805-2427 RGB LEDs from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), the strips have a pitch of 8.33mm (120 leds per metre), and are only 6mm wide! In total I used 64x strips of 30, with seperate power and data lines to each section of 8x strips. ![Scaffolding](V4-scaffolding2.PNG)
 
 Test fit of everything together. ![Scaffolding](V4-scaffolding3.PNG)
 
   Checking if the LEDs all light up and my matrix XY() code works.
+  
 https://user-images.githubusercontent.com/25134458/209637888-4b88d217-abbb-4099-afa3-3a01516f0b0f.mp4
 
-Once I had each section built and connected, I had to somehow get them all inside the shell and lined up. It was like building a ship in a bottle but I managed to squeeze them all in somehow and connect them up to the bottom support. ![Inside](V4-inside2.jpg)
+
+https://user-images.githubusercontent.com/25134458/209641775-9f14f9cc-60d3-4ed1-b838-ff2e159a5c03.mp4
+
+
+Once I had each section built and connected, they needed to somehow be placed inside the shell and properly lined up. It was like building a ship in a bottle, but with a bit of a squeeze all 8 sections were somehow in and connected up to the bottom support to hold them in place. ![Inside](V4-inside2.jpg)
+
+I'm really happy with how the diffusion turned out, the lights are held back almost the perfect distance. 
+
+
+
 
 
 ## Power
-Previously I'd powered V1 and V2 from initially 2xAA batteries. V3 kicked it up a notch going up to 288 LEDs so I went with 4xAAA batteries but it struggled if I turned up the brightness and would glitch out. It worked okay for V3 but moving up to ~2000 LEDs I needed something stronger. 
+Previously I had powered V1 and V2 from initially 2xAA batteries. V3 kicked it up a notch going up to 288 LEDs so I went with 4xAAA batteries, but it still struggled if I turned up the brightness and would glitch out or freeze. It worked okay for V3 but moving up to ~2000 LEDs I needed something stronger. 
 
-I used 4x 18650 batteries in a standard holder from amazon and changed it to a the barrel connector. The full battery voltage is sent up a wire to the LEDs at the top of the pole, and plugs into the daughter board up there. ![Daughter board](V4-daughterBoard.PNG)
+I used 4x 18650 batteries in a standard holder from amazon and changed it to a the barrel connector. The full battery voltage is sent up a wire to the LEDs at the top of the pole, and plugs into the daughter board up there. This allowed me to send the full battery voltage (~15V) up to the LEDs without needing a heavy gauge wire. There's a beefy [Pololu D24V150F5](https://www.pololu.com/product/2881) 5V 15A buck converter up there that does an amazing job for its size. This thing is expensive (and seems to have almost doubled in price since I bought one - ouch) but can handle up to 15A at 5V reliably and pretty efficiently, which is important since the LEDS draw ~0.5A (at 15V!) even when off with just their standby current! I guess 0.8ma per led adds up when there are 1920 of them... There's a seperate step-down converter in the controller which avoids software freezes and glitches ~~if~~when the leds draw too much current and dip the voltage. 
 
-To avoid an absolute rats nest of wires at the top and bottom of the strips (128 wires for power/ground + data lines... no thanks!). I injected power into the middle of the strips. Each section of 8 gets a data/power/ground connection from the daughter board, which goes to a piece of protoboard with a capacitor and 8 ground/power wires to each strip. ![Inside](V4-inside.jpg)
+The connection for the LEDs is an ethernet cable, like with the [Teensy OctoWS2811](https://www.pjrc.com/store/octo28_adaptor.html). In theory, you should be able to connect an OctoWS2811 directly to the daughter board without any issues since I've used the same circuit as the octoboard to output data lines from the Teensy. ![Daughter board](V4-daughterBoard.PNG)
+
+To avoid an absolute rats nest of wires at the top and bottom of the strips (128 wires for power/ground + data lines... no thanks!). I injected power into the middle of the strips. Each section of 8 gets a data/power/ground connection from the daughter board, which goes to a piece of protoboard with a capacitor and 8 ground/power wires for each strip. ![Inside](V4-inside.jpg)
 
 
 ## Controller
-Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. The LEDs had 8 data wires to allow for parallel output and a reasonable framerate, using a single dataline would have a framerate around 10fps. I used an ethernet connector for easy connection to get these data lines to the LEDs, using the circuit for the [Teensy OctoWS2811](https://www.pjrc.com/store/octo28_adaptor.html). I wanted input controls similar to an ipod classic, but designing a capacitive encoder seemed overkill so I settled for a hollow encoder with a joystick in the centre. I was testing everything with an ESP32 initially, which worked okay but was missing some grunt. Around this time the Teensy 4.0 was released and it blew everything else out of the water performance wise, I pivoted over to use it instead and I'm so glad I did. 
+Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. The LEDs had 8 data wires to allow for parallel output and a reasonable framerate, using a single dataline would have a framerate around 10fps. 
 
+I wanted input controls similar to an ipod classic, but designing a capacitive encoder seemed overkill so I settled for a hollow encoder with a joystick in the centre. I was testing everything with an ESP32 initially, which worked okay but was missing some grunt. Around this time the Teensy 4.0 was released and it blew everything else out of the water performance wise, I pivoted over to use it instead and I'm so glad I did. 
+
+The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and transmit colours/patterns change messages to them. 
+<details>
+  
+  The headbands have a mere 14 LEDs on them in a waterproof casing, connected to a small circuit board that holds an ATTINY and an NRF24L01, powered by 2xAA batteries in a 3d printed case. The case is a little bulky, but has a nice curve that conforms to the back of your head. It's proven to be a pretty sturdy design, none of the 12 I made have broken yet... A couple patterns and the NRF code is at the limit of what the ATTINY can do, though it's impressive for a DIP8 chip! Technically powering the leds from 3V shouldn't work and I was prepared to squeeze a boost converter in there, but it somehow works without it! ![photo](HeadbandGroup.jpg)
+  </details>
 
 
 ## Previous versions
