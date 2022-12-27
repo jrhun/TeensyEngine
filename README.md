@@ -2,6 +2,8 @@
 
 TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*. 
 
+
+
 Included in this repository is a description of both the hardware and software features, including my MCAD/ECAD designs for everything.
 It includes an emulator that's using OpenFrameworks for display and UI to allow easy testing and development.
 
@@ -15,9 +17,9 @@ It includes an emulator that's using OpenFrameworks for display and UI to allow 
 
 
 ## About
-I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball, then hooked them all up to a Teensy. Shockingly, it worked quite well. 
-This has been a multiyear endevour that I've slowly added more and more features to.
-It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - how far this project has come!
+I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball that was then placed on top of a stick and hooked up to a microprocessor and battery pack. Shockingly, it worked quite well! I use it as a Totem Pole primarily for the Meredith and Golden plains music festival in Melbourne Australia, come say hi if you see it!
+
+This has been a multiyear endevour that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions
 
 Just a heads up - I'm a completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
 I will glady take any suggestions or tips to improve my work, please comment any suggestions!
@@ -37,7 +39,7 @@ I will glady take any suggestions or tips to improve my work, please comment any
 
 ## Hardware
 Some photos of the completed project can be found [here](buildLog/README.md).
-I made a custom circuit board for connecting everything up along with a daughter board for [powering](####Power) the leds and providing the data through a CAT5 cable. In theory, you should be able to connect a teensy octoboard to this without any issues since I've used the same circuit on the output from the Teensy. 
+I made a custom circuit board for connecting everything up along with a daughter board for [powering](#Power) the leds and providing the data through a CAT5 cable. 
 
 #### Processor
 A teensy 4.0 is the heart of the project, providing plenty of raw power to overcome my inefficient coding and push out LEDs while controling a UI. 
@@ -54,17 +56,14 @@ A teensy 4.0 is the heart of the project, providing plenty of raw power to overc
 If trying to make this project, please confirm the pinout matches for the display and accelerometer! I got caught out and assumed they were the same for the two almost identical accelerometers I had, then needed to edit the circuit board. Also the linear regulator for the processor 5V line got way too hot so I changed it for a small buck convertor that (roughly) matched it's footprint. To be honest the circuit board could be redone with a teensy 4.1, as soldering the pogo pins to connect to the back of the teensy 4.0 was very tedious. 
 
 #### Lights
-Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV, they're also held in place under slight compression from the globe. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections in the middle of the strips for power/ground and stability in holding everything in place.
-The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the build details for photos. 
+Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV, they're also held in place under slight compression from the globe. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections in the middle of the strips for power/ground and stability in holding everything in place. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md) for photos. 
 
 The lights are from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), and were chosen for their high density (120/M, 8.33mm pitch) and thin strips (6mm width). 
 Lights with a smaller pitch and thinner stip were outrageously expensive at the time I was purchasing LEDs, but have since come down in price somewhat... Version 5 [TBC](https://www.aliexpress.com/item/1005003798198621.html?spm=a2g0o.productlist.main.1.1ec91845yMUVny&algo_pvid=75d3a123-2f4a-48b9-b82f-fbbad28e56ed&algo_exp_id=75d3a123-2f4a-48b9-b82f-fbbad28e56ed-0&pdp_ext_f=%7B%22sku_id%22%3A%2212000028080815414%22%7D&pdp_npi=2%40dis%21AUD%2140.15%2126.11%21%21%21%21%21%40211bf14716719782508633629d0742%2112000028080815414%21sea&curPageLogUid=63plojRdJNp2)?
 
 #### Power
-The whole thing is powered by 4x 18650 batteries, I usually carry a spare set of 4x batteries for each night it's used which seems to last the night through.
-There's a regulator in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a seperate Pololu [D24V150F5](https://www.pololu.com/product/2881) Step-down convertor. This thing is expensive (and seems to have almost doubled in price since I bought one - ouch) but can handle up to 15A at 5V reliably and pretty efficiently, which is important since the LEDS draw ~0.5A even when off with just their standby current! (2.5microamps adds up when there are almost 2000 leds...)
-
-The benefit of the two power supplies is efficiency and stability - it avoids the much higher current that would be needed from sending 5V to the LEDs (and the voltage drop since it's a decent 1M run!), and a seperate and stable power source for the controller that doesn't dip when the LEDs draw a bunch of power. 
+The whole thing is powered by 4x 18650 batteries, I usually carry a spare set of 4x batteries for each night that it's used which usually lasts the night through.
+There's a step-down converter in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a seperate Pololu [D24V150F5](https://www.pololu.com/product/2881) Step-down convertor. The benefit of the two power supplies is efficiency and stability - it avoids the much higher current that would be needed from sending 5V to the LEDs (and the voltage drop since it's a decent 1M run!), and a seperate and stable power source for the controller that doesn't dip when the LEDs draw a bunch of power. It also means I can provide much more power than most USB powerbanks, although I do want to try sending 20v from a 100w USB C powerbank to the leds.
 
 
 ## Software
@@ -95,7 +94,7 @@ I've tried to organise the UI controls into roughly similar pages.
 ### Adding a new pattern
 The basic format for a pattern is a class inheriting from the `_Pattern` class, and should have the name for the pattern passed to it.
 
-A `drawFrame()` function should be provided that is called to run the pattern. You can set the delay in msec for when to draw the next frame by the value you return. It also provides functions that are automatically called when starting or stopping a pattern, and a trigger option. Helper functions from drawing to the LED matrix are in the `gfx` class from `Graphics.h`. Try using `gfx.getColour(uint8_t offset)` for colours because this links in to the palette system. 
+A `drawFrame()` function should be provided that is called to run the pattern. You can set the delay in msec for when to draw the next frame by the value you return. It also provides functions that are automatically called when starting or stopping a pattern, and a trigger option. Helper functions for drawing to the LED matrix are in the `gfx` class from `Graphics.h`. Try using `gfx.getColour(uint8_t offset)` for colours because this links in to the palette system. 
 
 Include the code for a new pattern in `src\patterns\PatternController.h`, then add it as a member to the `PatternController` class and include it in the `patternList`
 <details>
@@ -125,6 +124,7 @@ Include the code for a new pattern in `src\patterns\PatternController.h`, then a
 
 ## Arduino code
 The Teensyduino core was used for compiling and uploading.
+`Graphics.h` does all the heavy lifting for helper functions. 
 
 Arduino libraries used:
 - [ILI9341_t3n](https://github.com/KurtE/ILI9341_t3n)
@@ -140,7 +140,7 @@ Arduino libraries used:
 Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
 
 Visual Studio 2019 was used for compiling.
-At one point I had it cross compiling on mac xcode, but I haven't checked if that still works in a while.
+At one point I had it compiling on mac xcode, but I haven't checked if that still works in a while.
 
 <details>
   <summary>The emulator has keyboard controls for the UI:</summary>
