@@ -5,13 +5,14 @@ TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*
 Included in this repository is a description of both the hardware and software features, including my MCAD/ECAD designs for everything.
 It includes an emulator that's using OpenFrameworks for display and UI to allow easy testing and development.
 
-## Contents 
 
+## Contents 
 - [About](#about)
 - [Features](#features)
 - [Hardware](#hardware)
 - [Software](#software)
 - [Credit](#credit)
+
 
 ## About
 I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball, then hooked them all up to a Teensy. Shockingly, it worked quite well. 
@@ -32,6 +33,7 @@ I will glady take any suggestions or tips to improve my work, please comment any
 - Microphone input 
 - Wireless compatibility with NRF24L01 or ESP-01
 - Current sensor for monitoring power usage
+
 
 ## Hardware
 #### Processor
@@ -58,9 +60,11 @@ There's a regulator in the controller providing 5V for the teensy and accessorie
 
 The benefit of the two power supplies is efficiency and stability - it avoids the much higher current that would be needed from sending 5V to the LEDs (and the voltage drop since it's a decent 1M run!), and a seperate and stable power source for the controller that doesn't dip when the LEDs draw a bunch of power. 
 
+
 ## Software
 The software include a basic emulator that runs the same UI and pattern software using Openframeworks to display the LEDs. 
-I've tried to organise the UI controls into roughly similar groups.
+
+I've tried to organise the UI controls into roughly similar pages.
 #### Pattern controls
 - Select desired patterns from the list of patterns
 - Change overall brightness
@@ -82,6 +86,17 @@ I've tried to organise the UI controls into roughly similar groups.
 #### General settings
 - LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
 
+## Arduino code
+The Teensyduino core was used for compiling and uploading.
+
+Arduino libraries used:
+- [ILI9341_t3n](https://github.com/KurtE/ILI9341_t3n)
+- [Encoder](https://github.com/PaulStoffregen/Encoder/blob/master/Encoder.h) from Paul Stroffregen
+- [MPU9250](https://github.com/kriswiner/MPU9250) from kriswiner
+- [FastLED](https://github.com/FastLED/FastLED)
+- [Teensy ADC](https://github.com/pedvide/ADC)
+- [RF24](https://github.com/nRF24/RF24)
+
 
 ## PC Emulator 
 #### Requirements 
@@ -98,6 +113,7 @@ The emulator has keyboard controls for the UI:
 - Home/End/Del/PgDown: change pitch/roll level to emulate accelerometer changes
 - I: add random impulse to accelerometer data
 - 1 through 7: change beat type (RAMP, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, AUDIO, AUDIO_AVG, OFF)
+- 
 
 ## Credit 
 This project has taken much inspiration from many different sources. Please see [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for full details. 
