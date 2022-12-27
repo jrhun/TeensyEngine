@@ -55,12 +55,14 @@ To avoid an absolute rats nest of wires at the top and bottom of the strips (128
 
 ## Controller
 Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. The LEDs had 8 data wires to allow for parallel output and a reasonable framerate, using a single dataline would have a framerate around 10fps. 
+![Case](Controller-case.png)
 
 I wanted input controls similar to an ipod classic, but designing a capacitive encoder seemed overkill so I settled for a hollow encoder with a joystick in the centre. I was testing everything with an ESP32 initially, which worked okay but was missing some grunt. Around this time the Teensy 4.0 was released and it blew everything else out of the water performance wise, I pivoted over to use it instead and I'm so glad I did. 
 
 The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and transmit colours/patterns change messages to them. 
+
 <details>
-  
+  <summary>Headbands</summary>
   The headbands have a mere 14 LEDs on them in a waterproof casing, connected to a small circuit board that holds an ATTINY and an NRF24L01, powered by 2xAA batteries in a 3d printed case. The case is a little bulky, but has a nice curve that conforms to the back of your head. It's proven to be a pretty sturdy design, none of the 12 I made have broken yet... A couple patterns and the NRF code is at the limit of what the ATTINY can do, though it's impressive for a DIP8 chip! Technically powering the leds from 3V shouldn't work and I was prepared to squeeze a boost converter in there, but it somehow works without it! ![photo](HeadbandGroup.jpg)
   </details>
 
