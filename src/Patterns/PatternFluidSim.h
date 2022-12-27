@@ -4,6 +4,8 @@
 #include "../../data.h"
 #include "../Vec2.h"
 
+//I've tried lots of different times to get an interesting fluid sim running, I knew it'd be hard but it's seems it's too far beyond me at this point
+
 //sample running http://neuroid.co.uk/lab/fluid/
 //js http://neuroid.co.uk/lab/fluid/fluid.js
 //processing https://github.com/weymouth/lily-pad
@@ -507,6 +509,8 @@ public:
 	}
 
 	Vec2 projectOntoPlane(Vec3 force, int8_t x, int8_t y = -1) {
+		// this does the same as getAccel but can provide the force rather than getting it from accelerometer
+		// also takes it one step further and uses the Y axis too. could allow for effects like water pooling in globe when tilted
 		float theta = myMap(x, 0, SCREEN_WIDTH, 0, 2 * PI);
 		float phi = myMap(y, 0, SCREEN_HEIGHT, PI / 8, 7 * PI / 8);
 		Vec3 yVec;
@@ -563,8 +567,8 @@ public:
 //https://github.com/nepluno/apic2d/blob/master/apic2d/fluidsim.h
 //https://sci-hub.se/https://doi.org/10.1145/2766996
 
-//based on https://github.com/mike-rankin/ESP32_CoinCell_Color_TFT/blob/master/Code/colorcoin_test/colorcoin_test.ino
-//also dislike this method... 
+//Below is based on https://github.com/mike-rankin/ESP32_CoinCell_Color_TFT/blob/master/Code/colorcoin_test/colorcoin_test.ino
+//also dislike how this method looks on a globe... 
 struct Grain {
 	Grain() {}
 

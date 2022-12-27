@@ -57,7 +57,7 @@ uint32_t calcForceSq(uint16_t x, uint16_t y) {
 	return uint32_t(x * x + y * y);
 }
 
-
+// Flocking code adapted from The Coding Train - Coding Challenge #124: Flocking Simulation - https://www.youtube.com/watch?v=mhjuuHl6qHM
 class ParticleOld {
 public:
 	int16_t x;
@@ -449,7 +449,7 @@ public:
 		}
 	}
 };
-
+// I can't for the life of me remember where I found the initial code that was the inspiration for this, please let me know if you do so I can give propper credit
 class Firework {
 public:
 	//std::vector<fParticle> part;

@@ -39,6 +39,7 @@ public:
 	}
 
 	Vec3 & TransformSphere(Vec3 &v) {
+		// I can't remember how this code works but it attemps to project onto a spherical surface rather than flat
 		float L = v.Len();
 		v /= L;
 		float theta = atan2(v.z, v.x);
