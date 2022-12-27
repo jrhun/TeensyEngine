@@ -93,9 +93,11 @@ I've tried to organise the UI controls into roughly similar pages.
 - LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
 
 ### Adding a new pattern
-The basic format for a pattern is a class inheriting from the `_Pattern` class, and should be constructed with the name for the pattern
-A `drawFrame()` function should be provided that is called to run the pattern. You can set the delay in msec for when to draw the next frame by the value you return. It also provides functions that are automatically called when starting or stopping a pattern, and a trigger option. Helper functions are in the `gfx` class from `Graphics.h`
+The basic format for a pattern is a class inheriting from the `_Pattern` class, and should have the name for the pattern passed to it.
 
+A `drawFrame()` function should be provided that is called to run the pattern. You can set the delay in msec for when to draw the next frame by the value you return. It also provides functions that are automatically called when starting or stopping a pattern, and a trigger option. Helper functions from drawing to the LED matrix are in the `gfx` class from `Graphics.h`. Try using `gfx.getColour(uint8_t offset)` for colours because this links in to the palette system. 
+
+Include the code for a new pattern in `src\patterns\PatternController.h`, then add it as a member to the `PatternController` class and include it in the `patternList`
 <details>
 <summary>Example pattern</summary>
   
@@ -109,9 +111,9 @@ A `drawFrame()` function should be provided that is called to run the pattern. Y
         count = 0;
         flip != flip;
       }
-      if (flip) gfx.fill(CRGB::White);
+      if (flip) gfx.fill(gfx.getColour());
       else      gfx.fill(CRGB::Black);
-      return returnVal; //default 10 = 100fps
+      return returnVal; //default 10, 1000/10 = 100fps
     }
     uint8_t count = 0;
     bool flip = false;
@@ -119,7 +121,6 @@ A `drawFrame()` function should be provided that is called to run the pattern. Y
   ```
 </details>
 
-Include the code for a new pattern in `src\patterns\PatternController.h`, then add it as a member to the `PatternController` class and include it in the `patternList`
 
 
 ## Arduino code
