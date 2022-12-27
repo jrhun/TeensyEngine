@@ -2,9 +2,9 @@
 
 TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*. 
 
+![gif](buildLog/firePattern.gif)
 
-
-Included in this repository is a description of both the hardware and software features, including my MCAD/ECAD designs for everything.
+Included in this repository is a description of both the hardware and software features, and eventually the MCAD/ECAD designs for everything.
 It includes an emulator that's using OpenFrameworks for display and UI to allow easy testing and development.
 
 
@@ -27,6 +27,11 @@ I will glady take any suggestions or tips to improve my work, please comment any
 
 ## Features
 - 25+ different patterns with the ability to change the colour pallete being used for most patterns!
+  - <details open> 
+
+https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-94cc-6f29fc267113.mp4
+    
+  </details>
 - Custom global blur/fade/glitter effects that can run on top of any pattern
 - Text overlay onto patterns with the ability to enter custom text using the controller
 - LCD Screen for changing settings/patterns + showing battery voltage and power usage
@@ -78,6 +83,7 @@ I've tried to organise the UI controls into roughly similar pages.
 - Trigger ability to change a patterns settings (e.g. trigger different settings for a pattern without making a complete new one, see )
 #### Colour controls
 - Change current pallete with a palette preview option
+  - https://user-images.githubusercontent.com/25134458/209676572-e61da54b-b9a8-4b95-bfd1-fcbd3a2c399e.mp4
 - Blend amount when changing palletes over - quick or slow blend
 - Change how fast colours from a palette are cycled through
 #### Text/Fx controls
@@ -136,6 +142,9 @@ Arduino libraries used:
 
 
 ## PC Emulator 
+
+https://user-images.githubusercontent.com/25134458/209675905-0a1664af-fdfa-492f-b072-93c58537c89a.mp4
+
 #### Requirements 
 Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
 
