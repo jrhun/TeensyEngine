@@ -23,16 +23,11 @@ This has been a multiyear endevour that I've slowly added more and more features
 
 Just a heads up - I'm a completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
 I will glady take any suggestions or tips to improve my work, please comment any suggestions!
-![description](totemPoleDescription.png)
+![description](buildLog/totemPoleDescription.png)
 
 
 ## Features
 - 25+ different patterns with the ability to change the colour pallete being used for most patterns!
-  - <details open> 
-
-https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-94cc-6f29fc267113.mp4
-    
-  </details>
 - Custom global blur/fade/glitter effects that can run on top of any pattern
 - Text overlay onto patterns with the ability to enter custom text using the controller
 - LCD Screen for changing settings/patterns + showing battery voltage and power usage
@@ -42,13 +37,14 @@ https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-
 - Microphone input 
 - Wireless compatibility with NRF24L01 or ESP-01
 
+https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-94cc-6f29fc267113.mp4
 
 ## Hardware
 Some photos of the completed project can be found [here](buildLog/README.md).
 I made a custom circuit board for connecting everything up along with a daughter board for [powering](#Power) the leds and providing the data through a CAT5 cable. 
 
 #### Processor
-A teensy 4.0 is the heart of the project, providing plenty of raw power to overcome my inefficient coding and push out LEDs while controling a UI. 
+A teensy 4.0 is the heart of the project, providing plenty of raw power to overcome my inefficient coding and push out LEDs while controling a UI.
 
 #### Accessories
 - Microphone - I can't remember what I'm using, one of the sparkfun electret autogain boards. 
@@ -62,7 +58,7 @@ A teensy 4.0 is the heart of the project, providing plenty of raw power to overc
 If trying to make this project, please confirm the pinout matches for the display and accelerometer! I got caught out and assumed they were the same for the two almost identical accelerometers I had, then needed to edit the circuit board. Also the linear regulator for the processor 5V line got way too hot so I changed it for a small buck convertor that (roughly) matched it's footprint. To be honest the circuit board could be redone with a teensy 4.1, as soldering the pogo pins to connect to the back of the teensy 4.0 was very tedious. 
 
 #### Lights
-Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV, they're also held in place under slight compression from the globe. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections in the middle of the strips for power/ground and stability in holding everything in place. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md) for photos. 
+Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV. They're also held in place under slight compression from the globe. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections in the middle of the strips for power/ground and stability in holding everything in place. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md) for photos. 
 
 The lights are from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), and were chosen for their high density (120/M, 8.33mm pitch) and thin strips (6mm width). 
 Lights with a smaller pitch and thinner stip were outrageously expensive at the time I was purchasing LEDs, but have since come down in price somewhat... Version 5 [TBC](https://www.aliexpress.com/item/1005003798198621.html?spm=a2g0o.productlist.main.1.1ec91845yMUVny&algo_pvid=75d3a123-2f4a-48b9-b82f-fbbad28e56ed&algo_exp_id=75d3a123-2f4a-48b9-b82f-fbbad28e56ed-0&pdp_ext_f=%7B%22sku_id%22%3A%2212000028080815414%22%7D&pdp_npi=2%40dis%21AUD%2140.15%2126.11%21%21%21%21%21%40211bf14716719782508633629d0742%2112000028080815414%21sea&curPageLogUid=63plojRdJNp2)?
@@ -76,15 +72,30 @@ There's a step-down converter in the controller providing 5V for the teensy and 
 The software include a basic emulator that runs the same UI and pattern software using Openframeworks to display the LEDs. 
 
 I've tried to organise the UI controls into roughly similar pages.
+
+<details>
+  <summary>Videos</summary>
+ 
+  https://user-images.githubusercontent.com/25134458/209736586-94fa050d-8a2f-43fb-920e-38acb0f2c6ba.mp4
+
+  
+  https://user-images.githubusercontent.com/25134458/209676572-e61da54b-b9a8-4b95-bfd1-fcbd3a2c399e.mp4
+  
+</details>
+
 #### Pattern controls
 - Select desired patterns from the list of patterns
+
+
+
 - Change overall brightness
 - Select a tempo + tap tempo
 - Change the tempo oscillator between square/ramp/sine etc...
 - Trigger ability to change a patterns settings (e.g. trigger different settings for a pattern without making a complete new one, see )
 #### Colour controls
+
+    
 - Change current pallete with a palette preview option
-  - https://user-images.githubusercontent.com/25134458/209676572-e61da54b-b9a8-4b95-bfd1-fcbd3a2c399e.mp4
 - Blend amount when changing palletes over - quick or slow blend
 - Change how fast colours from a palette are cycled through
 #### Text/Fx controls
@@ -165,4 +176,4 @@ At one point I had it compiling on mac xcode, but I haven't checked if that stil
 </details>
 
 ## Credit 
-This project has taken much inspiration from many different sources. Please see [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for full details. 
+This project has taken inspiration from countless different sources. Please see [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for full details. 
