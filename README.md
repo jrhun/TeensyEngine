@@ -89,8 +89,6 @@ There's a step-down converter in the controller providing 5V for the teensy and 
 ## Software
 The software include a basic emulator that runs the same UI and pattern software using Openframeworks to display the LEDs. 
 
-I've tried to organise the UI controls into roughly similar pages.
-
 <details open>
   <summary>Videos of the controller</summary>
  
@@ -100,38 +98,38 @@ I've tried to organise the UI controls into roughly similar pages.
   
 </details>
 
-#### Pattern controls
-- Select desired patterns from the list of patterns
+### UI Pages
+I've tried to organise the UI controls into roughly similar pages. The current battery voltage and current draw is shown in to top right corner, and the current FastLED FPS reading in the bottom right corner. The name of the totem is on the top of the screen, then the current page and a depiction of what page you're on. Joystick left/right changes the page, and up and down to select a setting. Hovering over a setting allows you to change a value with the encoder, or for some settings such as picking a pattern or palette you can press the joystick to enter a menu for that listing options. 
 
+- **Pattern controls**
+  - Select desired patterns from the list of patterns
+  - Change overall brightness
+  - Select a tempo + tap tempo
+  - Change the tempo oscillator between square/ramp/sine etc...
+  - Trigger ability to change a patterns settings (e.g. trigger different settings for a pattern without making a complete new one, see )
+- **Colour controls**
+  - Change current pallete with a palette preview option
+  - Blend amount when changing palletes over - quick or slow blend
+  - Change how fast colours from a palette are cycled through
+- **Text/Fx controls**
+  - Add transparent or opaque text over any pattern, or just blink text 
+  - Text scroll speed
+  - Select the text from a list or enter custom text (12 char max only!)
+  - Global blur/fade/glitter effects
+- **Wireless controlls**
+  - Control the wireless headbands I made using NRF24L01 communication
+  - Change the pattern/colour/brightness of headbands in range
+- **General settings**
+  - LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
 
-
-- Change overall brightness
-- Select a tempo + tap tempo
-- Change the tempo oscillator between square/ramp/sine etc...
-- Trigger ability to change a patterns settings (e.g. trigger different settings for a pattern without making a complete new one, see )
-#### Colour controls
-
-    
-- Change current pallete with a palette preview option
-- Blend amount when changing palletes over - quick or slow blend
-- Change how fast colours from a palette are cycled through
-#### Text/Fx controls
-- Add transparent or opaque text over any pattern, or just blink text 
-- Text scroll speed
-- Select the text from a list or enter custom text (12 char max only!)
-- Global blur/fade/glitter effects
-#### Wireless controlls
-- Control the wireless headbands I made using NRF24L01 communication
-- Change the pattern/colour/brightness of headbands in range
-#### General settings
-- LCD Backlight/Dither/Colour temp/Accelerometer/Save/load settings
+![UI example](buildLog/uiPages.jpg)
 
 ### Adding a new pattern
 The basic format for a pattern is a class inheriting from the `_Pattern` class, and should have the name for the pattern passed to it.
 
 A `drawFrame()` function should be provided that is called to run the pattern. You can set the delay in msec for when to draw the next frame by the value you return. It also provides functions that are automatically called when starting or stopping a pattern, and a trigger option. Helper functions for drawing to the LED matrix are in the `gfx` class from `Graphics.h`. Try using `gfx.getColour(uint8_t offset)` for colours because this links in to the palette system. 
 
-Include the code for a new pattern in `src\patterns\PatternController.h`, then add it as a member to the `PatternController` class and include it in the `patternList`
+Include the code for a new pattern in `src/patterns/PatternController.h`, then add it as a member to the `PatternController` class and include it in the `patternList`
 <details>
 <summary>Example pattern</summary>
   
