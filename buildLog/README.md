@@ -9,13 +9,13 @@
 
 ## LEDS
 I wanted as many LEDs as possible, and I wanted them held back enough from the polycarbonate shell to diffuse them nicely. 
-I 3d modeled some scaffolding using ideas that had worked well from my previous attempts. The pieces press fit together, and once the LEDs are on they're held in place quite firmly. It's built in 8 sections in order to fit inside the opening for the polycarbonate sphere (Only a 10cm opening!), with a top and bottom piece to hold in place. The top section can be tightened against the shell to hold everything snug. 
+I 3d modeled some scaffolding using ideas that had worked well from my previous attempts. The pieces press fit together, and once the LEDs are on they're held in place quite firmly. It's built in 8 sections in order to fit inside the opening for the polycarbonate sphere (Only a ~10cm opening!), with a top and bottom piece to hold it in place. The top section can be tightened against the shell to help hold everything snug. 
 
 ### 3d Modeling the LEDs
-This was definitely one of the most complex models I'd made thus far, I didn't want anything touching the sides as this would cast shadows and be visible (something V3 showed). This meant it needed a lot of rigidity to sandwich it inside the sphere form the top and bottom and not move around. 
+This was definitely one of the most complex models I'd made thus far, I didn't want anything touching the sides as this would cast shadows and be visible (something V3 showed). This meant it needed a lot of rigidity to sandwich it inside the sphere from the top and bottom and not move around. 
 
-I tried to design the profile to give as much space in the centre for my hand for getting inside, but maintaining rigidity.
-You can see how the leds interfere which each other at the top - it's wasted resolution up the top/bottom anyway which is why the leds are offset from each other. 
+I tried to design the profile to give as much space in the centre for my hand for getting inside, but still maintaining rigidity.
+You can see how the leds interfere which each other at the top - it's wasted resolution up the top/bottom anyway and it gets crowded up there which is why the leds are offset from each other. 
 
 ![Overview](designOverview.PNG)
 
@@ -28,7 +28,7 @@ One of the 8 sections printed.
 ![Scaffolding](V4-scaffolding1.PNG)
 
 
-These are SK6805-2427 RGB LEDs from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), the strips have a pitch of 8.33mm (120 leds per metre), and are only 6mm wide! In total I used 64x strips of 30, with seperate power and data lines to each section of 8x strips. 
+These are SK6805-2427 RGB LEDs from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), the strips have a pitch of 8.33mm (120 leds per metre), and are only 6mm wide! In total I used 64x strips of 30, with seperate power and data lines to each section of 8x strips. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections throughout the strips for distriputing power/ground around and added stability in holding everything in place. 
 
 ![Scaffolding](V4-scaffolding2.PNG)
 
@@ -58,9 +58,9 @@ I'm really happy with how the diffusion turned out, the lights are held back alm
 ## Power
 Previously I had powered V1 and V2 from initially 2xAA batteries. V3 kicked it up a notch going up to 288 LEDs so I went with 4xAAA batteries, but it still struggled if I turned up the brightness and would glitch out or freeze. It worked okay for V3 but moving up to ~2000 LEDs I needed something stronger. 
 
-I used 4x 18650 batteries in a standard holder from amazon and changed it to a the barrel connector. The full battery voltage is sent up a wire to the LEDs at the top of the pole, and plugs into the daughter board up there. This allowed me to send the full battery voltage (~15V) up to the LEDs without needing a heavy gauge wire. There's a beefy [Pololu D24V150F5](https://www.pololu.com/product/2881) 5V 15A buck converter up there that does an amazing job for its size. This thing is expensive (and seems to have almost doubled in price since I bought one - ouch) but can handle up to 15A at 5V reliably and pretty efficiently, which is important since the LEDS draw ~0.5A (at 15V!) even when off with just their standby current! I guess 0.8ma per led adds up when there are 1920 of them... There's a seperate step-down converter in the controller which avoids software freezes and glitches ~~if~~when the leds draw too much current and dip the voltage. 
+I used 4x 18650 batteries in a standard holder from amazon and changed it to a the barrel connector. The full battery voltage is sent up a wire to the LEDs at the top of the pole, and plugs into the daughter board up there. This allowed me to send the full battery voltage (~15V) up to the LEDs without needing a heavy gauge wire. There's a beefy [Pololu D24V150F5](https://www.pololu.com/product/2881) 5V 15A buck converter up there that does an amazing job for its size. This thing is expensive (and seems to have almost doubled in price since I bought one - ouch) but can handle up to 15A at 5V reliably and pretty efficiently, which is important since the LEDS draw ~0.5A (at 15V!) even when off with just their standby current! I guess 0.8ma per led adds up when there are 1920 of them... There's a seperate step-down converter in the controller which avoids software freezes and glitches ~~if~~ when the leds draw too much current and dip the voltage. 
 
-The connection for the LEDs is an ethernet cable, like with the [Teensy OctoWS2811](https://www.pjrc.com/store/octo28_adaptor.html). In theory, you should be able to connect an OctoWS2811 directly to the daughter board without any issues since I've used the same circuit as the octoboard to output data lines from the Teensy. 
+The connection for the LEDs is an ethernet cable, like with the [Teensy OctoWS2811](https://www.pjrc.com/store/octo28_adaptor.html). In theory, you should be able to connect an OctoWS2811 directly to the daughter board without any issues since I've used the same circuit as the octoboard to output data lines from the Teensy. Having 8 independent LED sections allowed 8 data wires for parallel output and a reasonable framerate, using a single dataline for 1920 LEDs would have resulted in a framerate < 10fps.  
 
 ![Daughter board](V4-daughterBoard.PNG)
 
@@ -71,16 +71,18 @@ To avoid an absolute rats nest of wires at the top and bottom of the strips (128
 
 
 ## Controller
-Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. Having 8 seperate LED sections allows for 8 data wires for parallel output and a reasonable framerate, using a single datalinefor 1920 LEDs would have a framerate <10fps. 
+Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. It's much nicer actually being able to see the screen and having a colour screen allowed for a preview of a colour palette. 
 
 ![Case](Controller-case.png)
 
 I wanted input controls similar to an ipod classic, but designing a capacitive encoder seemed overkill so I settled for a hollow encoder with a joystick in the centre. I was testing everything with an ESP32 initially, which worked okay but was missing some grunt. Around this time the Teensy 4.0 was released and it blew everything else out of the water performance wise, I pivoted over to use it instead and I'm so glad I did. 
 
-The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and transmit colours/patterns change messages to them. 
+The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and can transmit colour/pattern change messages to them. 
 
-<details>
-  <summary>Headbands details/photos</summary>
+The 
+
+<details open>
+  <summary>Headbands</summary>
   
   The headbands have a mere 14 LEDs on them in a waterproof casing, connected to a small circuit board that holds an ATTINY and an NRF24L01, powered by 2xAA batteries in a 3d printed case. The case is a little bulky, but has a nice curve that conforms to the back of your head. It's proven to be a pretty sturdy design, none of the 12 I made have broken yet... A couple patterns and the NRF code is at the limit of what the ATTINY can do, though it's impressive for a DIP8 chip! Technically powering the leds from 3V shouldn't work and I was prepared to squeeze a boost converter in there, but it somehow works without it! 
   
@@ -91,7 +93,7 @@ The controller has pinouts for a NRF24L01, I've used this to connect to a set of
 
 ## Previous versions
 ### Version 1  
-The initial design called for lasers shining on a crystal in the centre. This didn't work at all. Luckily I had added a handful of WS2812 leds at the last minute and tapped them to the bottom so it at least lit up somewhat brightly. I also had spray painted the pole and bowls which just made everything tacky - terrible!
+The initial design for a Totem poll called for lasers shining on a crystal in the centre, in an attempt to get a bunch of refraction and look interesting. This didn't work at all. Luckily I had added a handful of WS2812 leds around, and at the last minute tapped them to the bottom so it at least lit up somewhat brightly. I  had spray painted the pole and bowls which was a poor choice as it would rub off onto your hands and made everything tacky - truly terrible!
 
 ### Version 2 
 I scrapped the lasers, but went big on the LEDs which had worked the best. I found these excellent partially opaque polycarbonate shells 25cm in diameter, and tapped 9x strips of 8 WS2812 leds to the inside of it. It was much better than V1, but the tape came loose during the festival and some of the strips weren't always sitting up against the shell. This looked better than and ended up giving a nice diffuser effect to these lights to make them less of a pinpoint of light, giving me the inspiration for V3. 
