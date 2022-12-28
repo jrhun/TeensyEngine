@@ -7,6 +7,12 @@ TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*
 Included in this repository is a description of both the hardware and software features, and eventually the MCAD/ECAD designs for everything.
 It includes an emulator that's using OpenFrameworks for display and UI control, allowing easy testing and development.
 
+<details>
+<summary> *The Orb* in the wild </summary>
+
+![totem crowd](buildLog/totemCrowd.jpg)
+
+</details>
 
 ## Contents 
 - [About](#about)
@@ -17,16 +23,18 @@ It includes an emulator that's using OpenFrameworks for display and UI control, 
 
 
 ## About
-I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball that was then placed on top of a stick and hooked up to a microprocessor and battery pack. Shockingly, it worked quite well! I use it as a Totem Pole primarily music festivals, come say hi if you see it!
+I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball that was then placed on top of a stick and hooked up to a microprocessor and battery pack. Shockingly, it worked quite well! I use it as a Totem Pole for music festivals, come say hi if you see it!
 
 This has been a multiyear endevour that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions
 
 Just a heads up - I'm a completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
 I will glady take any suggestions or tips to improve my work, please comment any suggestions!
-![description](buildLog/totemPoleDescription.png)
+
 
 
 ## Features
+
+![description](buildLog/totemPoleDescription.png)
 - 25+ different patterns with the ability to change the colour pallete being used for most patterns!
 - Custom global blur/fade/glitter effects that can run on top of any pattern
 - Text overlay onto patterns with the ability to enter custom text using the controller
@@ -37,7 +45,16 @@ I will glady take any suggestions or tips to improve my work, please comment any
 - Microphone input 
 - Wireless compatibility with NRF24L01 or ESP-01
 
+<details open>
+<summary> Videos of patterns on the hardware </summary>
+
 https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-94cc-6f29fc267113.mp4
+
+https://user-images.githubusercontent.com/25134458/209741537-4713a7b6-7f0b-4868-8ff8-e278ab186450.mp4
+
+https://user-images.githubusercontent.com/25134458/209743201-d97811d2-97b1-4fea-91a2-2c5a3d3df347.mp4
+
+</details>
 
 ## Hardware
 Some photos of the completed project can be found [here](buildLog/README.md).
@@ -58,14 +75,14 @@ A teensy 4.0 is the heart of the project, providing plenty of raw power to overc
 If trying to make this project, please confirm the pinout matches for the display and accelerometer! I got caught out and assumed they were the same for the two almost identical accelerometers I had, then needed to edit the circuit board. Also the linear regulator for the processor 5V line got way too hot so I changed it for a small buck convertor that (roughly) matched it's footprint. To be honest the circuit board could be redone with a teensy 4.1, as soldering the pogo pins to connect to the back of the teensy 4.0 was very tedious. 
 
 #### Lights
-Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV. They're also held in place under slight compression from the globe. I won't lie, it took a long time to cut/strip the wires and solder everything all together, I probably didn't need to but I also added extra connections in the middle of the strips for power/ground and stability in holding everything in place. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md) for photos. 
+Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV. They're also held in place under slight compression from the globe. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md#leds) for photos. 
 
 The lights are from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), and were chosen for their high density (120/M, 8.33mm pitch) and thin strips (6mm width). 
 Lights with a smaller pitch and thinner stip were outrageously expensive at the time I was purchasing LEDs, but have since come down in price somewhat... Version 5 [TBC](https://www.aliexpress.com/item/1005003798198621.html?spm=a2g0o.productlist.main.1.1ec91845yMUVny&algo_pvid=75d3a123-2f4a-48b9-b82f-fbbad28e56ed&algo_exp_id=75d3a123-2f4a-48b9-b82f-fbbad28e56ed-0&pdp_ext_f=%7B%22sku_id%22%3A%2212000028080815414%22%7D&pdp_npi=2%40dis%21AUD%2140.15%2126.11%21%21%21%21%21%40211bf14716719782508633629d0742%2112000028080815414%21sea&curPageLogUid=63plojRdJNp2)?
 
 #### Power
 The whole thing is powered by 4x 18650 batteries, I usually carry a spare set of 4x batteries for each night that it's used which usually lasts the night through.
-There's a step-down converter in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a seperate Pololu [D24V150F5](https://www.pololu.com/product/2881) Step-down convertor. The benefit of the two power supplies is efficiency and stability - it avoids the much higher current that would be needed from sending 5V to the LEDs (and the voltage drop since it's a decent 1M run!), and a seperate and stable power source for the controller that doesn't dip when the LEDs draw a bunch of power. It also means I can provide much more power than most USB powerbanks, although I do want to try sending 20v from a 100w USB C powerbank to the leds.
+There's a step-down converter in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a seperate step-down convertor. The benefit of the two power supplies is efficiency and stability, having a seperate power source for the controller means its voltage doesn't dip when the LEDs draw a bunch of power. It also means I can provide much more power than *most* USB powerbanks, although I do want to try sending 20v from a 100w USB-C powerbank to the leds. Further details in the [build section](buildLog/README.md#power)
 
 
 ## Software
@@ -73,11 +90,10 @@ The software include a basic emulator that runs the same UI and pattern software
 
 I've tried to organise the UI controls into roughly similar pages.
 
-<details>
-  <summary>Videos</summary>
+<details open>
+  <summary>Videos of the controller</summary>
  
   https://user-images.githubusercontent.com/25134458/209736586-94fa050d-8a2f-43fb-920e-38acb0f2c6ba.mp4
-
   
   https://user-images.githubusercontent.com/25134458/209676572-e61da54b-b9a8-4b95-bfd1-fcbd3a2c399e.mp4
   
