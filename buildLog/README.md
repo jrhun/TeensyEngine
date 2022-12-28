@@ -48,7 +48,7 @@ https://user-images.githubusercontent.com/25134458/209641775-9f14f9cc-60d3-4ed1-
 
 Once I had each section built and connected, they needed to somehow be placed inside the shell and properly lined up. It was like building a ship in a bottle, but with a bit of a squeeze all 8 sections were somehow in and connected up to the bottom support to hold them in place. 
 
-![Inside](V4-inside2.jpg)
+![Inside](V4-inside2.JPG)
 
 
 I'm really happy with how the diffusion turned out, the lights are held back almost the perfect distance. 
@@ -80,7 +80,7 @@ I wanted input controls similar to an ipod classic, but designing a capacitive e
 The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and transmit colours/patterns change messages to them. 
 
 <details>
-  <summary>Headbands</summary>
+  <summary>Headbands details/photos</summary>
   
   The headbands have a mere 14 LEDs on them in a waterproof casing, connected to a small circuit board that holds an ATTINY and an NRF24L01, powered by 2xAA batteries in a 3d printed case. The case is a little bulky, but has a nice curve that conforms to the back of your head. It's proven to be a pretty sturdy design, none of the 12 I made have broken yet... A couple patterns and the NRF code is at the limit of what the ATTINY can do, though it's impressive for a DIP8 chip! Technically powering the leds from 3V shouldn't work and I was prepared to squeeze a boost converter in there, but it somehow works without it! 
   
