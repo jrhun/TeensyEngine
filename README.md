@@ -8,7 +8,8 @@ Included in this repository is a description of both the hardware and software f
 It includes an emulator that's using OpenFrameworks for display and UI control, allowing easy testing and development.
 
 <details>
-<summary> *The Orb* in the wild </summary>
+<summary>  The Orb in the wild 
+</summary>
 
 ![totem crowd](buildLog/totemCrowd.jpg)
 
@@ -25,17 +26,17 @@ It includes an emulator that's using OpenFrameworks for display and UI control, 
 ## About
 I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball that was then placed on top of a stick and hooked up to a microprocessor and battery pack. Shockingly, it worked quite well! I use it as a Totem Pole for music festivals, come say hi if you see it!
 
-This has been a multiyear endevour that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions
+This has been a multiyear endeavour  that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions)
 
-Just a heads up - I'm a completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
-I will glady take any suggestions or tips to improve my work, please comment any suggestions!
+Just a heads up - I'm an almost completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
+I will gladly take any suggestions or tips to improve my work, please comment any suggestions!
 
 
 
 ## Features
 
 ![description](buildLog/totemPoleDescription.png)
-- 25+ different patterns with the ability to change the colour pallete being used for most patterns!
+- 25+ different patterns with the ability to change the colour palette being used for most patterns!
 - Custom global blur/fade/glitter effects that can run on top of any pattern
 - Text overlay onto patterns with the ability to enter custom text using the controller
 - LCD Screen for changing settings/patterns + showing battery voltage and power usage
@@ -59,13 +60,13 @@ https://user-images.githubusercontent.com/25134458/209743201-d97811d2-97b1-4fea-
 
 ## Hardware
 Some photos of the completed project can be found [here](buildLog/README.md).
-I made a custom circuit board for connecting everything up along with a daughter board for [powering](#Power) the leds and providing the data through a CAT5 cable. 
+I made a custom circuit board for connecting everything up along with a daughter board for [powering](#Power) the LEDs and providing the data through a CAT5 cable. 
 
 #### Processor
-A teensy 4.0 is the heart of the project, providing plenty of raw power to overcome my inefficient coding and push out LEDs while controling a UI.
+A teensy 4.0 is the heart of the project, providing plenty of raw power to overcome my inefficient coding and push out LEDs while controlling  a UI.
 
 #### Accessories
-- Microphone - I can't remember what I'm using, one of the sparkfun electret autogain boards. 
+- Microphone - I can't remember what I'm using, one of the Sparkfun electret autogain boards. 
 - NRF24l01 - used to connect wirelessly to LED headbands - allows you to change the patterns/brightness/colour of the headbands!
 - ESP-01 - pins to connect to an ESP are broken out but not yet implemented
 - ACS712 current sensor in series with the LEDs to measure power usage
@@ -76,18 +77,18 @@ A teensy 4.0 is the heart of the project, providing plenty of raw power to overc
 If trying to make this project, please confirm the pinout matches for the display and accelerometer! I got caught out and assumed they were the same for the two almost identical accelerometers I had, then needed to edit the circuit board. Also the linear regulator for the processor 5V line got way too hot so I changed it for a small buck convertor that (roughly) matched it's footprint. To be honest the circuit board could be redone with a teensy 4.1, as soldering the pogo pins to connect to the back of the teensy 4.0 was very tedious. 
 
 #### Lights
-Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a sphereical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV. They're also held in place under slight compression from the globe. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md#leds) for photos. 
+Custom 3d printed scaffolding for strips of SK6805-2427 RGB LEDs, to hold them in a spherical shape inside a polycarbonate ball 25cm in diameter. They're held slightly back from the inside of the sphere to help diffuse the lights nicely. The scaffolding press fits together and tolerances were set for my 3d printer - YUMV. They're also held in place under slight compression from the globe. The LED strips are arranged as 30 to a strip with an offset pattern to reduce crowding at the poles, allowing for an effective resolution of 32H x 64W. See the [build details](buildLog/README.md#leds) for photos. 
 
 The lights are from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), and were chosen for their high density (120/M, 8.33mm pitch) and thin strips (6mm width). 
-Lights with a smaller pitch and thinner stip were outrageously expensive at the time I was purchasing LEDs, but have since come down in price somewhat... Version 5 [TBC](https://www.aliexpress.com/item/1005003798198621.html?spm=a2g0o.productlist.main.1.1ec91845yMUVny&algo_pvid=75d3a123-2f4a-48b9-b82f-fbbad28e56ed&algo_exp_id=75d3a123-2f4a-48b9-b82f-fbbad28e56ed-0&pdp_ext_f=%7B%22sku_id%22%3A%2212000028080815414%22%7D&pdp_npi=2%40dis%21AUD%2140.15%2126.11%21%21%21%21%21%40211bf14716719782508633629d0742%2112000028080815414%21sea&curPageLogUid=63plojRdJNp2)?
+Lights with a smaller pitch and thinner strip were outrageously expensive at the time I was purchasing LEDs, but have since come down in price somewhat... Version 5 [TBC](https://www.aliexpress.com/item/1005003798198621.html?spm=a2g0o.productlist.main.1.1ec91845yMUVny&algo_pvid=75d3a123-2f4a-48b9-b82f-fbbad28e56ed&algo_exp_id=75d3a123-2f4a-48b9-b82f-fbbad28e56ed-0&pdp_ext_f=%7B%22sku_id%22%3A%2212000028080815414%22%7D&pdp_npi=2%40dis%21AUD%2140.15%2126.11%21%21%21%21%21%40211bf14716719782508633629d0742%2112000028080815414%21sea&curPageLogUid=63plojRdJNp2)?
 
 #### Power
 The whole thing is powered by 4x 18650 batteries, I usually carry a spare set of 4x batteries for each night that it's used which usually lasts the night through.
-There's a step-down converter in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a seperate step-down convertor. The benefit of the two power supplies is efficiency and stability, having a seperate power source for the controller means its voltage doesn't dip when the LEDs draw a bunch of power. It also means I can provide much more power than *most* USB powerbanks, although I do want to try sending 20v from a 100w USB-C powerbank to the leds. Further details in the [build section](buildLog/README.md#power)
+There's a step-down converter in the controller providing 5V for the teensy and accessories. The full battery voltage is sent up to the LEDs where there is a separate step-down convertor. The benefit of the two power supplies is efficiency and stability, having a separate power source for the controller means its voltage doesn't dip when the LEDs draw a bunch of power. It also means I can provide much more power than *most* USB powerbanks, although I do want to try sending 20v from a 100w USB-C powerbank to the LEDs. Further details in the [build section.](buildLog/README.md#power)
 
 
 ## Software
-The software include a basic emulator that runs the same UI and pattern software using Openframeworks to display the LEDs. 
+The software include a basic emulator that runs the same UI and pattern software using OpenFrameworks to display the LEDs. 
 
 <details open>
   <summary>Videos of the controller</summary>
@@ -108,15 +109,15 @@ I've tried to organise the UI controls into roughly similar pages. The current b
   - Change the tempo oscillator between square/ramp/sine etc...
   - Trigger ability to change a patterns settings (e.g. trigger different settings for a pattern without making a complete new one, see )
 - **Colour controls**
-  - Change current pallete with a palette preview option
-  - Blend amount when changing palletes over - quick or slow blend
+  - Change current palette with a palette preview option
+  - Blend amount when changing palette  over - quick or slow blend
   - Change how fast colours from a palette are cycled through
-- **Text/Fx controls**
+- **Text/FX controls**
   - Add transparent or opaque text over any pattern, or just blink text 
   - Text scroll speed
   - Select the text from a list or enter custom text (12 char max only!)
   - Global blur/fade/glitter effects
-- **Wireless controlls**
+- **Wireless controls**
   - Control the wireless headbands I made using NRF24L01 communication
   - Change the pattern/colour/brightness of headbands in range
 - **General settings**
@@ -133,7 +134,7 @@ Include the code for a new pattern in `src/patterns/PatternController.h`, then a
 <details>
 <summary>Example pattern</summary>
   
-#### Blink all leds on/off
+#### Blink all LEDs on/off
   ```
   class PatternBlink : public _Pattern {
   public:
@@ -173,27 +174,27 @@ Arduino libraries used:
 https://user-images.githubusercontent.com/25134458/209675905-0a1664af-fdfa-492f-b072-93c58537c89a.mp4
 
 #### Requirements 
-Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
+OpenFrameworks 0.10.1 was used for the graphics, with the ofxGui addon.
 
 Visual Studio 2019 was used for compiling.
-At one point I had it compiling on mac xcode, but I haven't checked if that still works in a while.
+At one point I had it compiling on Mac XCode, but I haven't checked if that still works in a while.
 
 <details open>
   <summary>The emulator has keyboard controls for the UI:</summary>
   
   - WASD: joystick up/left/down/right
-  - Q/E: encoder rotate clockwise/counterclockwise
+  - Q/E: encoder rotate clockwise/counter clockwise
   - F: joystick press 
-  - space: seperate trigger, triggers effect on certain patterns (calls Pattern::Trigger())
+  - space: separate trigger, triggers effect on certain patterns (calls Pattern::Trigger())
   - Home/End/Del/PgDown: change pitch/roll level to emulate accelerometer changes
   - I: add random impulse to accelerometer data
   - 1 through 7: change beat type (RAMP, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, AUDIO, AUDIO_AVG, OFF)
 </details>
 
-## Todo list
+## To-do list
 - [ ] Add more photos of the completed totem to the build log
 - [ ] More patterns
-- [ ] Accelerometer fluid simulation - I've had multiple attemps but it just doesn't look right, a little beyond my abilites currently!
+- [ ] Accelerometer fluid simulation - I've had multiple attempts but it just doesn't look right, a little beyond my abilities currently!
 - [ ] More audio responsive patterns/improving audio code
 - [ ] More patterns to respond to accelerometer 
 - [ ] Make better use of global effects - the LEDs are double buffered but this is only really used for text currently
