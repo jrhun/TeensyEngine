@@ -53,6 +53,7 @@ Once I had each section built and connected, they needed to somehow be placed in
 
 I'm really happy with how the diffusion effect turned out, the lights are held back at almost the perfect distance. 
 
+https://user-images.githubusercontent.com/25134458/209674595-40512c94-f8f8-4173-94cc-6f29fc267113.mp4
 
 
 ## Power
@@ -65,7 +66,7 @@ The connection for the LEDs is an ethernet cable, like with the [Teensy OctoWS28
 ![Daughter board](V4-daughterBoard.PNG)
 
 
-To avoid an absolute rats nest of wires at the top and bottom of the strips (128 wires for power/ground + data lines... no thanks!). I injected power into the middle of the strips. Each section of 8 gets a data/power/ground connection from the daughter board, which goes to a piece of protoboard with a capacitor and 8 ground/power wires for each strip. 
+To avoid an absolute rats nest of wires at the top and bottom of the strips (128 wires for power/ground + data lines... no thanks!), I injected power into the middle of the strips. Each section of 8x strips (8 sections total) gets a data/power/ground connection from the daughter board, which goes to a small piece of protoboard with a capacitor and 8 ground/power wires for each strip. 
 
 ![Inside](V4-inside.jpg)
 
