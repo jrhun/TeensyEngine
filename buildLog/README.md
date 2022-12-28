@@ -71,7 +71,7 @@ To avoid an absolute rats nest of wires at the top and bottom of the strips (128
 
 
 ## Controller
-Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. It's much nicer actually being able to see the screen and having a colour screen allowed for a preview of a colour palette. 
+Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless due to it's small size and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. It's much nicer actually being able to see the screen and having a colour screen allowed for a preview of the colour palettes. 
 
 ![Case](Controller-case.png)
 
@@ -79,10 +79,8 @@ I wanted input controls similar to an ipod classic, but designing a capacitive e
 
 The controller has pinouts for a NRF24L01, I've used this to connect to a set of headbands I made and can transmit colour/pattern change messages to them. 
 
-The 
-
 <details open>
-  <summary>Headbands</summary>
+  <summary>Headbands details/photos</summary>
   
   The headbands have a mere 14 LEDs on them in a waterproof casing, connected to a small circuit board that holds an ATTINY and an NRF24L01, powered by 2xAA batteries in a 3d printed case. The case is a little bulky, but has a nice curve that conforms to the back of your head. It's proven to be a pretty sturdy design, none of the 12 I made have broken yet... A couple patterns and the NRF code is at the limit of what the ATTINY can do, though it's impressive for a DIP8 chip! Technically powering the leds from 3V shouldn't work and I was prepared to squeeze a boost converter in there, but it somehow works without it! 
   
