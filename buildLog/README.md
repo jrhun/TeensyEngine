@@ -28,12 +28,12 @@ One of the 8 sections printed.
 ![Scaffolding](V4-scaffolding1.PNG)
 
 
-You can *just* see how the leds are offset from each other to make space at the top/bottom. These are SK6805-2427 RGB LEDs from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), the strips have a pitch of 8.33mm (120 leds per metre), and are only 6mm wide! In total I used 64x strips of 30, with seperate power and data lines to each section of 8x strips. 
+These are SK6805-2427 RGB LEDs from [Aliexpress](https://www.aliexpress.com/item/32818340106.html?spm=a2g0o.order_list.order_list_main.358.679f1802EQyb32), the strips have a pitch of 8.33mm (120 leds per metre), and are only 6mm wide! In total I used 64x strips of 30, with seperate power and data lines to each section of 8x strips. 
 
 ![Scaffolding](V4-scaffolding2.PNG)
 
 
-Test fit of everything together. 
+Test fit of everything together. You can see how the leds are offset from each other to make space at the top/bottom. 
 
 ![Scaffolding](V4-Scaffolding3.PNG)
 
@@ -71,7 +71,7 @@ To avoid an absolute rats nest of wires at the top and bottom of the strips (128
 
 
 ## Controller
-Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. The LEDs had 8 data wires to allow for parallel output and a reasonable framerate, using a single dataline would have a framerate around 10fps. 
+Version 3 had one of the tiny 128x64 oled screens on it, it was almost useless and was also only monochrome. I found a much larger 240x360 colour TFT that was the basis for the new controller. Having 8 seperate LED sections allows for 8 data wires for parallel output and a reasonable framerate, using a single datalinefor 1920 LEDs would have a framerate <10fps. 
 
 ![Case](Controller-case.png)
 
