@@ -45,6 +45,7 @@ I will glady take any suggestions or tips to improve my work, please comment any
 - Microphone input 
 - Wireless compatibility with NRF24L01 or ESP-01
 
+
 <details open>
 <summary> Videos of patterns on the hardware </summary>
 
@@ -179,7 +180,7 @@ Openframeworks 0.10.1 was used for the graphics, with the ofxGui addon.
 Visual Studio 2019 was used for compiling.
 At one point I had it compiling on mac xcode, but I haven't checked if that still works in a while.
 
-<details>
+<details open>
   <summary>The emulator has keyboard controls for the UI:</summary>
   
   - WASD: joystick up/left/down/right
@@ -190,6 +191,15 @@ At one point I had it compiling on mac xcode, but I haven't checked if that stil
   - I: add random impulse to accelerometer data
   - 1 through 7: change beat type (RAMP, INVERSE_RAMP, TRIANGLE, SQUARE, SIN, TRIGGER, GATE, AUDIO, AUDIO_AVG, OFF)
 </details>
+
+## Todo list
+- [ ] Add more photos of the completed totem to the build log
+- [ ] More patterns
+- [ ] Accelerometer fluid simulation - I've had multiple attemps but it just doesn't look right, a little beyond my abilites currently!
+- [ ] More audio responsive patterns/improving audio code
+- [ ] More patterns to respond to accelerometer 
+- [ ] Make better use of global effects - the LEDs are double buffered but this is only really used for text currently
+- [ ] Rotatable 3d view of the totem in the emulator rather than displaying as a flat 2d matrix
 
 ## Credit 
 This project has taken inspiration from countless different sources. Please see [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for full details. 
