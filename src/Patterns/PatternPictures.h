@@ -194,8 +194,8 @@ void drawGrayscaleBitmapColour(int16_t x, int16_t y, const uint8_t bitmap[], int
 				// if closer to white then turn down saturation 
 				// clamp val at 128 minimum to keep from getting too dark 
 				// 0 - 127
-				uint8_t sat = 0; 
-				uint8_t val = 0; 
+				uint8_t sat = 0;
+				uint8_t val = 0;
 				//if (color > 127) {
 				//	// 128 - 255, val = 255, sat from 255 to 127
 				//	val = 255; 
@@ -205,7 +205,7 @@ void drawGrayscaleBitmapColour(int16_t x, int16_t y, const uint8_t bitmap[], int
 				//	sat = 255;
 				//	val = color + 127;
 				//}
-				CRGB c= CHSV(hue, 255, color);
+				CRGB c = CHSV(hue, 255, color);
 				gfx.putPixel((i + x) % SCREEN_WIDTH, j + y, c);
 			}
 		}
@@ -224,7 +224,7 @@ void drawRGBBitmap(int16_t x, int16_t y,
 			if (color != 0x0000) {
 				//treat black as alpha
 				if (hueShift == 0) {
-					gfx.putPixel(x + i, j + y, CRGB(pgm_read_byte(&gamma5[color >> 11]),
+					gfx.putPixel((x + i) % SCREEN_WIDTH, j + y, CRGB(pgm_read_byte(&gamma5[color >> 11]),
 						pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
 						pgm_read_byte(&gamma5[color & 0x1F])));
 				}
@@ -232,7 +232,7 @@ void drawRGBBitmap(int16_t x, int16_t y,
 					CRGB c = CRGB(pgm_read_byte(&gamma5[color >> 11]),
 						pgm_read_byte(&gamma6[(color >> 5) & 0x3F]),
 						pgm_read_byte(&gamma5[color & 0x1F]));
-					gfx.putPixel(x + i, j + y, gfx.rotate(c));
+					gfx.putPixel((x + i) % SCREEN_WIDTH, j + y, gfx.rotate(c));
 				}
 			}
 		}
@@ -248,10 +248,10 @@ void drawARGBBitmap(int16_t x, int16_t y,
 			uint16_t color = pgm_read_word(&bitmap[j * w + i]);
 			if (((color >> 15) & 0x01) == 1) { //if alpha 
 				uint8_t r = pgm_read_byte(&gamma5[(color >> 10) & 0x1F]);
-				uint8_t g = pgm_read_byte(&gamma5[(color >>  5) & 0x1F]);
-				uint8_t b = pgm_read_byte(&gamma5[(color >>  0) & 0x1F]);
+				uint8_t g = pgm_read_byte(&gamma5[(color >> 5) & 0x1F]);
+				uint8_t b = pgm_read_byte(&gamma5[(color >> 0) & 0x1F]);
 				uint16_t xPos = (flip) ? SCREEN_WIDTH - i - 1 : i;
-				gfx.putPixel((xPos + x) % SCREEN_WIDTH, j + y, CRGB(r,g,b));
+				gfx.putPixel((xPos + x) % SCREEN_WIDTH, j + y, CRGB(r, g, b));
 			}
 		}
 	}
@@ -266,7 +266,7 @@ void drawRGBBitmap24bit(int16_t x, int16_t y,
 	if (hueShift != 0) {
 		gfx.rotateCalculate(hueShift);
 	}
-	CRGB color; 
+	CRGB color;
 	for (int16_t j = 0; j < h; j++) {
 		for (int16_t i = 0; i < w; i++) {
 			uint32_t px = w * j * px_size + i * px_size;
@@ -279,15 +279,15 @@ void drawRGBBitmap24bit(int16_t x, int16_t y,
 			gfx.putPixel((i + x) % SCREEN_WIDTH, j + y, color);
 		}
 	}
-	
+
 
 }
 
-class PatternWorld: public _Pattern {
-public: 
+class PatternWorld : public _Pattern {
+public:
 	PatternWorld() : _Pattern("World") {}
 
-	
+
 
 	uint8_t drawFrame() {
 
@@ -295,19 +295,19 @@ public:
 		CRGB fg = CHSV(93, 255, 255);
 		static uint16_t offset = SCREEN_WIDTH;
 		static uint8_t offsetDelay = 0;
-//#if defined(ARDUINO)
-//		ledControl.drawGrayscaleBitmap(offset / 8, 0, world_64_32_8bit, 64, 32, fg, bg);
-//#else 
-//		
+		//#if defined(ARDUINO)
+		//		ledControl.drawGrayscaleBitmap(offset / 8, 0, world_64_32_8bit, 64, 32, fg, bg);
+		//#else 
+		//		
 		uint16_t buffidx = 0;
 		for (int16_t j = 0; j < SCREEN_HEIGHT; j++) {
 			for (int16_t i = 0; i < SCREEN_WIDTH; i++) {
 				CRGB colour = blend(bg, fg, (world_64_32_8bit[buffidx]));
 				buffidx++;
-				gfx.putPixel(((offset) + i + SCREEN_WIDTH) % SCREEN_WIDTH, j + 0, colour);
+				gfx.putPixel(((offset)+i + SCREEN_WIDTH) % SCREEN_WIDTH, j + 0, colour);
 			}
 		}
-//#endif
+		//#endif
 		offsetDelay = (offsetDelay + 1) % 6;
 		if (offsetDelay == 0)
 			offset--;
@@ -338,10 +338,10 @@ public:
 		uint16_t buffidx = 0;
 		for (int16_t j = 0; j < SCREEN_HEIGHT; j++) {
 			for (int16_t i = 0; i < SCREEN_WIDTH; i++) {
-				fg = gfx.getColour(-i - j/2);
+				fg = gfx.getColour(-i - j / 2);
 				CRGB colour = blend(bg, fg, (world_64_32_8bit[buffidx]));
 				buffidx++;
-				gfx.putPixel(((offset) + i ) % SCREEN_WIDTH, j + 0, colour);
+				gfx.putPixel(((offset)+i) % SCREEN_WIDTH, j + 0, colour);
 			}
 		}
 		//#endif
@@ -373,7 +373,7 @@ public:
 		gfx.fill(CRGB(90, 142, 245)); //mario background colour
 		//ground
 		for (uint8_t i = 0; i < 8; i++) {
-			drawARGBBitmap(SCREEN_WIDTH + i*8 - staticPos, groundPosY, mario_ground_8_8_16bit, 8, 8);
+			drawARGBBitmap(SCREEN_WIDTH + i * 8 - staticPos, groundPosY, mario_ground_8_8_16bit, 8, 8);
 		}
 		//bush
 		drawARGBBitmap(SCREEN_WIDTH + 7 - staticPos, 14, mario_bush_27_10_16bit, 27, 10);
@@ -399,7 +399,7 @@ public:
 			// jump counts down from 128
 			float v = 1.0 - float(jump) / float(jumpTime); // convert from 0 - 1
 			float yPos = 0;
-			
+
 			if (v < 0.4) {
 				yPos = myMap(v, 0.0, 0.4, 0, jumpHeight);
 			}
@@ -439,12 +439,159 @@ public:
 	const uint8_t jumpHeight = 7;
 	unsigned long lastFrameUpdate = 0;
 	uint8_t marioPosX = 33; //positions are from the top down 
-	uint8_t marioPosY = 9; 
+	uint8_t marioPosY = 9;
 	uint8_t cloudPosX = 42;
 	const uint8_t groundPosY = 24;
 	uint8_t staticPos = 0;
 
-	
+
+};
+
+
+
+static const uint16_t PROGMEM mushroom_12_11_16bit[132] = {
+	0x0000, 0x0000, 0x0000, 0xf821, 0xf821, 0xf821, 0xf821, 0xffff, 0xf821, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0x0000, 0x0000,
+	0x0000, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0x0000,
+	0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0xf821, 0xf821, 0xc042,
+	0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xffff, 0xc042,
+	0xf821, 0xf821, 0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0xffff, 0xf821, 0xf821, 0xf821, 0xc042,
+	0x0000, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xb5b6, 0xb5b6, 0xb5b6, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000
+};
+
+static const uint16_t PROGMEM mushroomNodots_12_11_16bit[132] = {
+	0x0000, 0x0000, 0x0000, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0x0000, 0x0000,
+	0x0000, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0x0000,
+	0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xc042,
+	0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xc042,
+	0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xf821, 0xc042,
+	0x0000, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0xc042, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xb5b6, 0xb5b6, 0xb5b6, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0xe73c, 0xe73c, 0xe73c, 0xb5b6, 0x0000, 0x0000, 0x0000, 0x0000
+};
+
+class PatternMushroom : public _Pattern {
+public:
+	PatternMushroom() : _Pattern("Mushrooms") {}
+
+	uint8_t drawFrame() {
+		_Pattern::drawFrame();
+		gfx.clear();
+
+		//angle = myMap(GuiVars1, 0, 2, 0, angleMax);
+		if (beat.getType() != beat.OFF) {
+			angle = myMap(*beat, 0, 2552, 0, angleMax/2);
+		}
+		else if (++angleCounter > 7) {
+			angleCounter = 0;
+			if (angle == 0) {
+				angle = angleMax;
+			}
+			else {
+				angle--;
+			}
+		}
+
+		if (++posCounter > 25) {
+			posCounter = 0;
+			pos = (pos + 1) % SCREEN_WIDTH;
+		}
+		uint8_t ybase = 12;
+
+		float yPos = 0;
+		if (jump) {
+			jump--;
+			// jump counts down from jumptime (100)
+			float v = 1.0 - float(jump) / float(jumpTime); // convert from 0 - 1
+
+			if (v < 0.4) {
+				yPos = myMap(v, 0.0, 0.4, 0, jumpHeight);
+			}
+			else if (v < 0.6) {
+				yPos = jumpHeight;
+			}
+			else {
+				yPos = myMap(v, 0.6, 1.0, jumpHeight, 0);
+			}
+		}
+		drawMushroom(pos, ybase - yPos);
+		drawMushroom((pos + 21) % SCREEN_WIDTH, ybase - yPos);
+		drawMushroom((pos + 42) % SCREEN_WIDTH, ybase - yPos);
+		return returnVal;
+	}
+
+	void drawMushroom(uint8_t x, uint8_t y) {
+		drawRGBBitmap(x, y, mushroom_12_11_16bit, 12, 11); //mushroom_12_11_16bit
+		//drawDots(x, y);
+	}
+
+	void drawDots(uint8_t xOffset, uint8_t yOffset) {
+		//12 x 4 size, 6 rows
+		// we want to top row to 'rotate' slower than the bottom rows, less dots on the top (like a sphere rotating)
+
+		uint8_t angle0 = myMap(angle, 0, angleMax, 0, 48); // visible from 6 to 16, 2 in loop %24
+		uint8_t angle1 = myMap((angle + 8) % angleMax, 0, angleMax, 0, 64); // visible from 4 to 18, 3 in loop %20
+		uint8_t angle2 = myMap((angle + 8) % angleMax, 0, angleMax, 0, 80); // visible from 2 to 20, 4 in loop %18
+		uint8_t angle3 = myMap((angle + 0) % angleMax, 0, angleMax, 0, 96); // visible from 0 to 24, 5 in loop %14
+		uint8_t angle4 = myMap((angle + 4) % angleMax, 0, angleMax, 0, 96); //
+		uint8_t angle5 = myMap((angle + 12) % angleMax, 0, angleMax, 0, 96); // 
+
+
+		if (angle0 % 16 >= 3 and angle0 % 16 <= 8) {
+			gfx.putPixel((xOffset + angle0 % 16) % SCREEN_WIDTH, yOffset + 0, CRGB::White);
+		}
+		//else if (angle0 >= (3 + 16) and angle0 <= (8 + 16)) {
+		//	gfx.putPixel((xOffset + angle0 - 16), yOffset + 0, CRGB::White);
+		//}
+		//else if (angle0 >= (3 + 32) and angle0 <= (8 + 32)) {
+		//	gfx.putPixel((xOffset + angle0 - 32), yOffset + 0, CRGB::White);
+		//}
+
+		if (angle1 % 12 >= 3 and angle1 % 12 <= 9) {
+			gfx.putPixel((xOffset + angle1 % 12) % SCREEN_WIDTH, yOffset + 1, CRGB::White);
+			//gfx.putPixel(xOffset + (angle1 + 8)% 10, yOffset + 1, CRGB::White);
+		}
+
+		//if (angle2 % 12 >= 1 and angle2 % 12 <= 10) {
+			//gfx.putPixel(xOffset + angle2 % 12, yOffset + 2, CRGB::White);
+			//gfx.putPixel(xOffset + (angle2 +8 )% 10, yOffset + 2, CRGB::White);
+		//}
+
+
+		gfx.putPixel((xOffset + angle3 % 12) % SCREEN_WIDTH, yOffset + 3, CRGB::White);
+		gfx.putPixel((xOffset + (angle3 + 6) % 12) % SCREEN_WIDTH, yOffset + 3, CRGB::White);
+
+		
+		//gfx.putPixel(xOffset + angle4 % 12, yOffset + 4, CRGB::White);
+		//gfx.putPixel(xOffset + (angle4 + 6) % 12 , yOffset + 4, CRGB::White);
+
+		gfx.putPixel((xOffset + angle5 % 12) % SCREEN_WIDTH, yOffset + 5, CRGB::White);
+		gfx.putPixel((xOffset + (angle5 + 6)% 12) % SCREEN_WIDTH, yOffset + 5, CRGB::White);
+
+	}
+
+
+	void trigger() {
+		jump = jumpTime;
+	}
+	uint8_t pos = 0;
+	uint8_t posCounter = 0;
+	uint8_t jump = 0;
+	uint8_t jumpTime = 100;
+	const uint8_t jumpHeight = 7;
+
+	uint8_t angle = 0;
+	uint8_t angleMax = 255;
+	uint8_t angleCounter = 0;
+
+
 };
 
 
@@ -572,7 +719,7 @@ public:
 		//x = lerp8by8(x, myMap(irisPosX, -3, 3, 0, 255), 128);
 		//x = myMap(x, 0, 255, 0, irisHorizontalMovementMax*2);
 		if (random8(64) == 0) {
-			uint8_t x = random8(); 
+			uint8_t x = random8();
 			x = ease8InOutCubic(x / 2); //0 - 127 clustered around 0
 			x = 127 + (random8(1) == 0) ? x : -x; //0-255 clustered around 127
 			irisPosX = myMap(x, 0, 255, -2, 2);
@@ -583,11 +730,11 @@ public:
 			irisPosX = myMap(*beat, 0, 255, -irisHorizontalMovementMax, irisHorizontalMovementMax);
 		}
 		//eyebrowsOffestLeft = myMap(GuiVars3, 0, 2, 0, -3);
-		EyeState esLeft = EyeState::NORMAL; 
+		EyeState esLeft = EyeState::NORMAL;
 		EyeState esRight = EyeState::NORMAL;
 
 		if (blinkCounter) {
-			blinkCounter--; 
+			blinkCounter--;
 			float p = myMap(blinkCounter, 0, blinkCounterMax, 0, 1);
 			if (p > 0.90) {
 				esLeft = esRight = EyeState::NORMAL;
@@ -632,7 +779,7 @@ public:
 			float p = myMap(raiseEyebrowsCounter, 0, raiseEyebrowsCounterMax, 0, 1);
 			if (p > 0.85) {
 				eyebrowsOffestLeft = eyebrowsOffestRight = -1;
-				ms = MouthState::NEUTRAL; 
+				ms = MouthState::NEUTRAL;
 			}
 			else if (p > 0.70) {
 				eyebrowsOffestLeft = eyebrowsOffestRight = -2;
@@ -650,14 +797,14 @@ public:
 				eyebrowsOffestLeft = eyebrowsOffestRight = -1;
 				ms = MouthState::NEUTRAL;
 			}
-			
+
 		}
 
 
 
 		//uint8_t ms = myMap(GuiVars1, 0, 2, 0, MouthState::SMILE4 + 1);
-		
-		if ((random8() == 0) and  (random8(2) == 0) and mouthCounter == 0 and raiseEyebrowsCounter == 0) {
+
+		if ((random8() == 0) and (random8(2) == 0) and mouthCounter == 0 and raiseEyebrowsCounter == 0) {
 			//change to new mouth position 
 			mouthTargetState = (MouthState)myMap(random8(), 0, 255, 0, MouthState::SMILE4);
 			mouthCounter = mouthCounterMax;
@@ -671,7 +818,7 @@ public:
 			}
 			else if (i > 0.3) {
 				//hold
-				ms = mouthTargetState; 
+				ms = mouthTargetState;
 			}
 			else {
 				//go to baseState
@@ -702,8 +849,8 @@ public:
 
 		eyebrowsOffestLeft = 0;
 		eyebrowsOffestRight = 0;
-		
-		
+
+
 
 		return returnVal;
 
@@ -713,9 +860,9 @@ public:
 		raiseEyebrowsCounter = raiseEyebrowsCounterMax;
 	}
 
-	uint8_t leftEyeX = 3; 
+	uint8_t leftEyeX = 3;
 	uint8_t rightEyeX = 14;
-	uint8_t eyeY = 9; 
+	uint8_t eyeY = 9;
 	uint8_t eyeIrisOffestLeftX = 4;
 	uint8_t eyeIrisOffestRightX = 4;
 	uint8_t eyeIrisOffestY = 1;
@@ -724,11 +871,11 @@ public:
 	int8_t eyebrowOffsetY = -3;
 
 	uint8_t mouthOffsetX = 3;
-	uint8_t mouthOffsetY = 10; 
+	uint8_t mouthOffsetY = 10;
 
 	int8_t irisPosX = 0;
-	uint8_t irisHorizontalMovementMax = 3; 
-	int8_t irisPosY = 0; 
+	uint8_t irisHorizontalMovementMax = 3;
+	int8_t irisPosY = 0;
 	uint8_t irisVerticalMovementMax = 1;
 	int8_t eyebrowsOffestLeft = 0;
 	int8_t eyebrowsOffestRight = 0;
@@ -739,7 +886,7 @@ public:
 	uint8_t winkCounterMax = 50;
 	uint8_t raiseEyebrowsCounter = 0;
 	uint8_t raiseEyebrowsCounterMax = 120;
-	uint16_t mouthCounter = 0; 
+	uint16_t mouthCounter = 0;
 	uint16_t mouthCounterMax = 260;
 
 	enum MouthState {
@@ -818,7 +965,7 @@ public:
 		//colour 192, 204, 222, tongue (210, 84, 96), tongue inner (230, 130, 140)
 		CRGB mouthColour = CRGB(192, 204, 222);//CRGB(192, 204, 222);
 		CRGB mouthInnerColour = CRGB(230, 230, 230);
-		CRGB tongueColour = CRGB(210, 84, 96); 
+		CRGB tongueColour = CRGB(210, 84, 96);
 		CRGB tongueColourInner = CRGB(230, 130, 140);
 
 		uint8_t posX = mouthOffsetX + leftEyeX;
@@ -826,7 +973,7 @@ public:
 
 
 		if (m == MouthState::NEUTRAL) {
-			gfx.drawLine(posX + 6, posY + 2, posX + 6, posY + 2, mouthColour); 
+			gfx.drawLine(posX + 6, posY + 2, posX + 6, posY + 2, mouthColour);
 			gfx.drawLine(posX + 7, posY + 3, posX + 11, posY + 3, mouthColour);
 			gfx.drawLine(posX + 12, posY + 2, posX + 12, posY + 2, mouthColour);
 		}
@@ -849,12 +996,12 @@ public:
 			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
 			gfx.drawLine(posX + 7, posY + 3, posX + 11, posY + 3, mouthInnerColour);
 			gfx.drawLine(posX + 7, posY + 4, posX + 11, posY + 4, mouthColour);
-			
+
 		}
-		
+
 		else if (m == MouthState::SMILE4) {
 			//make more narrow
-			gfx.putPixel(posX+2, posY, mouthColour);
+			gfx.putPixel(posX + 2, posY, mouthColour);
 			gfx.putPixel(posX + 16, posY, mouthColour);
 			gfx.drawLine(posX + 3, posY + 1, posX + 15, posY + 1, mouthColour);
 
@@ -881,9 +1028,9 @@ public:
 			gfx.drawLine(posX + 5, posY + 2, posX + 5, posY + 2, mouthColour);
 			gfx.drawLine(posX + 6, posY + 3, posX + 12, posY + 3, mouthColour);
 			gfx.drawLine(posX + 13, posY + 2, posX + 13, posY + 2, mouthColour);
-			gfx.drawLine(posX + 8, posY + 4, posX + 12, posY + 4, tongueColour); 
+			gfx.drawLine(posX + 8, posY + 4, posX + 12, posY + 4, tongueColour);
 			gfx.drawLine(posX + 9, posY + 5, posX + 11, posY + 5, tongueColour);
-			gfx.putPixel(posX + 10, posY + 4, tongueColourInner); 
+			gfx.putPixel(posX + 10, posY + 4, tongueColourInner);
 
 		}
 		else if (m == MouthState::TONGUE2) {
@@ -926,7 +1073,7 @@ public:
 
 	//animations for eyes
 	//blink, wink, raise 1 eyebrow, raise both eyebrows
-	
+
 	//animations for mouth 
 	// resting, tongue out, smile 
 
@@ -1187,7 +1334,7 @@ static const uint8_t PROGMEM tulip_top5_6_6_24bit[] = {
 
 class PatternFlowers : public _Pattern {
 public:
-	PatternFlowers() : _Pattern("Flowers"), currentFlowerType(FlowerType::ROSES), targetFlowerType(FlowerType::ROSES){}
+	PatternFlowers() : _Pattern("Flowers"), currentFlowerType(FlowerType::ROSES), targetFlowerType(FlowerType::ROSES) {}
 
 	uint8_t drawFrame() {
 		_Pattern::drawFrame();
@@ -1206,25 +1353,25 @@ public:
 		currentFrame = CLAMP(currentFrame, 0, maxFrames - 1);
 
 		//change to only had subset of hues, avoid green and washed out colours
-		const uint8_t randomAmount = 10; 
+		const uint8_t randomAmount = 10;
 		uint8_t hue = FxFade;
 		if (currentFlowerType == FlowerType::ROSES) {
-			drawFlower((0 + flowerRotatePos) % SCREEN_WIDTH,	    0, currentFrame, hues[currentHue] + random8(randomAmount));
-			drawFlower((13 * 1 + flowerRotatePos) % SCREEN_WIDTH,	1, currentFrame, hues[(currentHue + 1) % maxHues] + random8(randomAmount));
-			drawFlower((13 * 2 + flowerRotatePos) % SCREEN_WIDTH,  0, currentFrame, hues[(currentHue + 2) % maxHues] + random8(randomAmount));
-			drawFlower((13 * 3 + flowerRotatePos) % SCREEN_WIDTH,  1, currentFrame, hues[(currentHue + 3) % maxHues] + random8(randomAmount));
-			drawFlower((13 * 4 + flowerRotatePos) % SCREEN_WIDTH,  0, currentFrame, hues[(currentHue + 4) % maxHues] + random8(randomAmount));
+			drawFlower((0 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, hues[currentHue] + random8(randomAmount));
+			drawFlower((13 * 1 + flowerRotatePos) % SCREEN_WIDTH, 1, currentFrame, hues[(currentHue + 1) % maxHues] + random8(randomAmount));
+			drawFlower((13 * 2 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, hues[(currentHue + 2) % maxHues] + random8(randomAmount));
+			drawFlower((13 * 3 + flowerRotatePos) % SCREEN_WIDTH, 1, currentFrame, hues[(currentHue + 3) % maxHues] + random8(randomAmount));
+			drawFlower((13 * 4 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, hues[(currentHue + 4) % maxHues] + random8(randomAmount));
 		}
 		else if (currentFlowerType == FlowerType::TULIPS) {
-			drawTulip((0 + flowerRotatePos) % SCREEN_WIDTH,	  0, currentFrame, huesTulip[(currentHue + 0) % maxHues] + random8(randomAmount));
+			drawTulip((0 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, huesTulip[(currentHue + 0) % maxHues] + random8(randomAmount));
 			drawTulip((13 * 1 + flowerRotatePos) % SCREEN_WIDTH, 1, currentFrame, huesTulip[(currentHue + 1) % maxHues] + random8(randomAmount));
 			drawTulip((13 * 2 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, huesTulip[(currentHue + 2) % maxHues] + random8(randomAmount));
 			drawTulip((13 * 3 + flowerRotatePos) % SCREEN_WIDTH, 1, currentFrame, huesTulip[(currentHue + 3) % maxHues] + random8(randomAmount));
 			drawTulip((13 * 4 + flowerRotatePos) % SCREEN_WIDTH, 0, currentFrame, huesTulip[(currentHue + 4) % maxHues] + random8(randomAmount));
 		}
 
-		
-		
+
+
 		//change hue at end of frame counter
 		frameCounter = (frameCounter + 1) % frameCounterMax;
 		if (frameCounter == 0) {
@@ -1236,7 +1383,7 @@ public:
 		//flowerRotateFrames++;
 		if (flowerRotateFrames > 30) {
 			flowerRotateFrames = 0;
-			flowerRotatePos = (flowerRotatePos + 1) % SCREEN_WIDTH; 
+			flowerRotatePos = (flowerRotatePos + 1) % SCREEN_WIDTH;
 		}
 
 		return returnVal;
@@ -1250,10 +1397,10 @@ public:
 		else {
 			drawRGBBitmap(flowerBaseOffsetX + x, flowerBaseOffsetY + y, flowerBase[frame], 10, 10);
 		}
-		
+
 
 		//drawGrayscaleBitmapColour(flowerTopOffsetX + x, flowerTopOffsetY + y, flowerTop[frame], 8, 11, hue);
-		
+
 		//darkest to lightest 
 		CRGB flower0 = CRGB(152, 25, 36); // CHSV(hue, 213, 153); //actual 
 		CRGB flower1 = CRGB(206, 36, 47);
@@ -1273,7 +1420,7 @@ public:
 		CRGB flowerCentre1 = CRGB(245, 198, 107);
 		CRGB flowerCentre2 = CRGB(244, 224, 162);
 		if (frame == 1) {
-			gfx.putPixel(flowerTopOffsetX + x + 6, flowerTopOffsetY + y + 10, flower0); 
+			gfx.putPixel(flowerTopOffsetX + x + 6, flowerTopOffsetY + y + 10, flower0);
 		}
 		else if (frame == 2) {
 			gfx.putPixel(flowerTopOffsetX + x + 5, flowerTopOffsetY + y + 5, flower1);
@@ -1331,9 +1478,9 @@ public:
 			gfx.putPixel(baseX + 3, baseY + 8, CRGB(25, 124, 5));
 			gfx.putPixel(baseX + 5, baseY + 7, CRGB(104, 218, 79));
 			//gfx.putPixel(baseX + 5, baseY + 8, CRGB(25, 124, 5));
-			
+
 			//flower
-			gfx.putPixel(baseX + 4, baseY + 6, gfx.rotate(CRGB(237,117,255)));
+			gfx.putPixel(baseX + 4, baseY + 6, gfx.rotate(CRGB(237, 117, 255)));
 		}
 		else if (frame == 2) {
 			//extra offset as saving space (cutting top part of base out)
@@ -1345,7 +1492,7 @@ public:
 
 		}
 		else if (frame == 3) {
-			const uint8_t additOffsetX = 1; 
+			const uint8_t additOffsetX = 1;
 			const uint8_t additOffsetY = 5;
 			drawRGBBitmap24bit(baseX, baseY, tulip_base3_8_10_24bit, 8, 10);
 			drawRGBBitmap24bit(topX + additOffsetX, topY + additOffsetY, tulip_top3_4_4_24bit, 4, 4, hue);
@@ -1371,9 +1518,9 @@ public:
 	const uint8_t maxFrames = 6;
 	uint16_t frameCounter = 0;
 	uint16_t frameCounterMax = 270;
-	
+
 	uint8_t flowerRotatePos = 0;
-	uint8_t flowerRotateFrames = 0; 
+	uint8_t flowerRotateFrames = 0;
 
 	uint8_t flowerBaseOffsetX = 1;
 	uint8_t flowerBaseOffsetY = 14;
@@ -1386,7 +1533,7 @@ public:
 	uint8_t tulipTopOffsetY = 8;
 
 	enum FlowerType {
-		ROSES, 
+		ROSES,
 		TULIPS
 	} currentFlowerType, targetFlowerType;
 

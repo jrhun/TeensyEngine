@@ -227,7 +227,7 @@ namespace Data {
   VariableReference textIndex_t{"Text", &textIndex, 0, 0, textOptionsCount};
   const String textOptions[textOptionsCount] = {
     "Dance!",
-    "Golden!",
+    "Floodlight",
     "Good job!",
     "Well done!",
     "Good tune!", 

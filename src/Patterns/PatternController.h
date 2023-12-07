@@ -79,6 +79,7 @@ public:
 	PatternMario		mario; 
 	PatternEyes			eyes; 
 	PatternFlowers		flowers;
+	PatternMushroom		mushroom;
 	PatternTest			test;
 
 	PatternSandSim		sandSim;
@@ -93,9 +94,10 @@ public:
 		//&checkers,
 
 		&blank,
-		&audio1,
+		//&audio1,
+		&mushroom,
 		&fireworks,
-		&fish,
+		
 		&particlesWater,
 		&dualWaves,
 		&purpleRain,
@@ -120,6 +122,7 @@ public:
 		&fire, 
 		&world,
 		&worldNoWater,
+		&fish,
 		&mario,
 		&eyes,
 		&flowers,
