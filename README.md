@@ -4,7 +4,7 @@ TeensyEngine is primarily the software I use for my Totem Pole - named *The Orb*
 
 ![gif](buildLog/firePattern.gif)
 
-Included in this repository is a description of both the hardware and software features, and eventually the MCAD/ECAD designs for everything.
+Included in this repository is a description of both the hardware and software features, including the MCAD/ECAD designs for everything.
 It includes an emulator that's using OpenFrameworks for display and UI control, allowing easy testing and development.
 
 <details>
@@ -26,7 +26,7 @@ It includes an emulator that's using OpenFrameworks for display and UI control, 
 ## About
 I took ~2000 LED lights and carefully shoved them inside a polycarbonate ball that was then placed on top of a stick and hooked up to a microprocessor and battery pack. Shockingly, it worked quite well! I use it as a Totem Pole for music festivals, come say hi if you see it!
 
-This has been a multiyear endeavour  that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/batery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions)
+This has been a multiyear endeavor  that I've slowly added more and more features to. It's the 4th iteration of the hardware including LEDs and controller/battery box. The first version was a couple of LEDs taped down inside two salad bowls - [how far this project has come since then!](buildLog/README.md#previous-versions)
 
 Just a heads up - I'm an almost completely self taught programmer/3d modeler/electronics designer, there is a level of *jank* at times that should be expected to come of that, but overall I've been very pleased with the outcome! 
 I will gladly take any suggestions or tips to improve my work, please comment any suggestions!
